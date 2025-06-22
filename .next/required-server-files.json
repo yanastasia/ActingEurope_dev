@@ -96,7 +96,7 @@
         "transform": "lodash/{{member}}"
       }
     },
-    "outputFileTracingRoot": "D:\\ActingEurope\\ActingEurope_dev",
+    "outputFileTracingRoot": "D:\\ActingEurope\\ActingEurope_dev\\ActingEurope_dev",
     "experimental": {
       "allowedDevOrigins": [],
       "nodeMiddleware": false,
@@ -175,7 +175,7 @@
       "forceSwcTransforms": false,
       "largePageDataBytes": 128000,
       "turbo": {
-        "root": "D:\\ActingEurope\\ActingEurope_dev"
+        "root": "D:\\ActingEurope\\ActingEurope_dev\\ActingEurope_dev"
       },
       "typedRoutes": false,
       "typedEnv": false,
@@ -281,7 +281,7 @@
     "bundlePagesRouterDependencies": false,
     "configFileName": "next.config.mjs"
   },
-  "appDir": "D:\\ActingEurope\\ActingEurope_dev",
+  "appDir": "D:\\ActingEurope\\ActingEurope_dev\\ActingEurope_dev",
   "relativeAppDir": "",
   "files": [
     ".next\\routes-manifest.json",

@@ -1,9 +1,9 @@
 {
+  "/_not-found/page": "app/_not-found/page.js",
   "/api/data/route": "app/api/data/route.js",
   "/api/news/route": "app/api/news/route.js",
-  "/api/users/route": "app/api/users/route.js",
   "/api/users/create/route": "app/api/users/create/route.js",
-  "/_not-found/page": "app/_not-found/page.js",
+  "/api/users/route": "app/api/users/route.js",
   "/about/page": "app/about/page.js",
   "/admin/news/page": "app/admin/news/page.js",
   "/admin/page": "app/admin/page.js",
