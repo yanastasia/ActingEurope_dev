@@ -91,7 +91,13 @@ export default function Navigation() {
       <div className="container flex h-16 items-center">
         <div className="mr-4 hidden md:flex">
           <Link href="/" className="mr-6 flex items-center space-x-2">
-            <Image src="/logo.png" alt="Acting Europe Logo" width={180} height={40} className="h-10 w-auto" priority />
+            <Image
+              src="/logo.png"
+              alt="Acting Europe logo"
+              width={100}
+              height={100}
+              className="dark:invert"
+            />
           </Link>
           <nav className="flex items-center space-x-6 text-sm font-medium">
             {routes.map((route) => (
@@ -117,7 +123,12 @@ export default function Navigation() {
           </SheetTrigger>
           <SheetContent side="left" className="pr-0">
             <Link href="/" className="flex items-center" onClick={() => setIsOpen(false)}>
-              <Image src="/logo.png" alt="Acting Europe Logo" width={160} height={36} className="h-9 w-auto" />
+            <Image
+              src="/logo.png"
+              alt="Acting Europe logo"
+              width={100}
+              height={100}
+            />
             </Link>
             <nav className="mt-8 flex flex-col space-y-3">
               {routes.map((route) => (
