@@ -13,7 +13,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from "@/hooks/use-toast"
 import { isAdminEmail, setAuthenticated, isAdmin } from "@/lib/auth"
 import { sendVerificationEmailAction } from "@/app/actions/email-actions"
-import { DatabaseStorage } from "@/lib/database-storage"
+import { ds, DatabaseStorage, Event } from "@/lib/database-storage"
 import { useLanguage } from "@/lib/language-context"
 
 interface AuthFormProps {

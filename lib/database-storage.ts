@@ -1,6 +1,21 @@
 // Enhanced localStorage-based database for persistent storage
 // This provides a more robust storage solution that persists data
 
+export interface Event {
+  id: string;
+  title: string;
+  eventType: "performance" | "workshop" | "discussion";
+  date: string;
+  time: string;
+  venue: string;
+  company: string;
+  description: string;
+  imageUrl: string;
+  isFeatured: boolean;
+  price: string;
+  tags: string[];
+}
+
 export interface StorageData {
   events: any[]
   venues: any[]
@@ -9,7 +24,7 @@ export interface StorageData {
   news: any[]
 }
 
-class DatabaseStorage {
+export class DatabaseStorage {
   private static instance: DatabaseStorage
   private storageKey = "actingEurope_database"
 
@@ -198,7 +213,8 @@ class DatabaseStorage {
     localStorage.removeItem(this.storageKey)
     this.initializeDatabase()
     console.log("All database data cleared and reinitialized.")
-  }
+}
+
   updateUser(updatedUser: any): void {
     const data = this.getData()
     const userIndex = data.users.findIndex((user: any) => user.id === updatedUser.id)
@@ -209,4 +225,4 @@ class DatabaseStorage {
   }
 }
 
-export const db = DatabaseStorage.getInstance()
+export const ds = DatabaseStorage.getInstance()

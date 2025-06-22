@@ -17,23 +17,9 @@ import { Calendar, Ticket, FileText, AlertTriangle, ShieldCheck, Pencil, Trash2,
 import { isAdmin } from "@/lib/auth"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/lib/language-context"
-import { ds, DatabaseStorage } from "@/lib/database-storage"
+import { ds, DatabaseStorage, Event } from "@/lib/database-storage"
 
-// Event type definition
-interface Event {
-  id: string
-  title: string
-  eventType: "performance" | "workshop" | "discussion";
-  date: string
-  time: string
-  venue: string
-  company: string
-  description: string
-  imageUrl: string
-  isFeatured: boolean
-  price: string
-  tags: string[] // Add tags array
-}
+
 
 // Venue type definition
 interface Venue {

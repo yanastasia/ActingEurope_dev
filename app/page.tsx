@@ -9,7 +9,7 @@ import CountdownTimer from "@/components/countdown-timer"
 import QuickLinkCard from "@/components/quick-link-card"
 import PerformanceCard from "@/components/performance-card"
 import { useLanguage } from "@/lib/language-context"
-import { DatabaseStorage } from "@/lib/database-storage"
+import { ds, DatabaseStorage, Event } from "@/lib/database-storage"
 
 export default function Home() {
   const { t } = useLanguage()
@@ -68,7 +68,7 @@ export default function Home() {
     };
 
     // Listen for database updates
-    const handleDatabaseUpdate = async (event: Event) => {
+    const handleDatabaseUpdate = async (event: CustomEvent<any>) => {
       const currentDbInstance = (event as CustomEvent).detail as DatabaseStorage;
       const updatedEvents = await currentDbInstance.getEvents();
       const updatedFeatured = updatedEvents.filter((event: any) => event.type === "performance" && event.isFeatured);
@@ -100,10 +100,10 @@ export default function Home() {
     };
 
     loadData();
-    window.addEventListener("databaseUpdated", handleDatabaseUpdate as EventListener);
+    window.addEventListener("databaseUpdated", handleDatabaseUpdate as unknown as EventListener);
 
     return () => {
-      window.removeEventListener("databaseUpdated", handleDatabaseUpdate as EventListener);
+      window.removeEventListener("databaseUpdated", handleDatabaseUpdate as unknown as EventListener);
     };
 
   }, [])

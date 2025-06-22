@@ -8,17 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { useLanguage } from "@/lib/language-context"
-import { ds, DatabaseStorage } from "@/lib/database-storage"
-
-interface Event {
-  id: string;
-  date: string;
-  time: string;
-  venue: string;
-  type: "performance" | "workshop" | "discussion";
-  title: string;
-  description: string;
-}
+import { ds, DatabaseStorage, Event } from "@/lib/database-storage"
 
 export default function ProgramPage() {
   const { t } = useLanguage()
@@ -39,7 +29,7 @@ export default function ProgramPage() {
         // Extract unique dates, venues, and types
         const uniqueDates = ["All Dates", ...new Set(events.map((event: any) => event.date))]
         const uniqueVenues = ["All Venues", ...new Set(events.map((event: any) => event.venue))]
-        const uniqueTypes = ["All Types", ...new Set(events.map((event: any) => event.type))]
+        const uniqueTypes = ["All Types", ...new Set(events.map((event: any) => event.eventType))]
 
         setDates(uniqueDates)
         setVenues(uniqueVenues)
@@ -56,7 +46,7 @@ export default function ProgramPage() {
       // Re-extract unique dates, venues, and types after update
       const uniqueDates = ["All Dates", ...new Set(updatedEvents.map((event: any) => event.date))]
       const uniqueVenues = ["All Venues", ...new Set(updatedEvents.map((event: any) => event.venue))]
-      const uniqueTypes = ["All Types", ...new Set(updatedEvents.map((event: any) => event.type))]
+      const uniqueTypes = ["All Types", ...new Set(updatedEvents.map((event: any) => event.eventType))]
 
       setDates(uniqueDates)
       setVenues(uniqueVenues)
@@ -74,7 +64,7 @@ export default function ProgramPage() {
     return (
       (selectedDate === "All Dates" || event.date === selectedDate) &&
       (selectedVenue === "All Venues" || event.venue === selectedVenue) &&
-      (selectedType === "All Types" || event.type === selectedType)
+      (selectedType === "All Types" || event.eventType === selectedType)
     )
   })
 
@@ -186,13 +176,13 @@ export default function ProgramPage() {
                               <MapPin className="mr-1 h-4 w-4" />
                               {event.venue}
                             </div>
-                            <Badge className={`mt-2 ${getBadgeColor(event.type)}`}>{t(event.type)}</Badge>
+                            <Badge className={`mt-2 ${getBadgeColor(event.eventType)}`}>{t(event.eventType)}</Badge>
                           </div>
                           <div className="p-4 md:w-3/4">
                             <h3 className="mb-2 text-lg font-semibold text-secondary-blue">{event.title}</h3>
                             <p className="mb-4 text-sm text-muted-foreground">{event.description}</p>
                             <div className="flex flex-wrap gap-2">
-                              {event.type === "performance" && (
+                              {event.eventType === "performance" && (
                                 <Button size="sm" asChild>
                                   <a href={`/tickets?event=${event.id}`}>{t("bookTicket")}</a>
                                 </Button>

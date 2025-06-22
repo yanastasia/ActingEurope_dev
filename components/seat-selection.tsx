@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/lib/language-context"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ds, DatabaseStorage } from "@/lib/database-storage"
+import { ds, DatabaseStorage, Event } from "@/lib/database-storage"
 import { isAdmin, isAuthenticated } from "@/lib/auth"
 
 interface SeatSelectionProps {
@@ -60,16 +60,16 @@ export default function SeatSelection({ venueId, onSeatsSelected, isUserAdmin = 
     loadVenue()
 
     // Listen for database updates
-    const handleDatabaseUpdate = async (event: Event) => {
+    const handleDatabaseUpdate = async (event: CustomEvent<any>) => {
       const currentDbInstance = (event as CustomEvent).detail as DatabaseStorage;
       const updatedVenues = await currentDbInstance.getVenues();
       setVenue(updatedVenues.find((v: Venue) => v.id === venueId.toString() || v.name === venueId) || null);
     }
 
-    window.addEventListener("databaseUpdated", handleDatabaseUpdate as EventListener)
+    window.addEventListener("databaseUpdated", handleDatabaseUpdate as unknown as EventListener)
 
     return () => {
-      window.removeEventListener("databaseUpdated", handleDatabaseUpdate as EventListener)
+      window.removeEventListener("databaseUpdated", handleDatabaseUpdate as unknown as EventListener)
     }
   }, [venueId])
 
