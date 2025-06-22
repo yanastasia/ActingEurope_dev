@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { useLanguage } from "@/lib/language-context"
-import { db } from "@/lib/database-storage"
+import { ds, DatabaseStorage } from "@/lib/database-storage"
 
 interface Event {
   id: string;
@@ -32,28 +32,41 @@ export default function ProgramPage() {
 
   // Load events from localStorage
   useEffect(() => {
-    const events = db.getEvents()
-    setEvents(events)
+      const fetchEvents = async () => {
+        const events = await ds.getEvents()
+        setEvents(events)
 
-    // Extract unique dates, venues, and types
-    const uniqueDates = ["All Dates", ...new Set(events.map((event: any) => event.date))]
-    const uniqueVenues = ["All Venues", ...new Set(events.map((event: any) => event.venue))]
-    const uniqueTypes = ["All Types", ...new Set(events.map((event: any) => event.type))]
+        // Extract unique dates, venues, and types
+        const uniqueDates = ["All Dates", ...new Set(events.map((event: any) => event.date))]
+        const uniqueVenues = ["All Venues", ...new Set(events.map((event: any) => event.venue))]
+        const uniqueTypes = ["All Types", ...new Set(events.map((event: any) => event.type))]
 
-    setDates(uniqueDates)
-    setVenues(uniqueVenues)
-    setTypes(uniqueTypes)
+        setDates(uniqueDates)
+        setVenues(uniqueVenues)
+        setTypes(uniqueTypes)
+      }
+      fetchEvents()
 
     // Listen for database updates
-    const handleDatabaseUpdate = () => {
-      const updatedEvents = db.getEvents()
-      setEvents(updatedEvents)
+    const handleDatabaseUpdate = async (event: CustomEvent<any>) => {
+      const currentDbInstance = (event as CustomEvent).detail as DatabaseStorage;
+      const updatedEvents = await currentDbInstance.getEvents();
+      setEvents(updatedEvents);
+
+      // Re-extract unique dates, venues, and types after update
+      const uniqueDates = ["All Dates", ...new Set(updatedEvents.map((event: any) => event.date))]
+      const uniqueVenues = ["All Venues", ...new Set(updatedEvents.map((event: any) => event.venue))]
+      const uniqueTypes = ["All Types", ...new Set(updatedEvents.map((event: any) => event.type))]
+
+      setDates(uniqueDates)
+      setVenues(uniqueVenues)
+      setTypes(uniqueTypes)
     }
 
-    window.addEventListener("databaseUpdated", handleDatabaseUpdate)
+    window.addEventListener("databaseUpdated", (event) => { handleDatabaseUpdate(event as CustomEvent<any>) })
 
     return () => {
-      window.removeEventListener("databaseUpdated", handleDatabaseUpdate)
+      window.removeEventListener("databaseUpdated", (event) => { handleDatabaseUpdate(event as CustomEvent<any>) })
     }
   }, [])
 

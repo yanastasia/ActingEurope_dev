@@ -47,7 +47,8 @@ const AdminNewsPage = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      setNewsArticles(data);
+      // Ensure data is an array, or access the newsArticles property if it's an object
+      setNewsArticles(Array.isArray(data) ? data : data.newsArticles || []);
     } catch (error) {
       console.error('Failed to fetch news articles:', error);
     }

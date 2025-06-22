@@ -1,0 +1,188 @@
+[
+  {
+    "id": 1,
+    "name": "Drama Theatre \"Krum Kyulyavkov\"",
+    "city": "Kyustendil",
+    "country": "Bulgaria",
+    "description": "A prominent regional theatre known for its innovative productions and commitment to Bulgarian dramatic arts.",
+    "history": "Founded in the mid-20th century, the theatre has been a cultural cornerstone of Kyustendil, presenting both classical and contemporary works while nurturing local talent. The theatre was named after Krum Kyulyavkov, a celebrated Bulgarian actor and director who significantly contributed to the development of Bulgarian theatre. Over the decades, it has maintained its reputation for artistic excellence and community engagement.",
+    "foundedYear": 1952,
+    "images": [
+      {
+        "id": 1,
+        "imageUrl": "/placeholder.svg?height=400&width=600&text=Krum+Kyulyavkov+Theatre",
+        "caption": "Main building facade",
+        "isPrimary": true
+      },
+      {
+        "id": 2,
+        "imageUrl": "/placeholder.svg?height=300&width=400&text=Theatre+Interior",
+        "caption": "Main auditorium",
+        "isPrimary": false
+      },
+      {
+        "id": 3,
+        "imageUrl": "/placeholder.svg?height=300&width=400&text=Stage+Performance",
+        "caption": "Recent performance",
+        "isPrimary": false
+      }
+    ],
+    "tags": [
+      "Regional Theatre",
+      "Bulgarian Drama",
+      "Contemporary Works",
+      "Community Theatre"
+    ]
+  },
+  {
+    "id": 2,
+    "name": "\"Ivan Vazov\" National Theatre",
+    "city": "Sofia",
+    "country": "Bulgaria",
+    "description": "Bulgaria's oldest and most prestigious theatre, serving as the national stage for dramatic arts.",
+    "history": "Established in 1904, the Ivan Vazov National Theatre is named after Bulgaria's national poet Ivan Vazov. It has been the premier venue for Bulgarian theatre, hosting legendary performances and international collaborations. The theatre building itself is an architectural masterpiece and a symbol of Bulgarian cultural identity. Throughout its history, it has been home to the most celebrated Bulgarian actors and directors.",
+    "foundedYear": 1904,
+    "images": [
+      {
+        "id": 4,
+        "imageUrl": "/placeholder.svg?height=400&width=600&text=Ivan+Vazov+National+Theatre",
+        "caption": "Historic building exterior",
+        "isPrimary": true
+      },
+      {
+        "id": 5,
+        "imageUrl": "/placeholder.svg?height=300&width=400&text=Grand+Hall",
+        "caption": "Grand auditorium",
+        "isPrimary": false
+      },
+      {
+        "id": 6,
+        "imageUrl": "/placeholder.svg?height=300&width=400&text=Classical+Performance",
+        "caption": "Classical drama performance",
+        "isPrimary": false
+      }
+    ],
+    "tags": [
+      "National Theatre",
+      "Classical Drama",
+      "Bulgarian Heritage",
+      "Historic Venue"
+    ]
+  },
+  {
+    "id": 3,
+    "name": "\"N. O. Masalitinov\" Plovdiv Drama Theatre",
+    "city": "Plovdiv",
+    "country": "Bulgaria",
+    "description": "One of Bulgaria's leading regional theatres, known for its diverse repertoire and artistic excellence.",
+    "history": "Named after the renowned Bulgarian actor Nikola Masalitinov, this theatre has been a cultural beacon in Plovdiv since its establishment in 1881, contributing significantly to Bulgarian theatrical heritage. The theatre has a rich tradition of presenting both Bulgarian and international works, and has been instrumental in developing theatrical arts in the region.",
+    "foundedYear": 1881,
+    "images": [
+      {
+        "id": 7,
+        "imageUrl": "/placeholder.svg?height=400&width=600&text=Masalitinov+Plovdiv+Theatre",
+        "caption": "Theatre building",
+        "isPrimary": true
+      },
+      {
+        "id": 8,
+        "imageUrl": "/placeholder.svg?height=300&width=400&text=Modern+Stage",
+        "caption": "Modern stage setup",
+        "isPrimary": false
+      }
+    ],
+    "tags": [
+      "Regional Theatre",
+      "Diverse Repertoire",
+      "Artistic Excellence",
+      "Cultural Heritage"
+    ]
+  },
+  {
+    "id": 4,
+    "name": "\"Jordan Hadzi Konstantinov - Dzinot\" Drama Theatre",
+    "city": "Veles",
+    "country": "North Macedonia",
+    "description": "A distinguished theatre company from Veles, continuing the legacy of theatrical excellence in North Macedonia.",
+    "history": "Named after Jordan Hadzi Konstantinov - Dzinot, a prominent figure in Macedonian theatre, this institution has been a vital part of the cultural landscape in Veles since its founding. The theatre has contributed significantly to the development of Macedonian dramatic arts and continues to present works that celebrate both local and international theatrical traditions.",
+    "foundedYear": 1945,
+    "images": [
+      {
+        "id": 9,
+        "imageUrl": "/placeholder.svg?height=400&width=600&text=Jordan+Hadzi+Konstantinov+Theatre",
+        "caption": "Theatre exterior",
+        "isPrimary": true
+      },
+      {
+        "id": 10,
+        "imageUrl": "/placeholder.svg?height=300&width=400&text=Performance+Hall",
+        "caption": "Performance hall",
+        "isPrimary": false
+      }
+    ],
+    "tags": [
+      "Macedonian Theatre",
+      "Cultural Heritage",
+      "Regional Arts",
+      "Traditional Drama"
+    ]
+  },
+  {
+    "id": 5,
+    "name": "National Theatre",
+    "city": "Belgrade",
+    "country": "Serbia",
+    "description": "Serbia's premier theatrical institution, renowned for its classical and contemporary productions.",
+    "history": "Founded in 1868, the National Theatre of Belgrade has been the cornerstone of Serbian dramatic arts, hosting world-class productions and fostering theatrical innovation. It has played a crucial role in preserving Serbian cultural heritage while embracing modern theatrical movements.",
+    "foundedYear": 1868,
+    "images": [
+      {
+        "id": 11,
+        "imageUrl": "/placeholder.svg?height=400&width=600&text=Belgrade+National+Theatre",
+        "caption": "Historic theatre building",
+        "isPrimary": true
+      },
+      {
+        "id": 12,
+        "imageUrl": "/placeholder.svg?height=300&width=400&text=Grand+Stage",
+        "caption": "Grand stage",
+        "isPrimary": false
+      }
+    ],
+    "tags": [
+      "National Theatre",
+      "Serbian Heritage",
+      "Classical Productions",
+      "Theatrical Innovation"
+    ]
+  },
+  {
+    "id": 6,
+    "name": "Macedonian National Theatre",
+    "city": "Skopje",
+    "country": "North Macedonia",
+    "description": "The leading theatrical institution of North Macedonia, showcasing the rich cultural heritage of the region.",
+    "history": "Established in 1947 as the premier theatre of North Macedonia, it has been instrumental in developing and preserving Macedonian theatrical traditions while embracing international collaborations. The theatre has been a symbol of Macedonian cultural identity and artistic achievement.",
+    "foundedYear": 1947,
+    "images": [
+      {
+        "id": 13,
+        "imageUrl": "/placeholder.svg?height=400&width=600&text=Macedonian+National+Theatre",
+        "caption": "National theatre building",
+        "isPrimary": true
+      },
+      {
+        "id": 14,
+        "imageUrl": "/placeholder.svg?height=300&width=400&text=Cultural+Performance",
+        "caption": "Cultural performance",
+        "isPrimary": false
+      }
+    ],
+    "tags": [
+      "National Theatre",
+      "Macedonian Culture",
+      "International Collaborations",
+      "Cultural Identity"
+    ]
+  }
+]

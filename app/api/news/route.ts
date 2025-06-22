@@ -1,9 +1,9 @@
-import { db } from '@/lib/db';
+import { getNewsArticles, createNewsArticle, updateNewsArticle, deleteNewsArticle } from '@/lib/database-operations';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    const newsArticles = db.getNewsArticles();
+    const newsArticles = await getNewsArticles();
     return NextResponse.json(newsArticles);
   } catch (error) {
     console.error('Error fetching news articles:', error);
@@ -14,10 +14,15 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const { title, excerpt, imageUrl, date, category } = await request.json();
+
+    // Ensure content and author are defined before calling createNewsArticle
+    const content = excerpt; // Using excerpt as content
+    const author = "Admin"; // Placeholder author
+
     if (!title || !excerpt || !imageUrl || !date || !category) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
-    const newArticle = db.createNewsArticle(title, excerpt, imageUrl, date, category);
+    const newArticle = await createNewsArticle(title, content, excerpt, author, date, category, imageUrl); // Added comment to force recompile
     return NextResponse.json(newArticle, { status: 201 });
   } catch (error) {
     console.error('Error creating news article:', error);
@@ -31,7 +36,7 @@ export async function PUT(request: Request) {
     if (!id || !title || !excerpt || !imageUrl || !date || !category) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
-    const updatedArticle = db.updateNewsArticle(id, { title, excerpt, imageUrl, date, category });
+    const updatedArticle = await updateNewsArticle(id, { title, excerpt, imageUrl, date, category });
     if (!updatedArticle) {
       return NextResponse.json({ message: 'News article not found' }, { status: 404 });
     }
@@ -48,7 +53,7 @@ export async function DELETE(request: Request) {
     if (!id) {
       return NextResponse.json({ message: 'Missing article ID' }, { status: 400 });
     }
-    const deleted = db.deleteNewsArticle(id);
+    const deleted = await deleteNewsArticle(id);
     if (!deleted) {
       return NextResponse.json({ message: 'News article not found' }, { status: 404 });
     }

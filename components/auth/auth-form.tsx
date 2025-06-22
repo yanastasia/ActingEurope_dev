@@ -1,6 +1,6 @@
 "use client"
 
-import type React from "react"
+import React from "react"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -13,7 +13,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from "@/hooks/use-toast"
 import { isAdminEmail, setAuthenticated, isAdmin } from "@/lib/auth"
 import { sendVerificationEmailAction } from "@/app/actions/email-actions"
-import { db } from "@/lib/database-storage"
+import { DatabaseStorage } from "@/lib/database-storage"
 import { useLanguage } from "@/lib/language-context"
 
 interface AuthFormProps {
@@ -35,6 +35,14 @@ export function AuthForm({ type }: AuthFormProps) {
     confirmPassword: "",
   })
 
+  const [db, setDb] = useState<DatabaseStorage | null>(null);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setDb(DatabaseStorage.getInstance());
+    }
+  }, []);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
@@ -43,6 +51,16 @@ export function AuthForm({ type }: AuthFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+
+    if (!db) {
+      toast({
+        title: "Error",
+        description: "Database not initialized. Please try again.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return;
+    }
 
     try {
       // Validation
@@ -54,7 +72,7 @@ export function AuthForm({ type }: AuthFormProps) {
 
         // For signup, send verification email
         if (type === "signup") {
-        const existingUser = db.getUsers().find((u: any) => u.email === formData.email)
+        const existingUser = (await db.getUsers()).find((u: any) => u.email === formData.email)
         if (existingUser) {
           throw new Error("Email already in use")
         }
@@ -92,7 +110,7 @@ export function AuthForm({ type }: AuthFormProps) {
         // Login flow
         // Check if user exists
           console.log("Form Data:", formData);
-          const users = db.getUsers();
+          const users = await db.getUsers();
           const user = users.find((u: any) => u.email === formData.email);
           console.log("User found:", user);
 
@@ -172,7 +190,7 @@ export function AuthForm({ type }: AuthFormProps) {
           <Button variant="outline" onClick={() => router.push("/")}>
             Return to Home
           </Button>
-          <Button variant="destructive" onClick={() => db.clearAllData()} className="mt-4">
+          <Button variant="destructive" onClick={() => db?.clearAllData()} className="mt-4">
             Clear All Data (for testing)
           </Button>
         </CardContent>

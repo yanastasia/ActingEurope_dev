@@ -9,7 +9,7 @@ import CountdownTimer from "@/components/countdown-timer"
 import QuickLinkCard from "@/components/quick-link-card"
 import PerformanceCard from "@/components/performance-card"
 import { useLanguage } from "@/lib/language-context"
-import { db } from "@/lib/database-storage"
+import { DatabaseStorage } from "@/lib/database-storage"
 
 export default function Home() {
   const { t } = useLanguage()
@@ -38,37 +38,40 @@ export default function Home() {
 
   // Load featured performances from localStorage
   useEffect(() => {
-    const events = db.getEvents()
-    // Filter featured performances
-    const featured = events.filter((event: any) => event.type === "performance" && event.isFeatured)
+    const loadData = async () => {
+      const events = await DatabaseStorage.getInstance().getEvents();
+      // Filter featured performances
+      const featured = events.filter((event: any) => event.type === "performance" && event.isFeatured);
 
-    const formattedPerformances = featured.map((event: any) => ({
-      id: event.id,
-      title: event.title,
-      company: event.company || "Acting Europe Festival",
-      date: event.date,
-      time: event.time,
-      venue: event.venue,
-      imageUrl: event.imageUrl || "/placeholder.svg?height=1080&width=1920",
-      genre: "Drama",
-      language: "Various",
-      duration: "120 min",
-      featured: true,
-      price: event.price ? `€${event.price}` : "Free",
-    }))
+      const formattedPerformances = featured.map((event: any) => ({
+        id: event.id,
+        title: event.title,
+        company: event.company || "Acting Europe Festival",
+        date: event.date,
+        time: event.time,
+        venue: event.venue,
+        imageUrl: event.imageUrl || "/placeholder.svg?height=1080&width=1920",
+        genre: "Drama",
+        language: "Various",
+        duration: "120 min",
+        featured: true,
+        price: event.price ? `€${event.price}` : "Free",
+      }));
 
-    setFeaturedPerformances(formattedPerformances)
+      setFeaturedPerformances(formattedPerformances);
 
-    // Set single featured performance for the existing section (if needed)
-    if (formattedPerformances.length > 0) {
-      const randomIndex = Math.floor(Math.random() * formattedPerformances.length)
-      setFeaturedPerformance(formattedPerformances[randomIndex])
-    }
+      // Set single featured performance for the existing section (if needed)
+      if (formattedPerformances.length > 0) {
+        const randomIndex = Math.floor(Math.random() * formattedPerformances.length);
+        setFeaturedPerformance(formattedPerformances[randomIndex]);
+      }
+    };
 
     // Listen for database updates
-    const handleDatabaseUpdate = () => {
-      const updatedEvents = db.getEvents()
-      const updatedFeatured = updatedEvents.filter((event: any) => event.type === "performance" && event.isFeatured)
+    const handleDatabaseUpdate = async (event: Event) => {
+      const currentDbInstance = (event as CustomEvent).detail as DatabaseStorage;
+      const updatedEvents = await currentDbInstance.getEvents();
+      const updatedFeatured = updatedEvents.filter((event: any) => event.type === "performance" && event.isFeatured);
 
       const updatedFormattedPerformances = updatedFeatured.map((event: any) => ({
         id: event.id,
@@ -83,24 +86,26 @@ export default function Home() {
         duration: "120 min",
         featured: true,
         price: event.price ? `€${event.price}` : "Free",
-      }))
+      }));
 
-      setFeaturedPerformances(updatedFormattedPerformances)
+      setFeaturedPerformances(updatedFormattedPerformances);
 
       if (updatedFormattedPerformances.length > 0) {
-        const randomIndex = Math.floor(Math.random() * updatedFormattedPerformances.length)
-        setFeaturedPerformance(updatedFormattedPerformances[randomIndex])
+        const randomIndex = Math.floor(Math.random() * updatedFormattedPerformances.length);
+        setFeaturedPerformance(updatedFormattedPerformances[randomIndex]);
       } else {
-        setFeaturedPerformance(null)
-        setFeaturedPerformances([])
+        setFeaturedPerformance(null);
+        setFeaturedPerformances([]);
       }
-    }
+    };
 
-    window.addEventListener("databaseUpdated", handleDatabaseUpdate)
+    loadData();
+    window.addEventListener("databaseUpdated", handleDatabaseUpdate as EventListener);
 
     return () => {
-      window.removeEventListener("databaseUpdated", handleDatabaseUpdate)
-    }
+      window.removeEventListener("databaseUpdated", handleDatabaseUpdate as EventListener);
+    };
+
   }, [])
 
   return (

@@ -1,0 +1,146 @@
+[
+  {
+    "id": "venue-1",
+    "name": "Main Stage",
+    "description": "Main performance venue with regular and balcony seating",
+    "rows": [
+      {
+        "rowNumber": 1,
+        "seatCount": 20
+      },
+      {
+        "rowNumber": 2,
+        "seatCount": 20
+      },
+      {
+        "rowNumber": 3,
+        "seatCount": 20
+      },
+      {
+        "rowNumber": 4,
+        "seatCount": 20
+      },
+      {
+        "rowNumber": 5,
+        "seatCount": 20
+      },
+      {
+        "rowNumber": 6,
+        "seatCount": 20
+      },
+      {
+        "rowNumber": 7,
+        "seatCount": 0
+      },
+      {
+        "rowNumber": 8,
+        "seatCount": 20
+      },
+      {
+        "rowNumber": 9,
+        "seatCount": 20
+      },
+      {
+        "rowNumber": 10,
+        "seatCount": 20
+      },
+      {
+        "rowNumber": 11,
+        "seatCount": 20
+      },
+      {
+        "rowNumber": 12,
+        "seatCount": 20
+      },
+      {
+        "rowNumber": 13,
+        "seatCount": 20
+      },
+      {
+        "rowNumber": 14,
+        "seatCount": 20
+      },
+      {
+        "rowNumber": 15,
+        "seatCount": 20
+      },
+      {
+        "rowNumber": 16,
+        "seatCount": 20
+      }
+    ]
+  },
+  {
+    "id": "venue-2",
+    "name": "Chamber Stage",
+    "description": "Intimate performance space for smaller productions",
+    "rows": [
+      {
+        "rowNumber": 1,
+        "seatCount": 12
+      },
+      {
+        "rowNumber": 2,
+        "seatCount": 13
+      },
+      {
+        "rowNumber": 3,
+        "seatCount": 14
+      },
+      {
+        "rowNumber": 4,
+        "seatCount": 13
+      },
+      {
+        "rowNumber": 5,
+        "seatCount": 13
+      },
+      {
+        "rowNumber": 6,
+        "seatCount": 13
+      },
+      {
+        "rowNumber": 7,
+        "seatCount": 9
+      },
+      {
+        "rowNumber": 8,
+        "seatCount": 9
+      }
+    ]
+  },
+  {
+    "id": 1,
+    "name": "Main Stage",
+    "description": "Main performance venue with regular and balcony seating",
+    "capacity": 500,
+    "sections": [
+      {
+        "id": 1,
+        "sectionName": "Regular Seating",
+        "sectionType": "regular",
+        "seats": []
+      },
+      {
+        "id": 2,
+        "sectionName": "Balcony Seating",
+        "sectionType": "balcony",
+        "seats": []
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Chamber Stage",
+    "description": "Intimate performance space for smaller productions",
+    "capacity": 150,
+    "sections": [
+      {
+        "id": 3,
+        "sectionName": "Main Seating",
+        "sectionType": "regular",
+        "seats": []
+      }
+    ]
+  }
+]

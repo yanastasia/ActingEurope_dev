@@ -1,0 +1,23 @@
+{
+  "/api/data/route": "/api/data",
+  "/api/news/route": "/api/news",
+  "/api/users/route": "/api/users",
+  "/api/users/create/route": "/api/users/create",
+  "/_not-found/page": "/_not-found",
+  "/about/page": "/about",
+  "/admin/news/page": "/admin/news",
+  "/admin/page": "/admin",
+  "/admin/users/page": "/admin/users",
+  "/contact/page": "/contact",
+  "/news/page": "/news",
+  "/page": "/",
+  "/participants/[id]/page": "/participants/[id]",
+  "/participants/page": "/participants",
+  "/performances/[id]/page": "/performances/[id]",
+  "/profile/page": "/profile",
+  "/program/page": "/program",
+  "/tickets/page": "/tickets",
+  "/verify-email/page": "/verify-email",
+  "/auth/signup/page": "/auth/signup",
+  "/auth/login/page": "/auth/login"
+}

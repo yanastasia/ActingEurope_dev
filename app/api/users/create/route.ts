@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { createUser } from '@/lib/database-operations';
 
 
 export async function POST(req: NextRequest) {
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'Email, password, and role are required' }, { status: 400 });
     }
 
-    const newUser = await db.createUser(email, password, role);
+    const newUser = await createUser(email, password, role);
     return NextResponse.json(newUser, { status: 201 });
   } catch (error: any) {
     console.error('Error creating user:', error);

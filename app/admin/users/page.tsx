@@ -24,46 +24,25 @@ const UserManagementPage = () => {
   const [newUserRole, setNewUserRole] = useState<'admin' | 'seller' | 'client'>('client');
   const router = useRouter();
 
-  useEffect(() => {
-    if (!isAuthenticated() || !isAdmin()) {
-      router.push('/login');
-      return;
-    }
-
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch('/api/users', {
-          headers: {
-            'Authorization': 'Bearer super_admin_token', // Replace with actual token
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setUsers(data);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUsers();
-  }, [router, users]); // Added users to dependency array to re-fetch after changes
-
   const fetchUsers = async () => {
     try {
+      const userRole = localStorage.getItem("actingEurope_userRole");
+      console.log('Client-side User Role from localStorage:', userRole);
+      console.log('Sending Authorization header:', `Bearer ${userRole}`);
       const response = await fetch('/api/users', {
         headers: {
-          'Authorization': 'Bearer super_admin_token',
+          'Authorization': `Bearer ${userRole}`,
         },
       });
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+          const errorText = await response.text();
+          console.error('API Error Response:', errorText);
+          throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
       }
       const data = await response.json();
-      setUsers(data);
+      console.log('Received data from /api/users:', data);
+      // Ensure data is an array, or access the users property if it's an object
+      setUsers(Array.isArray(data) ? data : data.users || []);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -71,13 +50,22 @@ const UserManagementPage = () => {
     }
   };
 
+  useEffect(() => {
+    if (!isAuthenticated() || !isAdmin()) {
+      router.push('/login');
+      return;
+    }
+
+    fetchUsers();
+  }, [router, fetchUsers]);
+
   const handleRoleChange = async (userId: string, newRole: 'admin' | 'seller' | 'client') => {
     try {
       const response = await fetch('/api/users', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer super_admin_token', // Replace with actual token
+          'Authorization': `Bearer ${localStorage.getItem("actingEurope_userRole")}`,
         },
         body: JSON.stringify({ id: userId, newRole }),
       });
@@ -98,7 +86,7 @@ const UserManagementPage = () => {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer super_admin_token', // Replace with actual token
+          'Authorization': `Bearer ${localStorage.getItem("actingEurope_userRole")}`,
         },
         body: JSON.stringify({ id: userId }),
       });
@@ -127,7 +115,7 @@ const UserManagementPage = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer super_admin_token',
+          'Authorization': `Bearer ${localStorage.getItem("actingEurope_userRole")}`,
         },
         body: JSON.stringify({ email: newUserEmail, password: newUserPassword, role: newUserRole }),
       });
@@ -178,9 +166,9 @@ const UserManagementPage = () => {
                 <SelectValue placeholder="Select a role" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="client">Client</SelectItem>
-                <SelectItem value="seller">Seller</SelectItem>
-                <SelectItem value="admin">Admin</SelectItem>
+                <SelectItem key="client" value="client">Client</SelectItem>
+                <SelectItem key="seller" value="seller">Seller</SelectItem>
+                <SelectItem key="admin" value="admin">Admin</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -213,10 +201,10 @@ const UserManagementPage = () => {
                       <SelectValue placeholder={user.role} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="client">Client</SelectItem>
-                      <SelectItem value="seller">Seller</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
-                      {user.role === 'super_admin' && <SelectItem value="super_admin">Super Admin</SelectItem>}
+                      <SelectItem key="client" value="client">Client</SelectItem>
+                      <SelectItem key="seller" value="seller">Seller</SelectItem>
+                      <SelectItem key="admin" value="admin">Admin</SelectItem>
+                      {user.role === 'super_admin' && <SelectItem key="super_admin" value="super_admin">Super Admin</SelectItem>}
                     </SelectContent>
                   </Select>
                 </td>

@@ -17,7 +17,7 @@ import { Calendar, Ticket, FileText, AlertTriangle, ShieldCheck, Pencil, Trash2,
 import { isAdmin } from "@/lib/auth"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/lib/language-context"
-import { db } from "@/lib/database-storage"
+import { ds, DatabaseStorage } from "@/lib/database-storage"
 
 // Event type definition
 interface Event {
@@ -107,35 +107,44 @@ export default function AdminPage() {
   })
   const [venueRows, setVenueRows] = useState<VenueRow[]>([{ rowNumber: 1, seatCount: 10 }])
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [dbInstance, setDbInstance] = useState<DatabaseStorage | null>(null);
 
   useEffect(() => {
-    // Load events and venues from database
-    setEvents(db.getEvents())
-    setVenues(db.getVenues())
+    const fetchData = async () => {
+    if (typeof window !== 'undefined') {
+      const db = DatabaseStorage.getInstance();
+      setDbInstance(db);
 
-    // Set up listener for database updates
-    const handleDatabaseUpdate = () => {
-      setEvents(db.getEvents())
-      setVenues(db.getVenues())
+      // Load events and venues from database
+      // Load events and venues from database
+      setEvents((await db.getEvents()) || []);
+      setVenues((await db.getVenues()) || []);
+
+      // Set up listener for database updates
+      const handleDatabaseUpdate = async (event: CustomEvent<any>) => {
+        const currentDbInstance = (event as CustomEvent).detail as DatabaseStorage;
+        setEvents((await currentDbInstance.getEvents()) || []);
+        setVenues((await currentDbInstance.getVenues()) || []);
+      };
+
+      window.addEventListener("databaseUpdated", (event) => { handleDatabaseUpdate(event as CustomEvent<any>) })
+
+      return () => {
+        window.removeEventListener("databaseUpdated", (event) => { handleDatabaseUpdate(event as CustomEvent<any>) })
+      };
     }
-
-    window.addEventListener("databaseUpdated", handleDatabaseUpdate)
-
-    return () => {
-      window.removeEventListener("databaseUpdated", handleDatabaseUpdate)
-    }
-  }, [])
+    };
+    fetchData();
+  }, []);
 
   useEffect(() => {
     // Check if user is admin
-    const checkAdmin = () => {
+    if (typeof window !== "undefined") {
       const adminStatus = isAdmin()
       setAuthorized(adminStatus)
 
       // Get admin email for display
-      if (typeof window !== "undefined") {
-        setAdminEmail(localStorage.getItem("actingEurope_userEmail") || "")
-      }
+      setAdminEmail(localStorage.getItem("actingEurope_userEmail") || "")
 
       setIsLoading(false)
 
@@ -144,10 +153,6 @@ export default function AdminPage() {
         router.push("/auth/login")
       }
     }
-
-    // Small delay to ensure client-side code runs
-    const timer = setTimeout(checkAdmin, 500)
-    return () => clearTimeout(timer)
   }, [router])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -275,7 +280,7 @@ export default function AdminPage() {
     }
   }
 
-  const handleAddEvent = (e: React.FormEvent) => {
+  const handleAddEvent = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
 
@@ -297,10 +302,10 @@ export default function AdminPage() {
     }
 
     // Add to database
-    db.addEvent(newEvent)
+    dbInstance?.addEvent(newEvent)
 
     // Update local state
-    setEvents(db.getEvents())
+    setEvents(await ds.getEvents())
 
     // Show success message
     toast({
@@ -326,7 +331,7 @@ export default function AdminPage() {
     setIsSubmitting(false)
   }
 
-  const handleAddVenue = (e: React.FormEvent) => {
+  const handleAddVenue = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
 
@@ -351,12 +356,8 @@ export default function AdminPage() {
       rows: venueRows,
     }
 
-    // Add to venues array
-    const updatedVenues = [...venues, newVenue]
-    setVenues(updatedVenues)
-
-    // Save to localStorage
-    localStorage.setItem("actingEurope_venues", JSON.stringify(updatedVenues))
+    dbInstance?.addVenue(newVenue)
+    setVenues(await dbInstance?.getVenues() || [])
 
     // Show success message
     toast({
@@ -378,13 +379,6 @@ export default function AdminPage() {
     setIsSubmitting(false)
   }
 
-  const handleEditEvent = (id: string) => {
-    const eventToEdit = events.find((event) => event.id === id)
-    if (eventToEdit) {
-      setEditingEvent(eventToEdit)
-    }
-  }
-
   const handleEditVenue = (id: string) => {
     const venueToEdit = venues.find((venue) => venue.id === id)
     if (venueToEdit) {
@@ -392,7 +386,35 @@ export default function AdminPage() {
     }
   }
 
-  const handleUpdateEvent = (e: React.FormEvent) => {
+  const handleSelectEventForEdit = (id: string) => {
+    const eventToEdit = events.find((event) => event.id === id)
+    if (eventToEdit) {
+      setEditingEvent(eventToEdit)
+    }
+
+    // Validate form
+    if (!eventToEdit) {
+      toast({
+        title: "Error",
+        description: "Event not found for editing.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (!eventToEdit.title || !eventToEdit.eventType || !eventToEdit.date || !eventToEdit.time || !eventToEdit.venue) {
+      toast({
+        title: "Missing information",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      })
+      return
+    }
+
+
+  }
+
+  const handleEditEvent = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!editingEvent) return
 
@@ -409,10 +431,8 @@ export default function AdminPage() {
     // Update events array
     const updatedEvents = events.map((event) => (event.id === editingEvent.id ? editingEvent : event))
 
-    setEvents(updatedEvents)
-
-    // Save to localStorage
-    localStorage.setItem("actingEurope_events", JSON.stringify(updatedEvents))
+    dbInstance?.updateEvent(editingEvent.id, editingEvent)
+    setEvents(await dbInstance?.getEvents() || [])
 
     // Show success message
     toast({
@@ -424,7 +444,7 @@ export default function AdminPage() {
     setEditingEvent(null)
   }
 
-  const handleUpdateVenue = (e: React.FormEvent) => {
+  const handleUpdateVenue = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!editingVenue) return
 
@@ -441,10 +461,8 @@ export default function AdminPage() {
     // Update venues array
     const updatedVenues = venues.map((venue) => (venue.id === editingVenue.id ? editingVenue : venue))
 
-    setVenues(updatedVenues)
-
-    // Save to localStorage
-    localStorage.setItem("actingEurope_venues", JSON.stringify(updatedVenues))
+    dbInstance?.updateVenue(editingVenue.id, editingVenue)
+    setVenues(await dbInstance?.getVenues() || [])
 
     // Show success message
     toast({
@@ -461,10 +479,9 @@ export default function AdminPage() {
     setEditingVenue(null)
   }
 
-  const handleDeleteEvent = (id: string) => {
-    const updatedEvents = events.filter((event) => event.id !== id)
-    setEvents(updatedEvents)
-    localStorage.setItem("actingEurope_events", JSON.stringify(updatedEvents))
+  const handleDeleteEvent = async (id: string) => {
+    dbInstance?.deleteEvent(id)
+    setEvents(await dbInstance?.getEvents() || [])
 
     toast({
       title: "Event deleted",
@@ -472,7 +489,7 @@ export default function AdminPage() {
     })
   }
 
-  const handleDeleteVenue = (id: string) => {
+  const handleDeleteVenue = async (id: string) => {
     // Check if venue is used in any events
     const venueInUse = events.some((event) => event.venue === venues.find((v) => v.id === id)?.name)
 
@@ -485,9 +502,8 @@ export default function AdminPage() {
       return
     }
 
-    const updatedVenues = venues.filter((venue) => venue.id !== id)
-    setVenues(updatedVenues)
-    localStorage.setItem("actingEurope_venues", JSON.stringify(updatedVenues))
+    dbInstance?.deleteVenue(id)
+    setVenues(await dbInstance?.getVenues() || [])
 
     toast({
       title: "Venue deleted",
@@ -571,7 +587,7 @@ export default function AdminPage() {
                 <CardDescription>Update event information</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <form onSubmit={handleUpdateEvent} className="space-y-4">
+            <form onSubmit={handleEditEvent} className="grid gap-4 py-4">
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">
                       <Label htmlFor="title">Event Title *</Label>
@@ -847,7 +863,7 @@ export default function AdminPage() {
                           variant="outline"
                           size="sm"
                           className="h-8 w-8 p-0"
-                          onClick={() => handleEditEvent(event.id)}
+                          onClick={() => handleSelectEventForEdit(event.id)}
                         >
                           <Pencil className="h-4 w-4" />
                           <span className="sr-only">Edit</span>

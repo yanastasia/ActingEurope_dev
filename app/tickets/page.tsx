@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import SeatSelection from "@/components/seat-selection"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/lib/language-context"
-import { db } from "@/lib/database-storage"
+import { ds, DatabaseStorage, Event } from "@/lib/database-storage"
 import { generateAndSendTicket, type GenerateTicketResult } from "@/lib/user-verification"
 import { Loader2 } from "lucide-react"
 
@@ -37,46 +37,15 @@ export default function TicketsPage() {
 
   // Get events and venues from localStorage
   useEffect(() => {
-    // Load events
-    const events = db.getEvents()
-
-    // Convert the price to BGN
     const getBGNPrice = (euroPrice: string) => {
       if (!euroPrice) return "Free"
       const numericPrice = Number.parseFloat(euroPrice.replace("€", ""))
       return `${(numericPrice * 1.96).toFixed(2)} лв.`
     }
 
-    // Update the event mapping
-    const performances = events
-      .filter((event: any) => event.type === "performance")
-      .map((event: any) => ({
-        id: event.id,
-        title: event.title,
-        company: event.company || "Acting Europe Festival",
-        date: event.date,
-        time: event.time,
-        venue: event.venue,
-        imageUrl: event.imageUrl || "/placeholder.svg?height=200&width=300",
-        price: event.price ? getBGNPrice(event.price) : "Free",
-        rawPrice: event.price,
-      }))
-
-    setAllPerformances(performances)
-
-    // Load venues
-    setVenues(db.getVenues())
-
-    // Listen for database updates
-    const handleDatabaseUpdate = () => {
-      const updatedEvents = db.getEvents()
-
-      // Convert the price to BGN
-      const getBGNPrice = (euroPrice: string) => {
-        if (!euroPrice) return "Free"
-        const numericPrice = Number.parseFloat(euroPrice.replace("€", ""))
-        return `${(numericPrice * 1.96).toFixed(2)} лв.`
-      }
+    const handleDatabaseUpdate = async (event: CustomEvent<any>) => {
+      const currentDbInstance = (event as CustomEvent).detail as DatabaseStorage;
+      const updatedEvents = await currentDbInstance.getEvents();
 
       const updatedPerformances = updatedEvents
         .filter((event: any) => event.type === "performance")
@@ -93,13 +62,38 @@ export default function TicketsPage() {
         }))
 
       setAllPerformances(updatedPerformances)
-      setVenues(db.getVenues())
+      setVenues(await currentDbInstance.getVenues())
     }
 
-    window.addEventListener("databaseUpdated", handleDatabaseUpdate)
+    (async () => {
+      // Load events
+      const events = await ds.getEvents()
+
+      // Update the event mapping
+      const performances = events
+        .filter((event: any) => event.type === "performance")
+        .map((event: any) => ({
+          id: event.id,
+          title: event.title,
+          company: event.company || "Acting Europe Festival",
+          date: event.date,
+          time: event.time,
+          venue: event.venue,
+          imageUrl: event.imageUrl || "/placeholder.svg?height=200&width=300",
+          price: event.price ? getBGNPrice(event.price) : "Free",
+          rawPrice: event.price,
+        }))
+
+      setAllPerformances(performances)
+
+      // Load venues
+      setVenues(await ds.getVenues())
+    })();
+
+    window.addEventListener("databaseUpdated", (event) => { handleDatabaseUpdate(event as CustomEvent<any>) })
 
     return () => {
-      window.removeEventListener("databaseUpdated", handleDatabaseUpdate)
+      window.removeEventListener("databaseUpdated", (event) => { handleDatabaseUpdate(event as CustomEvent<any>) })
     }
   }, [])
 
@@ -165,16 +159,39 @@ export default function TicketsPage() {
 
       // Save booking to database
       const booking = {
-        id: `ticket-${Date.now()}`,
+        id: Date.now(),
+        userId: 1, // Assuming a default user ID for now, replace with actual user ID
+        eventId: selectedPerformanceData.id as number, // Use the ID of the selected performance as eventId
         performanceId: selectedPerformance,
-        seats: selectedSeats,
+        seats: selectedSeats.map((seatName, index) => ({
+          id: index + 1,
+          rowNumber: seatName.charCodeAt(0) - 64,
+          seatNumber: parseInt(seatName.substring(1)),
+          isAvailable: false,
+        })),
         customer: `${formData.firstName} ${formData.lastName}`,
         email: formData.email,
         date: new Date().toISOString(),
-        bookingReference: result.bookingReference,
+        bookingReference: result.bookingReference || "",
+        totalAmount: selectedSeats.length * selectedPerformanceData.rawPrice,
+        bookingStatus: "confirmed" as const,
+        event: {
+          id: selectedPerformanceData.id,
+          title: selectedPerformanceData.title,
+          theatreId: 0, // Placeholder: Add actual theatreId if available
+          venueId: 0, // Placeholder: Add actual venueId if available
+          eventType: "performance",
+          eventDate: selectedPerformanceData.date,
+          eventTime: selectedPerformanceData.time,
+          description: "", // Placeholder: Add actual description
+          price: selectedPerformanceData.rawPrice,
+          theatre: {} as any, // Placeholder: Add actual theatre object
+          venue: {} as any, // Placeholder: Add actual venue object
+        } as Event,
+        bookingDate: new Date().toISOString(),
       }
 
-      db.addBooking(booking)
+      ds.addBooking(booking)
 
       // Show confirmation
       setStep(4)
