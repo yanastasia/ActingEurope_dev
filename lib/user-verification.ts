@@ -1,7 +1,7 @@
 "use server"
 
 import crypto from "crypto"
-import { generateVerificationToken } from "../app/actions/verification-actions"
+import { generateVerificationToken } from "./tokens"
 import { sendVerificationEmail, sendTicketEmail, sendReminderEmail } from "./email-service"
 
 // Store verification tokens (in a real app, these would be in a database)

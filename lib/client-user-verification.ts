@@ -1,7 +1,7 @@
 "use client"
 
 import { db } from "./database-storage"
-import { getVerificationToken, deleteVerificationToken } from "../app/actions/verification-actions"
+import { getVerificationToken, deleteVerificationToken } from "./tokens"
 
 import { User } from "./database"
 
