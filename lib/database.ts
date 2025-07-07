@@ -125,8 +125,8 @@ export const mockTheatres: Theatre[] = [
     images: [
       {
         id: 1,
-        imageUrl: "/placeholder.svg?height=400&width=600&text=Krum+Kyulyavkov+Theatre",
-        caption: "Main building facade",
+        imageUrl: "/kyustendil.jpg",
+        caption: "Theatre exterior",
         isPrimary: true,
       },
       {
@@ -156,8 +156,8 @@ export const mockTheatres: Theatre[] = [
     images: [
       {
         id: 4,
-        imageUrl: "/placeholder.svg?height=400&width=600&text=Ivan+Vazov+National+Theatre",
-        caption: "Historic building exterior",
+        imageUrl: "/sofija.jpg",
+        caption: "Theatre exterior",
         isPrimary: true,
       },
       {
@@ -188,8 +188,8 @@ export const mockTheatres: Theatre[] = [
     images: [
       {
         id: 7,
-        imageUrl: "/placeholder.svg?height=400&width=600&text=Masalitinov+Plovdiv+Theatre",
-        caption: "Theatre building",
+        imageUrl: "/plovdiv.jpg",
+        caption: "Theatre exterior",
         isPrimary: true,
       },
       {
@@ -214,7 +214,7 @@ export const mockTheatres: Theatre[] = [
     images: [
       {
         id: 9,
-        imageUrl: "/placeholder.svg?height=400&width=600&text=Jordan+Hadzi+Konstantinov+Theatre",
+        imageUrl: "/veles.jpg",
         caption: "Theatre exterior",
         isPrimary: true,
       },
@@ -239,8 +239,8 @@ export const mockTheatres: Theatre[] = [
     images: [
       {
         id: 11,
-        imageUrl: "/placeholder.svg?height=400&width=600&text=Belgrade+National+Theatre",
-        caption: "Historic theatre building",
+        imageUrl: "/beograd.jpg",
+        caption: "Theatre exterior",
         isPrimary: true,
       },
       {
@@ -265,8 +265,8 @@ export const mockTheatres: Theatre[] = [
     images: [
       {
         id: 13,
-        imageUrl: "/placeholder.svg?height=400&width=600&text=Macedonian+National+Theatre",
-        caption: "National theatre building",
+        imageUrl: "/skopje.jpg",
+        caption: "Theatre exterior",
         isPrimary: true,
       },
       {
@@ -278,6 +278,35 @@ export const mockTheatres: Theatre[] = [
     ],
     tags: ["National Theatre", "Macedonian Culture", "International Collaborations", "Cultural Identity"],
   },
+  {
+    "id": 7,
+    "name": "National Theatre in Niš",
+    "city": "Niš",
+    "country": "Serbia",
+    "description": "A prominent Serbian theatre known for its diverse repertoire and significant contribution to the cultural life of Niš.",
+    "history": "Founded in 1887, the National Theatre in Niš has a rich history of theatrical excellence, presenting a wide range of plays from classical to contemporary. It has been a vital cultural institution for the city and the region, fostering artistic talent and engaging with the community.",
+    "foundedYear": 1887,
+    "images": [
+      {
+        "id": 15,
+        "imageUrl": "/nish.jpg",
+        "caption": "Theatre exterior",
+        "isPrimary": true
+      },
+      {
+        "id": 16,
+        "imageUrl": "/placeholder.svg?height=300&width=400&text=Theatre+Interior+Niš",
+        "caption": "Theatre interior",
+        "isPrimary": false
+      }
+    ],
+    "tags": [
+      "Serbian Theatre",
+      "Regional Theatre",
+      "Classical Drama",
+      "Contemporary Plays"
+    ]
+  }
 ]
 
 // Database utility functions (mock implementations)
