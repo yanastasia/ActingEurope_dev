@@ -41,13 +41,13 @@ const ContactPage = () => {
           <h2 className="text-2xl font-semibold mb-4">Our Information</h2>
           <div className="space-y-4 text-lg">
             <p>
-              <strong>Address:</strong> 123 Theatre Lane, Arts City, Europe
+              <strong>Address:</strong> bul. "Bulgaria" 26А, 2500 Kyustendil, Bulgaria
             </p>
             <p>
-              <strong>Phone:</strong> +123 456 7890
+              <strong>Phone:</strong> +359 87 696 7588
             </p>
             <p>
-              <strong>Email:</strong> info@actingeurope.com
+              <strong>Email:</strong> info@actingeurope.eu
             </p>
             <p>
               <strong>Business Hours:</strong> Monday - Friday, 9:00 AM - 5:00 PM (CET)
