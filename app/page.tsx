@@ -95,7 +95,6 @@ export default function Home() {
         setFeaturedPerformance(updatedFormattedPerformances[randomIndex]);
       } else {
         setFeaturedPerformance(null);
-        setFeaturedPerformances([]);
       }
     };
 
@@ -257,13 +256,14 @@ export default function Home() {
       <section className="bg-muted/30 py-12 md:py-20">
         <div className="container mx-auto px-4">
           <h2 className="mb-12 text-center text-3xl font-bold text-secondary-blue">{t("festivalMoments")}</h2>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="aspect-square relative overflow-hidden rounded-md">
+          <div className="grid grid-cols-5 gap-4 mx-auto max-w-fit">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="h-96 relative overflow-hidden rounded-md">
                 <Image
-                  src={`/placeholder.svg?height=300&width=300&text=Gallery+Image+${i}`}
+                  src={`/${['bez_krv.webp', 'bozhe_moj.jpg', 'don_zhuan.jpg', 'nevedenie.jpg', 'nichija_zemja.jpg'][i-1]}`}
                   alt={`Gallery image ${i}`}
-                  fill
+                  width={220}
+                  height={310}
                   className="object-cover transition-transform hover:scale-105"
                 />
               </div>
@@ -281,18 +281,30 @@ export default function Home() {
       <section className="py-12 md:py-16">
         <div className="container mx-auto px-4">
           <h2 className="mb-12 text-center text-3xl font-bold text-secondary-blue">{t("ourPartners")}</h2>
-          <div className="flex flex-wrap items-center justify-center gap-8">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="h-16 w-32 grayscale transition-all hover:grayscale-0">
-                <Image
-                  src={`/placeholder.svg?height=64&width=128&text=Partner+${i}`}
-                  alt={`Partner ${i}`}
-                  width={128}
-                  height={64}
-                  className="h-full w-full object-contain"
-                />
-              </div>
-            ))}
+          <div className="flex items-center justify-center gap-8 overflow-x-auto w-full">
+            {[1, 2, 3, 4, 5].map((i) => {
+              const partnerImages = ['ec.png', 'Kyustendil_logo.png', 'SAB_logo_site_2017-500x500.png', 'bgnmk.png', 'bgrs.png'];
+              const partnerLinks = [
+                'https://bulgaria.representation.ec.europa.eu/index_bg',
+                'https://www.kyustendil.bg/index.php?lang=bg',
+                'https://uba.bg/en/home-page/',
+                'https://ipa-bgmk.mrrb.bg/en',
+                'https://ipa-bgrs.mrrb.bg/en'
+              ];
+              return (
+                <Link key={i} href={partnerLinks[i-1]} target="_blank" rel="noopener noreferrer">
+                  <div className="h-24 w-48 grayscale transition-all hover:grayscale-0">
+                    <Image
+                      src={`/${partnerImages[i-1]}`}
+                      alt={`Partner ${i}`}
+                      width={180}
+                      height={90}
+                      className="h-full w-full object-contain"
+                    />
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
