@@ -14,7 +14,8 @@ import {
 import { performances } from "@/lib/performance-data"
 
 export default async function PerformancePage({ params }: { params: { id: string } }) {
-  const performance = performances.find((p) => p.id === params.id)
+  const { id } = await params;
+  const performance = performances.find((p) => p.id === id)
 
   if (!performance) {
     return <div>Performance not found</div>
