@@ -11,42 +11,14 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
+import { performances } from "@/lib/performance-data"
 
-// This would normally come from a database
-const getPerformance = (id: string) => {
-  return {
-    id,
-    title: "Hamlet Reimagined",
-    company: "Copenhagen Theatre Ensemble",
-    director: "Anna Bergmann",
-    cast: ["Michael Sørensen", "Lena Jensen", "Erik Nielsen", "Maria Poulsen"],
-    date: "June 15, 2023",
-    time: "19:30",
-    venue: "Main Stage",
-    address: "Theatre Square 1, City Center",
-    imageUrl: "/placeholder.svg?height=600&width=1200",
-    genre: "Drama",
-    language: "English with subtitles",
-    duration: "120 min",
-    synopsis:
-      "A modern take on Shakespeare's classic tragedy, exploring themes of power and betrayal through contemporary movement and multimedia. This innovative production reimagines the Danish prince's story in a corporate setting, where the struggle for power takes place in boardrooms rather than royal courts.\n\nThe production features striking visual design, original music, and physical theatre elements that bring new dimensions to this timeless story of revenge, moral corruption, and the human condition.",
-    reviews: [
-      {
-        source: "Theatre Today",
-        quote: "A breathtaking reimagining that brings new relevance to Shakespeare's masterpiece.",
-        rating: 5,
-      },
-      {
-        source: "European Stage",
-        quote: "Bold, innovative, and deeply moving - theatre at its finest.",
-        rating: 4.5,
-      },
-    ],
+export default async function PerformancePage({ params }: { params: { id: string } }) {
+  const performance = performances.find((p) => p.id === params.id)
+
+  if (!performance) {
+    return <div>Performance not found</div>
   }
-}
-
-export default function PerformancePage({ params }: { params: { id: string } }) {
-  const performance = getPerformance(params.id)
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -101,7 +73,6 @@ export default function PerformancePage({ params }: { params: { id: string } }) 
               <MapPin className="h-5 w-5 text-primary-gold" />
               <div>
                 <div className="font-medium">{performance.venue}</div>
-                <div className="text-sm text-muted-foreground">{performance.address}</div>
               </div>
             </div>
           </div>
@@ -131,35 +102,6 @@ export default function PerformancePage({ params }: { params: { id: string } }) 
                 ))}
               </ul>
             </div>
-          </div>
-
-          <h2 className="mb-4 text-2xl font-semibold text-secondary-blue">Reviews</h2>
-          <div className="mb-8 space-y-4">
-            {performance.reviews.map((review, index) => (
-              <div key={index} className="rounded-lg border p-4">
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="font-medium">{review.source}</span>
-                  <div className="flex">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <svg
-                        key={i}
-                        className={`h-4 w-4 ${i < Math.floor(review.rating) ? "text-primary-gold" : "text-muted"}`}
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    ))}
-                    {review.rating % 1 > 0 && (
-                      <svg className="h-4 w-4 text-primary-gold" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    )}
-                  </div>
-                </div>
-                <p className="text-muted-foreground">"{review.quote}"</p>
-              </div>
-            ))}
           </div>
         </div>
 

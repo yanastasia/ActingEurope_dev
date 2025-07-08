@@ -1,9 +1,9 @@
-import Image from "next/image"
 import Link from "next/link"
 import { Calendar, Clock, MapPin } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import Image from "next/image"
 
 interface PerformanceCardProps {
   id: string
@@ -16,7 +16,6 @@ interface PerformanceCardProps {
   genre: string
   language: string
   duration: string
-  price?: string
   featured?: boolean
 }
 
@@ -31,15 +30,8 @@ export default function PerformanceCard({
   genre,
   language,
   duration,
-  price,
   featured = false,
 }: PerformanceCardProps) {
-  // Format price to BGN if available
-  const formattedPrice = price
-    ? price.startsWith("€")
-      ? `${(Number.parseFloat(price.replace("€", "")) * 1.96).toFixed(2)} лв.`
-      : price
-    : undefined
 
   return (
     <Card className={`overflow-hidden transition-all hover:shadow-md ${featured ? "border-primary-gold/50" : ""}`}>
@@ -54,7 +46,7 @@ export default function PerformanceCard({
       </div>
       <CardHeader className="p-4">
         <CardTitle className="line-clamp-1 text-xl text-secondary-blue">{title}</CardTitle>
-        <CardDescription>{company}</CardDescription>
+        <p className="text-sm font-medium text-muted-foreground">{company}</p>
       </CardHeader>
       <CardContent className="p-4 pt-0">
         <div className="mb-4 flex flex-wrap gap-2">
@@ -67,11 +59,6 @@ export default function PerformanceCard({
           <Badge variant="outline" className="bg-muted/50">
             {duration}
           </Badge>
-          {formattedPrice && (
-            <Badge variant="outline" className="bg-primary-gold/10 text-secondary-blue">
-              {formattedPrice}
-            </Badge>
-          )}
         </div>
         <div className="space-y-2 text-sm">
           <div className="flex items-center gap-2">

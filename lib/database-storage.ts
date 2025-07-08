@@ -12,7 +12,7 @@ export interface Event {
   description: string;
   imageUrl: string;
   isFeatured: boolean;
-  price: string;
+  price?: string;
   tags: string[];
 }
 
