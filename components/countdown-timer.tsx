@@ -37,11 +37,11 @@ export default function CountdownTimer() {
       }
     }
 
-    // Initial calculation
-    calculateTimeLeft()
-
     // Set up interval for updates
     const timer = setInterval(calculateTimeLeft, 1000)
+
+    // Initial calculation after setting up interval
+    calculateTimeLeft()
 
     // Clean up interval on component unmount
     return () => clearInterval(timer)
