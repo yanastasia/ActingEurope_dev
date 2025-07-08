@@ -137,7 +137,7 @@ export const performances: Performance[] = [
     imageUrl: "/don_zhuan1.jpg", // Placeholder image
     posterUrl: "/don_zhuan.jpg", // Placeholder image
     genre: "Drama", // Genre inferred from synopsis
-    language: "English", // Language inferred from synopsis
+    language: "Serbian", // Language inferred from synopsis
     duration: "120 minutes",
     synopsis:
       "A person’s life journey and the marks they leave on others, their constant pursuit of self-improvement, give them the opportunity to rise freely and destroy all the delusions that time brings. This is my Don Juan – the one who can transcend himself and no longer be Don Juan.",

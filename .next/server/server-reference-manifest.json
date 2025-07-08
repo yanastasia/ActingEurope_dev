@@ -1,5 +1,17 @@
 {
-  "node": {},
+  "node": {
+    "60195ce9ec05bec89e6690d843339f8f3384d9fe34": {
+      "workers": {
+        "app/auth/login/page": {
+          "moduleId": "(action-browser)/./node_modules/.pnpm/next@15.2.4_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22D%3A%5C%5CActingEurope%5C%5CActingEurope_dev%5C%5CActingEurope_dev%5C%5Capp%5C%5Cactions%5C%5Cemail-actions.ts%22%2C%5B%7B%22id%22%3A%2260195ce9ec05bec89e6690d843339f8f3384d9fe34%22%2C%22exportedName%22%3A%22sendVerificationEmailAction%22%7D%5D%5D%5D&__client_imported__=true!",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/auth/login/page": "action-browser"
+      }
+    }
+  },
   "edge": {},
   "encryptionKey": "Ua2keiJRPDEyx4QsW+VuQHrV9prjoJak36AHVbcBr5Y="
 }
