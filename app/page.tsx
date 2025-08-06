@@ -9,121 +9,105 @@ import CountdownTimer from "@/components/countdown-timer"
 import QuickLinkCard from "@/components/quick-link-card"
 import PerformanceCard from "@/components/performance-card"
 import { useLanguage } from "@/lib/language-context"
-import { ds, DatabaseStorage, Event } from "@/lib/database-storage"
+import { performances } from "@/lib/performance-data"
 
 export default function Home() {
   const { t } = useLanguage()
   const [featuredPerformance, setFeaturedPerformance] = useState<any | null>(null)
   const [featuredPerformances, setFeaturedPerformances] = useState<any[]>([])
+  const [allSlides, setAllSlides] = useState<any[]>([])
   const [currentSlide, setCurrentSlide] = useState(0)
 
-  // Auto-advance slider
-  useEffect(() => {
-    if (featuredPerformances.length > 1) {
-      const interval = setInterval(() => {
-        setCurrentSlide((prev) => (prev + 1) % featuredPerformances.length)
-      }, 5000) // Change slide every 5 seconds
-
-      return () => clearInterval(interval)
-    }
-  }, [featuredPerformances.length])
+  // Removed auto-advance slider functionality
 
   const goToNextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % featuredPerformances.length)
+    setCurrentSlide((prev) => (prev + 1) % allSlides.length)
   }
 
   const goToPrevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + featuredPerformances.length) % featuredPerformances.length)
+    setCurrentSlide((prev) => (prev - 1 + allSlides.length) % allSlides.length)
   }
 
-  // Load featured performances from localStorage
+  // Load performances from performance-data.ts only
   useEffect(() => {
-    const loadData = async () => {
-      const events = await DatabaseStorage.getInstance().getEvents();
-      // Filter featured performances
-      const featured = events.filter((event: any) => event.type === "performance" && event.isFeatured);
+    // Use all performances from performance-data.ts as featured
+    const formattedPerformances = performances.map((p) => ({
+      id: `performance-${p.id}`,
+      title: p.title,
+      company: p.company,
+      date: p.date,
+      time: p.time,
+      venue: p.venue,
+      imageUrl: p.imageUrl || "/placeholder.svg?height=1080&width=1920",
+      genre: p.genre,
+      language: p.language,
+      duration: p.duration,
+      featured: true,
+      price: "Free",
+      type: "performance"
+    }));
 
-      const formattedPerformances = featured.map((event: any) => ({
-        id: event.id,
-        title: event.title,
-        company: event.company || "Acting Europe Festival",
-        date: event.date,
-        time: event.time,
-        venue: event.venue,
-        imageUrl: event.imageUrl || "/placeholder.svg?height=1080&width=1920",
-        genre: "Drama",
-        language: "Various",
-        duration: "120 min",
-        featured: true,
-        price: event.price ? `€${event.price}` : "Free",
-      }));
-
-      setFeaturedPerformances(formattedPerformances);
-
-      // Set single featured performance for the existing section (if needed)
-      if (formattedPerformances.length > 0) {
-        const randomIndex = Math.floor(Math.random() * formattedPerformances.length);
-        setFeaturedPerformance(formattedPerformances[randomIndex]);
-      }
+    // Create hero slide
+    const heroSlide = {
+      id: "hero",
+      type: "hero",
+      title: t("Acting Europe"),
+      subtitle: t("Theatre Without Borders"),
+      description: t("An international festival celebrating cultural exchange and artistic collaboration"),
+      date: t("September 18-21, 2025 • Kyustendil, Bulgaria")
     };
 
-    // Listen for database updates
-    const handleDatabaseUpdate = async (event: CustomEvent<any>) => {
-      const currentDbInstance = (event as CustomEvent).detail as DatabaseStorage;
-      const updatedEvents = await currentDbInstance.getEvents();
-      const updatedFeatured = updatedEvents.filter((event: any) => event.type === "performance" && event.isFeatured);
+    // Combine hero slide with performance slides
+    const combinedSlides = [heroSlide, ...formattedPerformances];
 
-      const updatedFormattedPerformances = updatedFeatured.map((event: any) => ({
-        id: event.id,
-        title: event.title,
-        company: event.company || "Acting Europe Festival",
-        date: event.date,
-        time: event.time,
-        venue: event.venue,
-        imageUrl: event.imageUrl || "/placeholder.svg?height=1080&width=1920",
-        genre: "Drama",
-        language: "Various",
-        duration: "120 min",
-        featured: true,
-        price: event.price ? `€${event.price}` : "Free",
-      }));
+    setFeaturedPerformances(formattedPerformances);
+    setAllSlides(combinedSlides);
 
-      setFeaturedPerformances(updatedFormattedPerformances);
-
-      if (updatedFormattedPerformances.length > 0) {
-        const randomIndex = Math.floor(Math.random() * updatedFormattedPerformances.length);
-        setFeaturedPerformance(updatedFormattedPerformances[randomIndex]);
-      } else {
-        setFeaturedPerformance(null);
-      }
-    };
-
-    loadData();
-    window.addEventListener("databaseUpdated", handleDatabaseUpdate as unknown as EventListener);
-
-    return () => {
-      window.removeEventListener("databaseUpdated", handleDatabaseUpdate as unknown as EventListener);
-    };
-
-  }, [])
+    // Set single featured performance for the existing section (if needed)
+    if (formattedPerformances.length > 0) {
+      const randomIndex = Math.floor(Math.random() * formattedPerformances.length);
+      setFeaturedPerformance(formattedPerformances[randomIndex]);
+    }
+  }, [t])
 
   return (
     <div className="flex flex-col">
-      {/* Hero Section - Performance Slider */}
+      {/* Hero and Featured Performances Slider */}
       <section className="relative overflow-hidden h-screen">
         <div className="relative h-full">
           {/* Background Images Slider */}
-          <div className="absolute inset-0">
-            {featuredPerformances.length > 0 ? (
+          <div className="absolute inset-0 overflow-hidden">
+            {allSlides.length > 0 ? (
               <div className="relative h-full">
-                <Image
-                  src={featuredPerformances[currentSlide]?.imageUrl || "/placeholder.svg?height=1080&width=1920"}
-                  alt={featuredPerformances[currentSlide]?.title || "Performance"}
-                  fill
-                  className="object-cover"
-                  priority
-                />
-                <div className="absolute inset-0 bg-black/40" />
+                {allSlides.map((slide, index) => (
+                  <div
+                    key={slide.id}
+                    className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
+                      index === currentSlide
+                        ? "opacity-100 transform translate-x-0"
+                        : index < currentSlide
+                        ? "opacity-0 transform -translate-x-full"
+                        : "opacity-0 transform translate-x-full"
+                    }`}
+                  >
+                    {slide.type === "hero" ? (
+                      <div className="h-full bg-secondary-blue">
+                        <div className="spotlight animate-spotlight"></div>
+                      </div>
+                    ) : (
+                      <>
+                        <Image
+                          src={slide.imageUrl || "/placeholder.svg?height=1080&width=1920"}
+                          alt={slide.title || "Performance"}
+                          fill
+                          className="object-cover"
+                          priority={index === 0}
+                        />
+                        <div className="absolute inset-0 bg-black/40" />
+                      </>
+                    )}
+                  </div>
+                ))}
               </div>
             ) : (
               <div className="h-full bg-secondary-blue">
@@ -133,53 +117,72 @@ export default function Home() {
           </div>
 
           {/* Content Overlay */}
-          <div className="relative z-10 flex h-full items-center">
-            <div className="container mx-auto px-4">
-              <div className="mx-auto max-w-3xl text-center text-white">
-                {featuredPerformances.length > 0 ? (
-                  <>
-                    <h1 className="mb-4 text-4xl font-bold md:text-6xl">{featuredPerformances[currentSlide]?.title}</h1>
-                    <h2 className="mb-8 text-xl font-medium text-primary-gold md:text-2xl">
-                      {featuredPerformances[currentSlide]?.company || "Acting Europe Festival"}
-                    </h2>
-                    <Link
-                      href={`/performances/${featuredPerformances[currentSlide]?.id}`}
-                      className="inline-block text-lg hover:text-primary-gold transition-colors"
-                    >
-                      See more
-                    </Link>
-                  </>
-                ) : (
-                  <>
-                    <h1 className="mb-6 text-4xl font-bold md:text-6xl">
-                      {t("heroTitle")}
-                      <span className="block text-primary-gold">{t("heroSubtitle")}</span>
-                    </h1>
-                    <p className="mb-8 text-lg text-white/80 md:text-xl">{t("heroDescription")}</p>
-                    <p className="mb-8 text-xl font-semibold text-primary-gold">{t("heroDate")}</p>
-                    <div className="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-x-4 sm:space-y-0">
-                      <Button size="lg" asChild>
-                        <Link href="/program">{t("viewProgram")}</Link>
-                      </Button>
-                      <Button
-                        size="lg"
-                        variant="outline"
-                        className="bg-transparent text-white hover:bg-white/10"
-                        asChild
-                      >
-                        <Link href="/tickets">{t("bookTickets")}</Link>
-                      </Button>
-                    </div>
-                  </>
-                )}
+          {allSlides.length > 0 && (
+            <div className="relative z-10 flex h-full items-center">
+              <div className="container mx-auto px-4">
+                <div className="mx-auto max-w-4xl text-center text-white">
+                  <div className="transition-all duration-700 ease-in-out transform">
+                    {allSlides[currentSlide]?.type === "hero" ? (
+                       <div className="animate-fade-in-up">
+                          <div className="mb-8 flex justify-center -mt-16">
+                            <Image
+                              src="/Acting Europe Mask.png"
+                              alt="Acting Europe Festival Logo"
+                              width={200}
+                              height={200}
+                              className="object-contain"
+                            />
+                          </div>
+                          <h1 className="mb-4 text-4xl font-bold md:text-5xl lg:text-6xl">
+                            {allSlides[currentSlide]?.title}
+                            <span className="block text-primary-gold">{allSlides[currentSlide]?.subtitle}</span>
+                          </h1>
+                          <p className="mb-6 text-lg text-white/90 md:text-xl lg:text-2xl max-w-3xl mx-auto">
+                            {allSlides[currentSlide]?.description}
+                          </p>
+                          <div className="mb-6">
+                            <p className="text-xl font-semibold text-primary-gold md:text-2xl">{allSlides[currentSlide]?.date}</p>
+                          </div>
+                        <div className="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-x-6 sm:space-y-0">
+                          <Button size="lg" className="bg-primary-gold hover:bg-primary-gold/90 text-white font-semibold px-8 py-3 transform transition-transform hover:scale-105" asChild>
+                            <Link href="/program">{t("viewProgram")}</Link>
+                          </Button>
+                          <Button
+                            size="lg"
+                            className="bg-secondary-blue border-2 border-white text-white hover:bg-secondary-blue/90 font-semibold px-8 py-3 transform transition-transform hover:scale-105"
+                            asChild
+                          >
+                            <Link href="/tickets">{t("bookTickets")}</Link>
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="animate-fade-in-up">
+                        <h1 className="mb-4 text-4xl font-bold md:text-6xl">{allSlides[currentSlide]?.title}</h1>
+                        <h2 className="mb-6 text-xl font-medium text-primary-gold md:text-2xl">
+                          {allSlides[currentSlide]?.company || "Acting Europe Festival"}
+                        </h2>
+                        <div className="mb-8 space-y-2">
+                          <p className="text-lg text-white/90">{allSlides[currentSlide]?.date} • {allSlides[currentSlide]?.time}</p>
+                          <p className="text-lg text-white/90">{allSlides[currentSlide]?.venue}</p>
+                        </div>
+                        <Button size="lg" className="bg-primary-gold hover:bg-primary-gold/90 text-white font-semibold transform transition-transform hover:scale-105" asChild>
+                          <Link href={`/performances/${allSlides[currentSlide]?.id}`}>
+                            Learn More
+                          </Link>
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Navigation Dots */}
-          {featuredPerformances.length > 1 && (
+          {allSlides.length > 1 && (
             <div className="absolute bottom-8 left-1/2 z-20 flex -translate-x-1/2 space-x-2">
-              {featuredPerformances.map((_, index) => (
+              {allSlides.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentSlide(index)}
@@ -193,7 +196,7 @@ export default function Home() {
           )}
 
           {/* Navigation Arrows */}
-          {featuredPerformances.length > 1 && (
+          {allSlides.length > 1 && (
             <>
               <button
                 onClick={goToPrevSlide}

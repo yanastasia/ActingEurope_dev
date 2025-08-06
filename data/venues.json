@@ -6,27 +6,27 @@
     "rows": [
       {
         "rowNumber": 1,
-        "seatCount": 20
+        "seatCount": 22
       },
       {
         "rowNumber": 2,
-        "seatCount": 20
+        "seatCount": 27
       },
       {
         "rowNumber": 3,
-        "seatCount": 20
+        "seatCount": 30
       },
       {
         "rowNumber": 4,
-        "seatCount": 20
+        "seatCount": 30
       },
       {
         "rowNumber": 5,
-        "seatCount": 20
+        "seatCount": 30
       },
       {
         "rowNumber": 6,
-        "seatCount": 20
+        "seatCount": 30
       },
       {
         "rowNumber": 7,
@@ -34,39 +34,39 @@
       },
       {
         "rowNumber": 8,
-        "seatCount": 20
+        "seatCount": 30
       },
       {
         "rowNumber": 9,
-        "seatCount": 20
+        "seatCount": 30
       },
       {
         "rowNumber": 10,
-        "seatCount": 20
+        "seatCount": 30
       },
       {
         "rowNumber": 11,
-        "seatCount": 20
+        "seatCount": 30
       },
       {
         "rowNumber": 12,
-        "seatCount": 20
+        "seatCount": 30
       },
       {
         "rowNumber": 13,
-        "seatCount": 20
+        "seatCount": 30
       },
       {
         "rowNumber": 14,
-        "seatCount": 20
+        "seatCount": 30
       },
       {
         "rowNumber": 15,
-        "seatCount": 20
+        "seatCount": 30
       },
       {
         "rowNumber": 16,
-        "seatCount": 20
+        "seatCount": 30
       }
     ]
   },

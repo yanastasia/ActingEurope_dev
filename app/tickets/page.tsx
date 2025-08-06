@@ -13,7 +13,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import SeatSelection from "@/components/seat-selection"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/lib/language-context"
-import { ds, DatabaseStorage, Event } from "@/lib/database-storage"
+import { ds, Event } from "@/lib/database-storage"
+import { performances } from "@/lib/performance-data"
 import { generateAndSendTicket, type GenerateTicketResult } from "@/lib/user-verification"
 import { Loader2 } from "lucide-react"
 
@@ -35,7 +36,7 @@ export default function TicketsPage() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [bookingReference, setBookingReference] = useState("")
 
-  // Get events and venues from localStorage
+  // Load performances from performance-data.ts only
   useEffect(() => {
     const getBGNPrice = (euroPrice: string) => {
       if (!euroPrice) return "Free"
@@ -43,58 +44,26 @@ export default function TicketsPage() {
       return `${(numericPrice * 1.96).toFixed(2)} лв.`
     }
 
-    const handleDatabaseUpdate = async (event: CustomEvent<any>) => {
-      const currentDbInstance = (event as CustomEvent).detail as DatabaseStorage;
-      const updatedEvents = await currentDbInstance.getEvents();
+    // Only use performance-data.ts as the single source of truth
+    const mappedPerformances = performances.map((p) => ({
+      id: `performance-${p.id}`,
+      title: p.title,
+      company: p.company,
+      date: p.date,
+      time: p.time,
+      venue: p.venue,
+      imageUrl: p.imageUrl || "/placeholder.svg?height=200&width=300",
+      price: "Free", // Default price for performances
+      rawPrice: 0, // Default raw price
+    }))
 
-      const updatedPerformances = updatedEvents
-        .filter((event: any) => event.type === "performance")
-        .map((event: any) => ({
-          id: event.id,
-          title: event.title,
-          company: event.company || "Acting Europe Festival",
-          date: event.date,
-          time: event.time,
-          venue: event.venue,
-          imageUrl: event.imageUrl || "/placeholder.svg?height=200&width=300",
-          price: event.price ? getBGNPrice(event.price) : "Free",
-          rawPrice: event.price,
-        }))
+    setAllPerformances(mappedPerformances)
 
-      setAllPerformances(updatedPerformances)
-      setVenues(await currentDbInstance.getVenues())
-    }
-
-    (async () => {
-      // Load events
-      const events = await ds.getEvents()
-
-      // Update the event mapping
-      const performances = events
-        .filter((event: any) => event.type === "performance")
-        .map((event: any) => ({
-          id: event.id,
-          title: event.title,
-          company: event.company || "Acting Europe Festival",
-          date: event.date,
-          time: event.time,
-          venue: event.venue,
-          imageUrl: event.imageUrl || "/placeholder.svg?height=200&width=300",
-          price: event.price ? getBGNPrice(event.price) : "Free",
-          rawPrice: event.price,
-        }))
-
-      setAllPerformances(performances)
-
-      // Load venues
+    // Load venues from database storage (for seat selection)
+    const loadVenues = async () => {
       setVenues(await ds.getVenues())
-    })();
-
-    window.addEventListener("databaseUpdated", (event) => { handleDatabaseUpdate(event as CustomEvent<any>) })
-
-    return () => {
-      window.removeEventListener("databaseUpdated", (event) => { handleDatabaseUpdate(event as CustomEvent<any>) })
     }
+    loadVenues()
   }, [])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -178,15 +147,16 @@ export default function TicketsPage() {
         event: {
           id: selectedPerformanceData.id,
           title: selectedPerformanceData.title,
-          theatreId: 0, // Placeholder: Add actual theatreId if available
-          venueId: 0, // Placeholder: Add actual venueId if available
           eventType: "performance",
-          eventDate: selectedPerformanceData.date,
-          eventTime: selectedPerformanceData.time,
+          date: selectedPerformanceData.date,
+          time: selectedPerformanceData.time,
+          venue: selectedPerformanceData.venue,
+          company: selectedPerformanceData.company || "Acting Europe Festival",
           description: "", // Placeholder: Add actual description
+          imageUrl: selectedPerformanceData.imageUrl || "/placeholder.svg?height=200&width=300",
+          isFeatured: false,
           price: selectedPerformanceData.rawPrice,
-          theatre: {} as any, // Placeholder: Add actual theatre object
-          venue: {} as any, // Placeholder: Add actual venue object
+          tags: [],
         } as Event,
         bookingDate: new Date().toISOString(),
       }

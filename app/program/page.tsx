@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { useLanguage } from "@/lib/language-context"
-import { ds, DatabaseStorage, Event } from "@/lib/database-storage"
+import { Event } from "@/lib/database-storage"
 import { performances, Performance } from "@/lib/performance-data"
 import Link from "next/link"
 
@@ -23,63 +23,26 @@ export default function ProgramPage() {
   const [types, setTypes] = useState<string[]>(["All Types"])
 
   useEffect(() => {
-    const fetchAndCombineEvents = async () => {
-      const dbEvents = await ds.getEvents()
+    // Only use performance-data.ts as the single source of truth
+    const mappedPerformances: Event[] = performances.map((p: Performance) => ({
+      id: `performance-${p.id}`,
+      title: p.title,
+      eventType: "performance",
+      date: p.date,
+      time: p.time,
+      venue: p.venue,
+      company: p.company,
+      description: p.synopsis,
+      imageUrl: p.imageUrl,
+      posterUrl: p.posterUrl,
+      isFeatured: false,
+      tags: [p.genre, p.language, p.duration].filter(Boolean) as string[],
+    }))
 
-      const mappedPerformances: Event[] = performances.map((p: Performance) => ({
-        id: p.id,
-        title: p.title,
-        eventType: "performance",
-        date: p.date,
-        time: p.time,
-        venue: p.venue,
-        company: p.company,
-        description: p.synopsis,
-        imageUrl: p.imageUrl,
-        posterUrl: p.posterUrl,
-        isFeatured: false,
-        tags: [p.genre, p.language, p.duration].filter(Boolean) as string[],
-      }))
-
-      const combinedEvents = [...dbEvents, ...mappedPerformances]
-      setEvents(combinedEvents)
-
-      setDates(["All Dates", ...new Set(combinedEvents.map(e => e.date))])
-      setVenues(["All Venues", ...new Set(combinedEvents.map(e => e.venue))])
-      setTypes(["All Types", ...new Set(combinedEvents.map(e => e.eventType))])
-    }
-
-    fetchAndCombineEvents()
-
-    const handleDatabaseUpdate = async (event: CustomEvent<any>) => {
-      const currentDbInstance = (event as CustomEvent).detail as DatabaseStorage
-      const updatedDbEvents = await currentDbInstance.getEvents()
-
-      const mappedPerformances: Event[] = performances.map((p: Performance) => ({
-        id: p.id,
-        title: p.title,
-        eventType: "performance",
-        date: p.date,
-        time: p.time,
-        venue: p.venue,
-        company: p.company,
-        description: p.synopsis,
-        imageUrl: p.imageUrl,
-        posterUrl: p.posterUrl,
-        isFeatured: false,
-        tags: [p.genre, p.language, p.duration].filter(Boolean) as string[],
-      }))
-
-      const combinedEvents = [...updatedDbEvents, ...mappedPerformances]
-      setEvents(combinedEvents)
-
-      setDates(["All Dates", ...new Set(combinedEvents.map(e => e.date))])
-      setVenues(["All Venues", ...new Set(combinedEvents.map(e => e.venue))])
-      setTypes(["All Types", ...new Set(combinedEvents.map(e => e.eventType))])
-    }
-
-    window.addEventListener("databaseUpdated", (event) => handleDatabaseUpdate(event as CustomEvent<any>))
-    return () => window.removeEventListener("databaseUpdated", (event) => handleDatabaseUpdate(event as CustomEvent<any>))
+    setEvents(mappedPerformances)
+    setDates(["All Dates", ...new Set(mappedPerformances.map(e => e.date))])
+    setVenues(["All Venues", ...new Set(mappedPerformances.map(e => e.venue))])
+    setTypes(["All Types", ...new Set(mappedPerformances.map(e => e.eventType))])
   }, [])
 
   const filteredEvents = events.filter((event) => {
@@ -226,7 +189,7 @@ export default function ProgramPage() {
                 const day = i + 1
                 const hasEvents = Object.keys(eventsByDate).some(date => new Date(date).getDate() === day)
                 return (
-                  <div key={i} className={`aspect-square rounded border p-1 ${hasEvents ? "bg-primary-gold/10 border-primary-gold/30" : ""}`}>
+                  <div key={`calendar-day-${i}`} className={`aspect-square rounded border p-1 ${hasEvents ? "bg-primary-gold/10 border-primary-gold/30" : ""}`}>
                     <div className="text-sm font-medium">{day}</div>
                     {hasEvents && <div className="mt-1 h-1 w-full rounded-full bg-primary-gold"></div>}
                   </div>

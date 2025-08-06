@@ -244,30 +244,6 @@ INSERT INTO theatres (name, city, country, description, history, founded_year) V
     1904
 ),
 (
-    '"N. O. Masalitinov" Plovdiv Drama Theatre', 
-    'Plovdiv', 
-    'Bulgaria',
-    'One of Bulgaria\'s leading regional theatres, known for its diverse repertoire and artistic excellence.',
-    'Named after the renowned Bulgarian actor Nikola Masalitinov, this theatre has been a cultural beacon in Plovdiv since its establishment, contributing significantly to Bulgarian theatrical heritage.',
-    1881
-),
-(
-    '"Jordan Hadzi Konstantinov - Dzinot" Drama Theatre', 
-    'Veles', 
-    'North Macedonia',
-    'A distinguished theatre company from Veles, continuing the legacy of theatrical excellence in North Macedonia.',
-    'Named after Jordan Hadzi Konstantinov - Dzinot, a prominent figure in Macedonian theatre, this institution has been a vital part of the cultural landscape in Veles since its founding.',
-    1945
-),
-(
-    'National Theatre', 
-    'Belgrade', 
-    'Serbia',
-    'Serbia\'s premier theatrical institution, renowned for its classical and contemporary productions.',
-    'Founded in the 19th century, the National Theatre of Belgrade has been the cornerstone of Serbian dramatic arts, hosting world-class productions and fostering theatrical innovation.',
-    1868
-),
-(
     'Macedonian National Theatre', 
     'Skopje', 
     'North Macedonia',

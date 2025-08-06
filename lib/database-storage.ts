@@ -213,7 +213,17 @@ export class DatabaseStorage {
     localStorage.removeItem(this.storageKey)
     this.initializeDatabase()
     console.log("All database data cleared and reinitialized.")
-}
+  }
+
+  // Force clear and reinitialize - useful for development
+  forceClearAndReinit(): void {
+    if (typeof window === "undefined") return
+    localStorage.clear() // Clear all localStorage
+    this.initializeDatabase()
+    console.log("All localStorage cleared and database reinitialized.")
+    // Dispatch event to notify components
+    window.dispatchEvent(new CustomEvent("databaseUpdated", { detail: this }))
+  }
 
   updateUser(updatedUser: any): void {
     const data = this.getData()

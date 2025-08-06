@@ -15,10 +15,23 @@ import { performances } from "@/lib/performance-data"
 
 export default async function PerformancePage({ params }: { params: { id: string } }) {
   const { id } = await params;
-  const performance = performances.find((p) => p.id === id)
+  
+  // Extract original ID if it's prefixed
+  const originalId = id.startsWith('performance-') ? id.replace('performance-', '') : id
+  
+  // Only use performance-data.ts as the single source of truth
+  const performance = performances.find((p) => p.id === originalId)
 
   if (!performance) {
-    return <div>Performance not found</div>
+    return (
+      <div className="container mx-auto px-4 py-12">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-secondary-blue mb-4">Performance Not Found</h1>
+          <p className="text-muted-foreground mb-6">The performance you're looking for doesn't exist.</p>
+          <Link href="/program" className="text-primary-gold hover:underline">← Back to Program</Link>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -87,23 +100,31 @@ export default async function PerformancePage({ params }: { params: { id: string
             ))}
           </div>
 
-          <h2 className="mb-4 text-2xl font-semibold text-secondary-blue">Cast & Crew</h2>
-          <div className="mb-8 space-y-2">
-            <div className="flex">
-              <span className="w-24 font-medium">Director:</span>
-              <span className="text-muted-foreground">{performance.director}</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="mb-2 w-24 font-medium">Cast:</span>
-              <ul className="ml-6 list-disc space-y-1">
-                {performance.cast.map((actor, index) => (
-                  <li key={index} className="text-muted-foreground">
-                    {actor}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+          {(performance.director !== "TBA" || performance.cast.length > 0) && (
+            <>
+              <h2 className="mb-4 text-2xl font-semibold text-secondary-blue">Cast & Crew</h2>
+              <div className="mb-8 space-y-2">
+                {performance.director !== "TBA" && (
+                  <div className="flex">
+                    <span className="w-24 font-medium">Director:</span>
+                    <span className="text-muted-foreground">{performance.director}</span>
+                  </div>
+                )}
+                {performance.cast.length > 0 && (
+                  <div className="flex flex-col">
+                    <span className="mb-2 w-24 font-medium">Cast:</span>
+                    <ul className="ml-6 list-disc space-y-1">
+                      {performance.cast.map((actor, index) => (
+                        <li key={index} className="text-muted-foreground">
+                          {actor}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Sidebar */}
