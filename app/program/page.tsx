@@ -124,24 +124,24 @@ export default function ProgramPage() {
                     <CardContent className="p-0">
                       <div className="flex flex-col md:flex-row">
                                               <div className="border-r border-b p-4 md:w-1/4 md:border-b-0 flex flex-row items-center justify-around">
-                        <div className="flex flex-col items-start -ml-2">
+                        <div className="flex flex-col items-start justify-start space-y-2">
                           <p className="font-semibold text-secondary-blue">{event.time}</p>
-                          <div className="mt-2 flex items-center text-sm text-muted-foreground">
+                          <div className="flex items-center text-sm text-muted-foreground">
                             <MapPin className="mr-1 h-4 w-4" />
                             {event.venue}
                           </div>
-                          <Badge className={`mt-2 ${getBadgeColor(event.eventType)}`}>
+                          <Badge className={`${getBadgeColor(event.eventType)}`}>
                             {t(event.eventType)}
                           </Badge>
                         </div>
                         <div className="flex-shrink-0">
-                          {(event.eventType === "performance" && 'posterUrl' in event) ? (
+                          {(event.eventType === "performance" && 'posterUrl' in event && event.posterUrl) ? (
                             <img
                               src={event.posterUrl as string}
                               alt={`${event.title} poster`}
                               className="mb-2 max-h-24 w-auto rounded-md object-contain"
                             />
-                          ) : event.imageUrl ? (
+                          ) : (event.imageUrl && event.imageUrl.trim() !== "") ? (
                             <img
                               src={event.imageUrl}
                               alt={`${event.title} poster`}

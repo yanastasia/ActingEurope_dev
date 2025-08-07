@@ -18,7 +18,16 @@ export default function Home() {
   const [allSlides, setAllSlides] = useState<any[]>([])
   const [currentSlide, setCurrentSlide] = useState(0)
 
-  // Removed auto-advance slider functionality
+  // Auto-advance slider functionality
+  useEffect(() => {
+    if (allSlides.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % allSlides.length);
+    }, 3500); // 3.5 seconds
+
+    return () => clearInterval(interval);
+  }, [allSlides.length]);
 
   const goToNextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % allSlides.length)
@@ -118,61 +127,76 @@ export default function Home() {
 
           {/* Content Overlay */}
           {allSlides.length > 0 && (
-            <div className="relative z-10 flex h-full items-center">
+            <div className="relative z-10 flex h-full items-center overflow-hidden">
               <div className="container mx-auto px-4">
                 <div className="mx-auto max-w-4xl text-center text-white">
-                  <div className="transition-all duration-700 ease-in-out transform">
-                    {allSlides[currentSlide]?.type === "hero" ? (
-                       <div className="animate-fade-in-up">
-                          <div className="mb-8 flex justify-center -mt-16">
-                            <Image
-                              src="/Acting Europe Mask.png"
-                              alt="Acting Europe Festival Logo"
-                              width={200}
-                              height={200}
-                              className="object-contain"
-                            />
-                          </div>
-                          <h1 className="mb-4 text-4xl font-bold md:text-5xl lg:text-6xl">
-                            {allSlides[currentSlide]?.title}
-                            <span className="block text-primary-gold">{allSlides[currentSlide]?.subtitle}</span>
-                          </h1>
-                          <p className="mb-6 text-lg text-white/90 md:text-xl lg:text-2xl max-w-3xl mx-auto">
-                            {allSlides[currentSlide]?.description}
-                          </p>
-                          <div className="mb-6">
-                            <p className="text-xl font-semibold text-primary-gold md:text-2xl">{allSlides[currentSlide]?.date}</p>
-                          </div>
-                        <div className="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-x-6 sm:space-y-0">
-                          <Button size="lg" className="bg-primary-gold hover:bg-primary-gold/90 text-white font-semibold px-8 py-3 transform transition-transform hover:scale-105" asChild>
-                            <Link href="/program">{t("viewProgram")}</Link>
-                          </Button>
-                          <Button
-                            size="lg"
-                            className="bg-secondary-blue border-2 border-white text-white hover:bg-secondary-blue/90 font-semibold px-8 py-3 transform transition-transform hover:scale-105"
-                            asChild
-                          >
-                            <Link href="/tickets">{t("bookTickets")}</Link>
-                          </Button>
+                  <div className="relative h-full">
+                    {allSlides.map((slide, index) => (
+                      <div
+                        key={slide.id}
+                        className={`absolute inset-0 flex items-center justify-center transition-all duration-1000 ease-in-out ${
+                          index === currentSlide
+                            ? "opacity-100 transform translate-x-0"
+                            : index < currentSlide
+                            ? "opacity-0 transform -translate-x-full"
+                            : "opacity-0 transform translate-x-full"
+                        }`}
+                      >
+                        <div className="w-full">
+                          {slide.type === "hero" ? (
+                            <div>
+                              <div className="mb-8 flex justify-center -mt-16">
+                                <Image
+                                  src="/Acting Europe Mask.png"
+                                  alt="Acting Europe Festival Logo"
+                                  width={200}
+                                  height={200}
+                                  className="object-contain"
+                                />
+                              </div>
+                              <h1 className="mb-4 text-4xl font-bold md:text-5xl lg:text-6xl">
+                                {slide.title}
+                                <span className="block text-primary-gold">{slide.subtitle}</span>
+                              </h1>
+                              <p className="mb-6 text-lg text-white/90 md:text-xl lg:text-2xl max-w-3xl mx-auto">
+                                {slide.description}
+                              </p>
+                              <div className="mb-6">
+                                <p className="text-xl font-semibold text-primary-gold md:text-2xl">{slide.date}</p>
+                              </div>
+                              <div className="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-x-6 sm:space-y-0">
+                                <Button size="lg" className="bg-primary-gold hover:bg-primary-gold/90 text-white font-semibold px-8 py-3 transform transition-transform hover:scale-105" asChild>
+                                  <Link href="/program">{t("viewProgram")}</Link>
+                                </Button>
+                                <Button
+                                  size="lg"
+                                  className="bg-secondary-blue border-2 border-white text-white hover:bg-secondary-blue/90 font-semibold px-8 py-3 transform transition-transform hover:scale-105"
+                                  asChild
+                                >
+                                  <Link href="/tickets">{t("bookTickets")}</Link>
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div>
+                              <h1 className="mb-4 text-4xl font-bold md:text-6xl">{slide.title}</h1>
+                              <h2 className="mb-6 text-xl font-medium text-primary-gold md:text-2xl">
+                                {slide.company || "Acting Europe Festival"}
+                              </h2>
+                              <div className="mb-8 space-y-2">
+                                <p className="text-lg text-white/90">{slide.date} • {slide.time}</p>
+                                <p className="text-lg text-white/90">{slide.venue}</p>
+                              </div>
+                              <Button size="lg" className="bg-primary-gold hover:bg-primary-gold/90 text-white font-semibold transform transition-transform hover:scale-105" asChild>
+                                <Link href={`/performances/${slide.id}`}>
+                                  Learn More
+                                </Link>
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       </div>
-                    ) : (
-                      <div className="animate-fade-in-up">
-                        <h1 className="mb-4 text-4xl font-bold md:text-6xl">{allSlides[currentSlide]?.title}</h1>
-                        <h2 className="mb-6 text-xl font-medium text-primary-gold md:text-2xl">
-                          {allSlides[currentSlide]?.company || "Acting Europe Festival"}
-                        </h2>
-                        <div className="mb-8 space-y-2">
-                          <p className="text-lg text-white/90">{allSlides[currentSlide]?.date} • {allSlides[currentSlide]?.time}</p>
-                          <p className="text-lg text-white/90">{allSlides[currentSlide]?.venue}</p>
-                        </div>
-                        <Button size="lg" className="bg-primary-gold hover:bg-primary-gold/90 text-white font-semibold transform transition-transform hover:scale-105" asChild>
-                          <Link href={`/performances/${allSlides[currentSlide]?.id}`}>
-                            Learn More
-                          </Link>
-                        </Button>
-                      </div>
-                    )}
+                    ))}
                   </div>
                 </div>
               </div>
@@ -263,7 +287,7 @@ export default function Home() {
             {[1, 2, 3, 4, 5].map((i) => (
               <div key={i} className="h-96 relative overflow-hidden rounded-md">
                 <Image
-                  src={`/${['bez_krv.webp', 'bozhe_moj.jpg', 'don_zhuan.jpg', 'nevedenie.jpg', 'nichija_zemja.jpg'][i-1]}`}
+                  src={`/${['artists_in_waiting.jpg', 'bozhe_moj.jpg', 'don_zhuan.jpg', 'nevedenie.jpg', 'nichija_zemja.jpg'][i-1]}`}
                   alt={`Gallery image ${i}`}
                   width={220}
                   height={310}

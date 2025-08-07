@@ -1,6 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
-import { Calendar, Clock, MapPin, Languages, Users } from "lucide-react"
+import { Calendar, Clock, MapPin, Languages, Users, Subtitles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
@@ -159,6 +159,12 @@ export default async function PerformancePage({ params }: { params: { id: string
                 <Languages className="h-5 w-5 text-primary-gold" />
                 <span className="text-sm">{performance.language}</span>
               </div>
+              {performance.subtitles && (
+                <div className="flex items-center gap-2">
+                  <Subtitles className="h-5 w-5 text-primary-gold" />
+                  <span className="text-sm">Subtitles: {performance.subtitles}</span>
+                </div>
+              )}
               <div className="flex items-center gap-2">
                 <Users className="h-5 w-5 text-primary-gold" />
                 <span className="text-sm">Suitable for ages 12+</span>

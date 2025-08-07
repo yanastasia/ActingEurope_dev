@@ -229,6 +229,54 @@ export const mockTheatres: Theatre[] = [
       "Classical Drama",
       "Contemporary Plays"
     ]
+  },
+  {
+    id: 8,
+    name: 'OSAIK "39 Monkeys"',
+    city: "Sofia",
+    country: "Bulgaria",
+    description: "An innovative independent theatre collective known for experimental and contemporary performances.",
+    history: "OSAIK '39 Monkeys' is a dynamic theatre group that has been pushing the boundaries of contemporary theatre in Sofia. Known for their creative approach to storytelling and experimental performances, they have gained recognition for bringing fresh perspectives to the Bulgarian theatre scene.",
+    foundedYear: 2010,
+    images: [
+      {
+        id: 17,
+        imageUrl: "/36monkeys.jpg",
+        caption: "Theatre space",
+        isPrimary: true,
+      },
+      {
+        id: 18,
+        imageUrl: "/placeholder.svg?height=300&width=400&text=Experimental+Performance",
+        caption: "Experimental performance",
+        isPrimary: false,
+      },
+    ],
+    tags: ["Independent Theatre", "Experimental", "Contemporary", "Bulgarian Theatre"],
+  },
+  {
+    id: 9,
+    name: "Intimate Theater Bitola",
+    city: "Bitola",
+    country: "North Macedonia",
+    description: "A cozy intimate theatre space dedicated to bringing audiences closer to the art of performance.",
+    history: "The Intimate Theater Bitola has been a cultural gem in the historic city of Bitola, providing an intimate setting for both local and international productions. The theatre focuses on creating meaningful connections between performers and audiences through its close-knit performance space.",
+    foundedYear: 1995,
+    images: [
+      {
+        id: 19,
+        imageUrl: "/bitolatheatre.jpg",
+        caption: "Theatre exterior",
+        isPrimary: true,
+      },
+      {
+        id: 20,
+        imageUrl: "/placeholder.svg?height=300&width=400&text=Intimate+Performance+Space",
+        caption: "Intimate performance space",
+        isPrimary: false,
+      },
+    ],
+    tags: ["Intimate Theatre", "Macedonian Culture", "Local Productions", "Community Theatre"],
   }
 ]
 
