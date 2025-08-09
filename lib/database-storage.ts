@@ -8,7 +8,7 @@ export interface Event {
   date: string;
   time: string;
   venue: string;
-  company: string;
+  company: string[];
   description: string;
   imageUrl: string;
   isFeatured: boolean;

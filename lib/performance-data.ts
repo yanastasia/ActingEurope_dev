@@ -1,7 +1,7 @@
 export interface Performance {
   id: string;
   title: string;
-  company: string;
+  company: string[];
   director: string;
   cast: string[];
   date: string;
@@ -20,7 +20,7 @@ export const performances: Performance[] = [
     {
     id: "1",
     title: "No Man's Land",
-    company: "Macedonian National Theatre",
+    company: ["Macedonian National Theatre"],
     director: "Aleksandar Morfov",
     cast: [
       "Saško Kocev",
@@ -43,7 +43,7 @@ export const performances: Performance[] = [
       "Tome Stankovski",
       "Aleksandar Ivanovski",
     ],
-    date: "2025-09-20",
+    date: "20-09-2025",
     time: "19:00",
     venue: "Main Stage",
     imageUrl: "/nizhija_zemja1.jpg",
@@ -58,7 +58,7 @@ export const performances: Performance[] = [
   {
     id: "2",
     title: "Don Juan",
-    company: "National Theatre in Nish",
+    company: ["National Theatre in Niš"],
     director: "Vasil Vasilev",
     cast: [
       "Dejan Lilić",
@@ -72,7 +72,7 @@ export const performances: Performance[] = [
       "Marjan Todorović",
       "Miloš Mitrović",
     ],
-    date: "2025-09-18",
+    date: "18-09-2025",
     time: "19:00",
     venue: "Main Stage",
     imageUrl: "/don_zhuan1.jpg",
@@ -87,12 +87,12 @@ export const performances: Performance[] = [
   {
     id: "3",
     title: "Oh My God",
-    company: "National Theatre Ivan Vazov",
+    company: ['"Ivan Vazov" National Theatre'],
     director: "Stoyan Radev",
     cast: [
       "Hristo Mutafchiev"
     ],
-    date: "2025-09-21",
+    date: "21-09-2025",
     time: "16:00",
     venue: "Chamber Stage",
     imageUrl: "/1bozhe_moj.jpg",
@@ -107,16 +107,16 @@ export const performances: Performance[] = [
     {
     id: "4",
     title: "Aivar or Lutenitsa",
-    company: 'OSAIK "39 Monkeys" Sofia & Intimate Theater Bitola',
+    company: ['OSAIK "39 Monkeys"', 'Intimate Theatre Bitola'],
     director: "Gergana Dimitrova",
     cast: [
       "Denitsa Darinova",
       "Sofia Ristevska"
     ],
-    date: "2025-09-20",
+    date: "20-09-2025",
     time: "16:00",
     venue: "Chamber Stage",
-    imageUrl: "/a_ili_lj1.JPG",
+    imageUrl: "/a_ili_lj1.jpg",
     posterUrl: "/a_ili_lj.png",
     genre: "Comedy",
     language: "Bulgarian and Macedonian",
@@ -128,7 +128,7 @@ export const performances: Performance[] = [
     {
     id: "5",
     title: "Artists in waiting",
-    company: 'Drama Theatre "Krum Kyulyavkov"',
+    company: ['Drama Theatre "Krum Kyulyavkov"'],
     director: "Presiyan Kuzov",
     cast: [
       "Yordan Danchev", 
@@ -140,7 +140,7 @@ export const performances: Performance[] = [
       "Ivana Ivanova", 
       "Yavor Borisov (voice)"
     ],
-    date: "2025-09-19",
+    date: "19-09-2025",
     time: "19:30",
     venue: "Main Stage",
     imageUrl: "/a_in_wait1.jpg",
@@ -155,10 +155,10 @@ export const performances: Performance[] = [
   {
     id: "6",
     title: "In the Dark",
-    company: "National Theatre Ivan Vazov",
+    company: ['"Ivan Vazov" National Theatre'],
     director: "Albena Stavreva",
     cast: ["Albena Stavreva"],
-    date: "2025-09-21",
+    date: "21-09-2025",
     time: "19:00",
     venue: "Main Stage",
     imageUrl: "/nevedenie1.jpg",

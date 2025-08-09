@@ -42,7 +42,7 @@ interface EventFormState {
   date: string;
   time: string;
   venue: string;
-  company: string;
+  company: string[];
   description: string;
   imageUrl: string;
   isFeatured: boolean;
@@ -76,7 +76,7 @@ export default function AdminPage() {
     date: "",
     time: "",
     venue: "",
-    company: "",
+    company: [],
     description: "",
     imageUrl: "/placeholder.svg?height=400&width=600",
     isFeatured: false,
@@ -306,7 +306,7 @@ export default function AdminPage() {
       date: "",
       time: "",
       venue: "",
-      company: "",
+      company: [],
       description: "",
       imageUrl: "/placeholder.svg?height=400&width=600",
       isFeatured: false,
@@ -631,10 +631,14 @@ export default function AdminPage() {
                       <Label htmlFor="company">Company/Presenter</Label>
                       <Input
                         id="company"
-                        placeholder="Enter company or presenter name"
-                        value={editingEvent.company}
-                        onChange={handleInputChange}
+                        placeholder="Enter companies separated by commas (max 2)"
+                        value={Array.isArray(editingEvent.company) ? editingEvent.company.join(', ') : editingEvent.company}
+                        onChange={(e) => {
+                          const companies = e.target.value.split(',').map(c => c.trim()).filter(c => c.length > 0).slice(0, 2)
+                          setEditingEvent({ ...editingEvent, company: companies })
+                        }}
                       />
+                      <p className="text-sm text-muted-foreground">Enter up to 2 companies separated by commas</p>
                     </div>
                   </div>
 
@@ -757,10 +761,14 @@ export default function AdminPage() {
                       <Label htmlFor="company">Company/Presenter</Label>
                       <Input
                         id="company"
-                        placeholder="Enter company or presenter name"
-                        value={formData.company}
-                        onChange={handleInputChange}
+                        placeholder="Enter companies separated by commas (max 2)"
+                        value={formData.company.join(', ')}
+                        onChange={(e) => {
+                          const companies = e.target.value.split(',').map(c => c.trim()).filter(c => c.length > 0).slice(0, 2)
+                          setFormData({ ...formData, company: companies })
+                        }}
                       />
+                      <p className="text-sm text-muted-foreground">Enter up to 2 companies separated by commas</p>
                     </div>
                   </div>
 

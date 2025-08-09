@@ -8,7 +8,7 @@ import Image from "next/image"
 interface PerformanceCardProps {
   id: string
   title: string
-  company: string
+  company: string | string[]
   date: string
   time: string
   venue: string
@@ -46,7 +46,9 @@ export default function PerformanceCard({
       </div>
       <CardHeader className="p-4">
         <CardTitle className="line-clamp-1 text-xl text-secondary-blue">{title}</CardTitle>
-        <p className="text-sm font-medium text-muted-foreground">{company}</p>
+        <p className="text-sm font-medium text-muted-foreground">
+          {Array.isArray(company) ? company.join(' & ') : company}
+        </p>
       </CardHeader>
       <CardContent className="p-4 pt-0">
         <div className="mb-4 flex flex-wrap gap-2">

@@ -1,7 +1,7 @@
 {
-  "/admin/page": "app/admin/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
   "/page": "app/page.js",
+  "/program/page": "app/program/page.js",
   "/performances/[id]/page": "app/performances/[id]/page.js",
-  "/tickets/page": "app/tickets/page.js",
-  "/participants/page": "app/participants/page.js"
+  "/tickets/page": "app/tickets/page.js"
 }

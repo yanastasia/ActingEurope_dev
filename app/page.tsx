@@ -181,7 +181,7 @@ export default function Home() {
                             <div>
                               <h1 className="mb-4 text-4xl font-bold md:text-6xl">{slide.title}</h1>
                               <h2 className="mb-6 text-xl font-medium text-primary-gold md:text-2xl">
-                                {slide.company || "Acting Europe Festival"}
+                                {slide.company ? (Array.isArray(slide.company) ? slide.company.join(' & ') : slide.company) : "Acting Europe Festival"}
                               </h2>
                               <div className="mb-8 space-y-2">
                                 <p className="text-lg text-white/90">{slide.date} • {slide.time}</p>

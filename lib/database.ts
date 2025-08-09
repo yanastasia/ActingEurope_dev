@@ -86,8 +86,8 @@ export interface Booking {
   event: Event
 }
 
-// Mock user data (for initial setup or testing)
-export const mockUsers: User[] = [
+// user data (for initial setup or testing)
+export const Users: User[] = [
   {
     id: 1,
     email: "admin@actingeurope.eu",
@@ -110,8 +110,11 @@ export const mockUsers: User[] = [
   },
 ]
 
+// Non-mock aliases for seed.ts
+export const users = Users;
+
 // Updated theatre data with correct information
-export const mockTheatres: Theatre[] = [
+export const Theatres: Theatre[] = [
   {
     id: 1,
     name: 'Drama Theatre "Krum Kyulyavkov"',
@@ -256,7 +259,7 @@ export const mockTheatres: Theatre[] = [
   },
   {
     id: 9,
-    name: "Intimate Theater Bitola",
+    name: "Intimate Theatre Bitola",
     city: "Bitola",
     country: "North Macedonia",
     description: "A cozy intimate theatre space dedicated to bringing audiences closer to the art of performance.",
@@ -280,7 +283,50 @@ export const mockTheatres: Theatre[] = [
   }
 ]
 
-// Database utility functions (mock implementations)
+// Static venues data for synchronous export
+const Venues: Venue[] = [
+  {
+    id: 1,
+    name: "Main Stage",
+    description: "Main performance venue with regular and balcony seating",
+    capacity: 500,
+    sections: [
+      {
+        id: 1,
+        sectionName: "Regular Seating",
+        sectionType: "regular",
+        seats: generateMainStageRegularSeats(),
+      },
+      {
+        id: 2,
+        sectionName: "Balcony Seating",
+        sectionType: "balcony",
+        seats: generateMainStageBalconySeats(),
+      },
+    ],
+  },
+  {
+    id: 2,
+    name: "Chamber Stage",
+    description: "Intimate performance space for smaller productions",
+    capacity: 150,
+    sections: [
+      {
+        id: 3,
+        sectionName: "Main Seating",
+        sectionType: "regular",
+        seats: generateChamberStageSeats(),
+      },
+    ],
+  },
+];
+
+// Export aliases for seed.ts (after Theatres declaration)
+export const theatres = Theatres;
+export const venues = Venues;
+export const news: any[] = [];
+
+// Database utility functions ( implementations)
 export async function getUserByEmail(email: string): Promise<User | null> {
   // In a real app, this would query the database
   const users = JSON.parse(localStorage.getItem("actingEurope_users") || "[]")
@@ -303,68 +349,44 @@ export async function createUser(userData: Omit<User, "id" | "createdAt" | "role
 
 export async function getTheatres(): Promise<Theatre[]> {
   // In a real app, this would query the database
-  return mockTheatres
+  return Theatres 
 }
 
 export async function getTheatreById(id: number): Promise<Theatre | null> {
   // In a real app, this would query the database
-  return mockTheatres.find((theatre) => theatre.id === id) || null
+  return Theatres.find((theatre) => theatre.id === id) || null
 }
 
 export async function getVenues(): Promise<Venue[]> {
-  // Updated venue data with correct seating layouts
-  return [
-    {
-      id: 1,
-      name: "Main Stage",
-      description: "Main performance venue with regular and balcony seating",
-      capacity: 500,
-      sections: [
-        {
-          id: 1,
-          sectionName: "Regular Seating",
-          sectionType: "regular",
-          seats: generateMainStageRegularSeats(),
-        },
-        {
-          id: 2,
-          sectionName: "Balcony Seating",
-          sectionType: "balcony",
-          seats: generateMainStageBalconySeats(),
-        },
-      ],
-    },
-    {
-      id: 2,
-      name: "Chamber Stage",
-      description: "Intimate performance space for smaller productions",
-      capacity: 150,
-      sections: [
-        {
-          id: 3,
-          sectionName: "Main Seating",
-          sectionType: "regular",
-          seats: generateChamberStageSeats(),
-        },
-      ],
-    },
-  ]
+  // Return the static venues data
+  return Venues;
 }
 
 function generateMainStageRegularSeats(): Seat[] {
   const seats: Seat[] = []
   const rowSeats = [22, 27, 26, 29, 28, 31, 0, 30, 33, 33, 33, 33, 32, 31, 30, 26, 26] // Row 7 has 0 seats (skipped)
+  
+  // Define accessibility seats (seats for people with disabilities that should not be selectable)
+  const accessibilitySeats = new Set([
+    '1-1', '1-2', '1-26', '1-27', // Row 1: seats 1, 2, 26, 27
+    '4-1', '4-29', // Row 4: seats 1, 29
+    '6-1', '6-31', // Row 6: seats 1, 31
+    '8-1', '8-2', '8-29', '8-30' // Row 8: seats 1, 2, 29, 30
+  ])
 
   rowSeats.forEach((seatCount, rowIndex) => {
     const rowNumber = rowIndex + 1
     if (seatCount > 0) {
       // Skip row 7
       for (let seatNumber = 1; seatNumber <= seatCount; seatNumber++) {
+        const seatKey = `${rowNumber}-${seatNumber}`
+        const isAccessibilitySeat = accessibilitySeats.has(seatKey)
+        
         seats.push({
           id: Number.parseInt(`1${rowNumber.toString().padStart(2, "0")}${seatNumber.toString().padStart(2, "0")}`),
           rowNumber,
           seatNumber,
-          isAvailable: Math.random() > 0.1, // 90% availability for demo
+          isAvailable: !isAccessibilitySeat, // Accessibility seats are not available for regular booking
         })
       }
     }
@@ -375,7 +397,7 @@ function generateMainStageRegularSeats(): Seat[] {
 
 function generateMainStageBalconySeats(): Seat[] {
   const seats: Seat[] = []
-  const rowSeats = [30, 29, 30, 29, 30, 29, 30]
+  const rowSeats = [30, 29, 30, 29, 30, 29, 30] // Updated balcony seating as specified
 
   rowSeats.forEach((seatCount, rowIndex) => {
     const rowNumber = rowIndex + 1
@@ -384,7 +406,7 @@ function generateMainStageBalconySeats(): Seat[] {
         id: Number.parseInt(`2${rowNumber.toString().padStart(2, "0")}${seatNumber.toString().padStart(2, "0")}`),
         rowNumber,
         seatNumber,
-        isAvailable: Math.random() > 0.05, // 95% availability for demo
+        isAvailable: true, // All balcony seats are available
       })
     }
   })

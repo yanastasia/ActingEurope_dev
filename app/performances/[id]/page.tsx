@@ -66,7 +66,9 @@ export default async function PerformancePage({ params }: { params: { id: string
           </div>
 
           <h1 className="mb-2 text-3xl font-bold text-secondary-blue md:text-4xl">{performance.title}</h1>
-          <p className="mb-4 text-xl text-muted-foreground">{performance.company}</p>
+          <p className="mb-4 text-xl text-muted-foreground">
+            {Array.isArray(performance.company) ? performance.company.join(' & ') : performance.company}
+          </p>
 
           <div className="mb-6 flex flex-wrap gap-2">
             <Badge className="bg-primary-gold/20 text-secondary-blue">{performance.genre}</Badge>

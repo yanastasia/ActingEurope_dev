@@ -158,7 +158,9 @@ export default function ProgramPage() {
                         <div className="p-4 md:w-3/4">
                             <h3 className="text-lg font-semibold text-secondary-blue">{event.title}</h3>
                             {event.company && (
-                              <p className="text-sm text-muted-foreground italic mb-6">{event.company}</p>
+                              <p className="text-sm text-muted-foreground italic mb-6">
+                                {Array.isArray(event.company) ? event.company.join(' & ') : event.company}
+                              </p>
                             )}
                             <div className="flex flex-wrap gap-2">
                             <Link href={`/tickets?event=${event.id}`} passHref>

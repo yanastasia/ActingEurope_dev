@@ -10,7 +10,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -118,21 +118,27 @@ model Event {
   id             Int        @id @default(autoincrement())
   title          String     @db.VarChar(255)
   theatre_id     Int
-  venue_id       Int
+  venue_id       Int?
   event_type     EventType
   event_date     DateTime   @db.Date
   event_time     DateTime   @db.Time(3)
-  duration_minutes Int?
   description    String?
   price          Decimal    @db.Decimal(10, 2)
   image_url      String?    @db.VarChar(500)
+  poster_url     String?    @db.VarChar(500)
   language       String?    @db.VarChar(50)
   genre          String?    @db.VarChar(100)
+  company        String[]   @default([])
+  director       String?    @db.VarChar(255)
+  cast           String[]   @default([])
+  synopsis       String?    @db.Text
+  subtitles      String?    @db.VarChar(255)
+  duration       String?    @db.VarChar(100)
   is_featured    Boolean    @default(false)
   created_at     DateTime   @default(now())
   updated_at     DateTime   @updatedAt
   theatre        Theatre    @relation(fields: [theatre_id], references: [id])
-  venue          Venue      @relation(fields: [venue_id], references: [id])
+  venue          Venue?     @relation(fields: [venue_id], references: [id])
   bookings       Booking[]
 
   @@map("events")

@@ -151,7 +151,7 @@ export default function TicketsPage() {
           date: selectedPerformanceData.date,
           time: selectedPerformanceData.time,
           venue: selectedPerformanceData.venue,
-          company: selectedPerformanceData.company || "Acting Europe Festival",
+          company: selectedPerformanceData.company ? (Array.isArray(selectedPerformanceData.company) ? selectedPerformanceData.company : [selectedPerformanceData.company]) : ["Acting Europe Festival"],
           description: "", // Placeholder: Add actual description
           imageUrl: selectedPerformanceData.imageUrl || "/placeholder.svg?height=200&width=300",
           isFeatured: false,
@@ -269,7 +269,9 @@ export default function TicketsPage() {
                             <div className="flex flex-1 flex-col justify-between p-4">
                               <div>
                                 <h3 className="mb-1 text-lg font-semibold text-secondary-blue">{performance.title}</h3>
-                                <p className="mb-2 text-sm text-muted-foreground">{performance.company}</p>
+                                <p className="mb-2 text-sm text-muted-foreground">
+                                  {Array.isArray(performance.company) ? performance.company.join(' & ') : performance.company}
+                                </p>
                                 <div className="mb-4 space-y-1 text-sm">
                                   <div className="flex items-center gap-2">
                                     <Calendar className="h-4 w-4 text-primary-gold" />
