@@ -13,7 +13,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from "@/hooks/use-toast"
 import { isAdminEmail, setAuthenticated, isAdmin } from "@/lib/auth"
 import { sendVerificationEmailAction } from "@/app/actions/email-actions"
-import { ds, DatabaseStorage, Event } from "@/lib/database-storage"
+// Removed direct database imports - now using API routes
 import { useLanguage } from "@/lib/language-context"
 
 interface AuthFormProps {
@@ -35,13 +35,7 @@ export function AuthForm({ type }: AuthFormProps) {
     confirmPassword: "",
   })
 
-  const [db, setDb] = useState<DatabaseStorage | null>(null);
 
-  React.useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setDb(DatabaseStorage.getInstance());
-    }
-  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -52,15 +46,7 @@ export function AuthForm({ type }: AuthFormProps) {
     e.preventDefault()
     setIsLoading(true)
 
-    if (!db) {
-      toast({
-        title: "Error",
-        description: "Database not initialized. Please try again.",
-        variant: "destructive",
-      });
-      setIsLoading(false);
-      return;
-    }
+
 
     try {
       // Validation
@@ -70,26 +56,30 @@ export function AuthForm({ type }: AuthFormProps) {
 
       console.log("Form Data:", formData);
 
-        // For signup, send verification email
-        if (type === "signup") {
-        const existingUser = (await db.getUsers()).find((u: any) => u.email === formData.email)
-        if (existingUser) {
-          throw new Error("Email already in use")
-        }
+      if (type === "signup") {
+        // Signup flow - call API
+        const response = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+            firstName: formData.name.split(' ')[0] || '',
+            lastName: formData.name.split(' ').slice(1).join(' ') || ''
+          })
+        })
 
-        const newUser = {
-          id: Math.random().toString(36).substring(2, 15),
-          email: formData.email,
-          password: formData.password, // Storing plain text password for now
-          role: "user",
-          emailVerified: false,
+        const result = await response.json()
+
+        if (!response.ok) {
+          throw new Error(result.error || 'Signup failed')
         }
-        db.addUser(newUser)
 
         // Send verification email
         const verificationToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
         const verificationResult = await sendVerificationEmailAction(formData.email, verificationToken)
-
 
         if (!verificationResult.success) {
           throw new Error("Failed to send verification email. Please try again.")
@@ -107,36 +97,28 @@ export function AuthForm({ type }: AuthFormProps) {
         router.push("/verify-email")
         return  
       } else {
-        // Login flow
-        // Check if user exists
-          console.log("Form Data:", formData);
-          const users = await db.getUsers();
-          const user = users.find((u: any) => u.email === formData.email);
-          console.log("User found:", user);
+        // Login flow - call API
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password
+          })
+        })
 
-          if (!user) {
-            console.log("No user found with this email.");
-            toast({
-              title: "Login Failed",
-              description: "No user found with this email.",
-              variant: "destructive",
-            });
-            return;
-          }
+        const result = await response.json()
 
-          console.log("Comparing passwords:", formData.password, user.password);
-          if (user.password !== formData.password) {
-            console.log("Incorrect password.");
-            toast({
-              title: "Login Failed",
-              description: "Incorrect password.",
-              variant: "destructive",
-            });
-            return;
-          }
+        if (!response.ok) {
+          throw new Error(result.error || 'Login failed')
+        }
+
+        const user = result.user
 
         // Set authentication
-        setAuthenticated(user.email, user.role)
+        setAuthenticated(user.email, user.isAdmin ? 'admin' : 'user')
 
         // Check if user is admin
         const isAdminUser = isAdmin()
@@ -190,9 +172,7 @@ export function AuthForm({ type }: AuthFormProps) {
           <Button variant="outline" onClick={() => router.push("/")}>
             Return to Home
           </Button>
-          <Button variant="destructive" onClick={() => db?.clearAllData()} className="mt-4">
-            Clear All Data (for testing)
-          </Button>
+
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           <div className="text-center text-sm">

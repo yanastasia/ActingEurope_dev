@@ -1,36 +1,26 @@
 "use client"
 
-import { ds } from "./database-storage"
-import { getVerificationToken, deleteVerificationToken } from "./tokens"
-
-import { User } from "./database"
+// Removed direct database imports - now using API routes
 
 export async function verifyEmail(token: string): Promise<{ success: boolean; email?: string; message?: string; role?: string }> {
-  const verification = await getVerificationToken(token)
+  try {
+    const response = await fetch('/api/auth/verify-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ token })
+    })
 
-  if (!verification) {
-    return { success: false, message: "Invalid verification token" }
+    const result = await response.json()
+
+    if (!response.ok) {
+      return { success: false, message: result.message || result.error || 'Verification failed' }
+    }
+
+    return result
+  } catch (error) {
+    console.error('Email verification error:', error)
+    return { success: false, message: 'Network error during verification' }
   }
-
-  if (new Date() > verification.expires) {
-    await deleteVerificationToken(token)
-    return { success: false, message: "Verification token has expired" }
-  }
-
-  // Mark user as verified in the database
-  const users = ds.getUsers()
-  const userIndex = users.findIndex((user) => user.email === verification.email)
-
-  if (userIndex === -1) {
-    return { success: false, message: "User not found" }
-  }
-
-  // Update user verification status
-  users[userIndex].emailVerified = true
-  ds.updateUser(users[userIndex])
-
-  // Remove the used token
-  await deleteVerificationToken(token)
-
-  return { success: true, email: verification.email, role: users[userIndex].role }
 }

@@ -8,8 +8,9 @@ import { Separator } from "@/components/ui/separator"
 import { getTheatreById } from "@/lib/database"
 import { notFound } from "next/navigation"
 
-export default async function TheatrePage({ params }: { params: { id: string } }) {
-  const theatre = await getTheatreById(Number.parseInt(params.id))
+export default async function TheatrePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const theatre = await getTheatreById(Number.parseInt(id))
 
   if (!theatre) {
     notFound()

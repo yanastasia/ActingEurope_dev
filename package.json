@@ -1,10 +1,10 @@
 {
-  "name": "my-v0-project",
+  "name": "acting-europe-web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && pnpm exec next build",
+    "build": "powershell -ExecutionPolicy Bypass -File .\\build-alternative.ps1",
     "start": "next start",
     "lint": "next lint",
     "db:generate": "prisma generate",
@@ -76,6 +76,8 @@
   },
   "devDependencies": {
     "@types/node": "^22",
+    "@types/nodemailer": "^6.4.17",
+    "@types/pdfkit": "^0.17.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "postcss": "^8.5",

@@ -136,7 +136,6 @@ const translations = {
     bookingConfirmedDesc: "Your tickets have been booked successfully",
     bookingConfirmationEmail: "A confirmation email has been sent to your email address with your ticket details.",
     bookingDetails: "Booking Details",
-    performance: "Performance",
     seats: "Seats",
     bookAnotherTicket: "Book Another Ticket",
     downloadTicket: "Download Ticket",
@@ -328,7 +327,6 @@ const translations = {
     bookingConfirmedDesc: "Вашите билети са резервирани успешно",
     bookingConfirmationEmail: "Имейл за потвърждение е изпратен на вашия имейл адрес с детайли за билетите.",
     bookingDetails: "Детайли на резервацията",
-    performance: "Представление",
     seats: "Места",
     bookAnotherTicket: "Резервирай друг билет",
     downloadTicket: "Изтегли билет",
@@ -398,7 +396,6 @@ const translations = {
     noEventsMatchFilter: "Няма събития, отговарящи на критериите за филтриране. Моля, опитайте с различни филтри.",
 
     // Event types
-    performance: "Представление",
     workshop: "Работилница",
     discussion: "Дискусия",
   },
@@ -590,7 +587,6 @@ const translations = {
     noEventsMatchFilter: "Нема настани што одговараат на вашите критериуми за филтрирање. Пробајте различни филтри.",
 
     // Event types
-    performance: "Претстава",
     workshop: "Работилница",
     discussion: "Дискусија",
   },
@@ -783,7 +779,6 @@ const translations = {
       "Нема догађаја који одговарају вашим критеријумима филтрирања. Покушајте са другачијим филтрима.",
 
     // Event types
-    performance: "Представа",
     workshop: "Радионица",
     discussion: "Дискусија",
   },

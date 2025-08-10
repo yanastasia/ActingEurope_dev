@@ -17,7 +17,21 @@ import { Calendar, Ticket, FileText, AlertTriangle, ShieldCheck, Pencil, Trash2,
 import { isAdmin } from "@/lib/auth"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/lib/language-context"
-import { ds, DatabaseStorage, Event } from "@/lib/database-storage"
+// Event type definition
+interface Event {
+  id: string
+  title: string
+  eventType: "performance" | "workshop" | "discussion"
+  date: string
+  time: string
+  venue: string
+  company: string[]
+  description: string
+  imageUrl: string
+  isFeatured: boolean
+  price: string
+  tags: string[]
+}
 
 
 
@@ -93,32 +107,25 @@ export default function AdminPage() {
   })
   const [venueRows, setVenueRows] = useState<VenueRow[]>([{ rowNumber: 1, seatCount: 10 }])
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [dbInstance, setDbInstance] = useState<DatabaseStorage | null>(null);
-
   useEffect(() => {
     const fetchData = async () => {
-    if (typeof window !== 'undefined') {
-      const db = DatabaseStorage.getInstance();
-      setDbInstance(db);
-
-      // Load events and venues from database
-      // Load events and venues from database
-      setEvents((await db.getEvents()) || []);
-      setVenues((await db.getVenues()) || []);
-
-      // Set up listener for database updates
-      const handleDatabaseUpdate = async (event: CustomEvent<any>) => {
-        const currentDbInstance = (event as CustomEvent).detail as DatabaseStorage;
-        setEvents((await currentDbInstance.getEvents()) || []);
-        setVenues((await currentDbInstance.getVenues()) || []);
-      };
-
-      window.addEventListener("databaseUpdated", (event) => { handleDatabaseUpdate(event as CustomEvent<any>) })
-
-      return () => {
-        window.removeEventListener("databaseUpdated", (event) => { handleDatabaseUpdate(event as CustomEvent<any>) })
-      };
-    }
+      try {
+        // Load events from API
+        const eventsResponse = await fetch('/api/events')
+        if (eventsResponse.ok) {
+          const eventsData = await eventsResponse.json()
+          setEvents(eventsData || [])
+        }
+        
+        // Load venues from API
+        const venuesResponse = await fetch('/api/venues')
+        if (venuesResponse.ok) {
+          const venuesData = await venuesResponse.json()
+          setVenues(venuesData || [])
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
     };
     fetchData();
   }, []);
@@ -287,11 +294,36 @@ export default function AdminPage() {
       ...formData,
     }
 
-    // Add to database
-    dbInstance?.addEvent(newEvent)
-
-    // Update local state
-    setEvents(await ds.getEvents())
+    // Add to database via API
+    try {
+      const response = await fetch('/api/events', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newEvent),
+      })
+      
+      if (response.ok) {
+        // Refresh events list
+        const eventsResponse = await fetch('/api/events')
+        if (eventsResponse.ok) {
+          const eventsData = await eventsResponse.json()
+          setEvents(eventsData || [])
+        }
+      } else {
+        throw new Error('Failed to add event')
+      }
+    } catch (error) {
+      console.error('Error adding event:', error)
+      toast({
+        title: "Error",
+        description: "Failed to add event. Please try again.",
+        variant: "destructive"
+      })
+      setIsSubmitting(false)
+      return
+    }
 
     // Show success message
     toast({
@@ -342,8 +374,36 @@ export default function AdminPage() {
       rows: venueRows,
     }
 
-    dbInstance?.addVenue(newVenue)
-    setVenues(await dbInstance?.getVenues() || [])
+    // Add to database via API
+    try {
+      const response = await fetch('/api/venues', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newVenue),
+      })
+      
+      if (response.ok) {
+        // Refresh venues list
+        const venuesResponse = await fetch('/api/venues')
+        if (venuesResponse.ok) {
+          const venuesData = await venuesResponse.json()
+          setVenues(venuesData || [])
+        }
+      } else {
+        throw new Error('Failed to add venue')
+      }
+    } catch (error) {
+      console.error('Error adding venue:', error)
+      toast({
+        title: "Error",
+        description: "Failed to add venue. Please try again.",
+        variant: "destructive"
+      })
+      setIsSubmitting(false)
+      return
+    }
 
     // Show success message
     toast({
@@ -417,8 +477,35 @@ export default function AdminPage() {
     // Update events array
     const updatedEvents = events.map((event) => (event.id === editingEvent.id ? editingEvent : event))
 
-    dbInstance?.updateEvent(editingEvent.id, editingEvent)
-    setEvents(await dbInstance?.getEvents() || [])
+    // Update event via API
+    try {
+      const response = await fetch(`/api/events/${editingEvent.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(editingEvent),
+      })
+      
+      if (response.ok) {
+        // Refresh events list
+        const eventsResponse = await fetch('/api/events')
+        if (eventsResponse.ok) {
+          const eventsData = await eventsResponse.json()
+          setEvents(eventsData || [])
+        }
+      } else {
+        throw new Error('Failed to update event')
+      }
+    } catch (error) {
+      console.error('Error updating event:', error)
+      toast({
+        title: "Error",
+        description: "Failed to update event. Please try again.",
+        variant: "destructive"
+      })
+      return
+    }
 
     // Show success message
     toast({
@@ -447,8 +534,35 @@ export default function AdminPage() {
     // Update venues array
     const updatedVenues = venues.map((venue) => (venue.id === editingVenue.id ? editingVenue : venue))
 
-    dbInstance?.updateVenue(editingVenue.id, editingVenue)
-    setVenues(await dbInstance?.getVenues() || [])
+    // Update venue via API
+    try {
+      const response = await fetch(`/api/venues/${editingVenue.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(editingVenue),
+      })
+      
+      if (response.ok) {
+        // Refresh venues list
+        const venuesResponse = await fetch('/api/venues')
+        if (venuesResponse.ok) {
+          const venuesData = await venuesResponse.json()
+          setVenues(venuesData || [])
+        }
+      } else {
+        throw new Error('Failed to update venue')
+      }
+    } catch (error) {
+      console.error('Error updating venue:', error)
+      toast({
+        title: "Error",
+        description: "Failed to update venue. Please try again.",
+        variant: "destructive"
+      })
+      return
+    }
 
     // Show success message
     toast({
@@ -466,8 +580,31 @@ export default function AdminPage() {
   }
 
   const handleDeleteEvent = async (id: string) => {
-    dbInstance?.deleteEvent(id)
-    setEvents(await dbInstance?.getEvents() || [])
+    // Delete event via API
+    try {
+      const response = await fetch(`/api/events/${id}`, {
+        method: 'DELETE',
+      })
+      
+      if (response.ok) {
+        // Refresh events list
+        const eventsResponse = await fetch('/api/events')
+        if (eventsResponse.ok) {
+          const eventsData = await eventsResponse.json()
+          setEvents(eventsData || [])
+        }
+      } else {
+        throw new Error('Failed to delete event')
+      }
+    } catch (error) {
+      console.error('Error deleting event:', error)
+      toast({
+        title: "Error",
+        description: "Failed to delete event. Please try again.",
+        variant: "destructive"
+      })
+      return
+    }
 
     toast({
       title: "Event deleted",
@@ -488,8 +625,31 @@ export default function AdminPage() {
       return
     }
 
-    dbInstance?.deleteVenue(id)
-    setVenues(await dbInstance?.getVenues() || [])
+    // Delete venue via API
+    try {
+      const response = await fetch(`/api/venues/${id}`, {
+        method: 'DELETE',
+      })
+      
+      if (response.ok) {
+        // Refresh venues list
+        const venuesResponse = await fetch('/api/venues')
+        if (venuesResponse.ok) {
+          const venuesData = await venuesResponse.json()
+          setVenues(venuesData || [])
+        }
+      } else {
+        throw new Error('Failed to delete venue')
+      }
+    } catch (error) {
+      console.error('Error deleting venue:', error)
+      toast({
+        title: "Error",
+        description: "Failed to delete venue. Please try again.",
+        variant: "destructive"
+      })
+      return
+    }
 
     toast({
       title: "Venue deleted",

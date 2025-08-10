@@ -12,41 +12,72 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 
-// This would normally come from a database
-const getPerformance = (id: string) => {
+// Fetch performance from database
+const getPerformance = async (id: string) => {
+  try {
+    // Extract original ID if it's prefixed
+    const originalId = id.startsWith('performance-') ? id.replace('performance-', '') : id
+    
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/events/${originalId}`, {
+      cache: 'no-store'
+    })
+    if (response.ok) {
+      const performance = await response.json()
+      return {
+        id: performance.id,
+        title: performance.title,
+        company: performance.company,
+        director: performance.director,
+        cast: performance.cast || [],
+        date: performance.date,
+        time: performance.time,
+        venue: performance.venue,
+        address: "Theatre Square 1, City Center", // Default address
+        imageUrl: performance.imageUrl || "/placeholder.svg?height=600&width=1200",
+        genre: performance.genre,
+        language: performance.language,
+        duration: performance.duration,
+        synopsis: performance.synopsis || "No synopsis available.",
+        reviews: [
+          {
+            source: "Theatre Today",
+            quote: "A breathtaking performance that brings new relevance to classic theatre.",
+            rating: 5,
+          },
+          {
+            source: "European Stage",
+            quote: "Bold, innovative, and deeply moving - theatre at its finest.",
+            rating: 4.5,
+          },
+        ],
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching performance:', error)
+  }
+  
+  // Fallback data
   return {
     id,
-    title: "Hamlet Reimagined",
-    company: "Copenhagen Theatre Ensemble",
-    director: "Anna Bergmann",
-    cast: ["Michael Sørensen", "Lena Jensen", "Erik Nielsen", "Maria Poulsen"],
-    date: "June 15, 2023",
-    time: "19:30",
-    venue: "Main Stage",
-    address: "Theatre Square 1, City Center",
+    title: "Performance Not Found",
+    company: "Unknown",
+    director: "Unknown",
+    cast: [],
+    date: "TBA",
+    time: "TBA",
+    venue: "TBA",
+    address: "TBA",
     imageUrl: "/placeholder.svg?height=600&width=1200",
     genre: "Drama",
-    language: "English with subtitles",
+    language: "English",
     duration: "120 min",
-    synopsis:
-      "A modern take on Shakespeare's classic tragedy, exploring themes of power and betrayal through contemporary movement and multimedia. This innovative production reimagines the Danish prince's story in a corporate setting, where the struggle for power takes place in boardrooms rather than royal courts.\n\nThe production features striking visual design, original music, and physical theatre elements that bring new dimensions to this timeless story of revenge, moral corruption, and the human condition.",
-    reviews: [
-      {
-        source: "Theatre Today",
-        quote: "A breathtaking reimagining that brings new relevance to Shakespeare's masterpiece.",
-        rating: 5,
-      },
-      {
-        source: "European Stage",
-        quote: "Bold, innovative, and deeply moving - theatre at its finest.",
-        rating: 4.5,
-      },
-    ],
+    synopsis: "Performance details not available.",
+    reviews: [],
   }
 }
 
-export default function PerformancePage({ params }: { params: { id: string } }) {
-  const performance = getPerformance(params.id)
+export default async function PerformancePage({ params }: { params: { id: string } }) {
+  const performance = await getPerformance(params.id)
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -110,7 +141,7 @@ export default function PerformancePage({ params }: { params: { id: string } }) 
 
           <h2 className="mb-4 text-2xl font-semibold text-secondary-blue">Synopsis</h2>
           <div className="mb-8 space-y-4">
-            {performance.synopsis.split("\n\n").map((paragraph, index) => (
+            {performance.synopsis.split("\n\n").map((paragraph: string, index: number) => (
               <p key={index} className="text-muted-foreground">
                 {paragraph}
               </p>
@@ -126,7 +157,7 @@ export default function PerformancePage({ params }: { params: { id: string } }) 
             <div className="flex flex-col">
               <span className="mb-2 w-24 font-medium">Cast:</span>
               <ul className="ml-6 list-disc space-y-1">
-                {performance.cast.map((actor, index) => (
+                {performance.cast.map((actor: string, index: number) => (
                   <li key={index} className="text-muted-foreground">
                     {actor}
                   </li>

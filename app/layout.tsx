@@ -11,9 +11,14 @@ import { LanguageProvider } from "@/lib/language-context"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Acting Europe – Theatre Without Borders",
+  title: "Acting Europe - Theatre Without Borders",
   description: "International theatre festival celebrating cultural exchange and artistic collaboration",
-    generator: 'v0.dev'
+  authors: [
+    {
+      name: "Anastasia Yakimovska",
+      url: "https://www.linkedin.com/in/yakiman/"
+    }
+  ]
 }
 
 export default function RootLayout({

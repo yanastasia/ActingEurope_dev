@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/lib/language-context"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ds, DatabaseStorage, Event } from "@/lib/database-storage"
+// Removed database-storage import - now using API
 import { isAdmin, isAuthenticated } from "@/lib/auth"
 
 interface SeatSelectionProps {
@@ -39,17 +39,21 @@ export default function SeatSelection({ venueId, onSeatsSelected, isUserAdmin = 
   useEffect(() => {
     const loadVenue = async () => {
       try {
-        // Load venues from database
-        const venues = await ds.getVenues()
-        // Find the venue by id or name
-        const foundVenue = venues.find((v: Venue) => v.id === venueId.toString() || v.name === venueId)
-
-        if (foundVenue) {
-          setVenue(foundVenue)
-        } else {
-          // Use first venue as fallback
-          setVenue(venues[0] || null)
+        // Create a default venue structure for now
+        // TODO: Replace with actual venue API call when available
+        const defaultVenue: Venue = {
+          id: venueId.toString(),
+          name: "Main Theatre",
+          description: "Main theatre venue",
+          rows: [
+            { rowNumber: 1, seatCount: 10 },
+            { rowNumber: 2, seatCount: 10 },
+            { rowNumber: 3, seatCount: 10 },
+            { rowNumber: 4, seatCount: 10 },
+            { rowNumber: 5, seatCount: 10 }
+          ]
         }
+        setVenue(defaultVenue)
       } catch (error) {
         console.error("Error loading venue:", error)
       } finally {
@@ -58,19 +62,6 @@ export default function SeatSelection({ venueId, onSeatsSelected, isUserAdmin = 
     }
 
     loadVenue()
-
-    // Listen for database updates
-    const handleDatabaseUpdate = async (event: CustomEvent<any>) => {
-      const currentDbInstance = (event as CustomEvent).detail as DatabaseStorage;
-      const updatedVenues = await currentDbInstance.getVenues();
-      setVenue(updatedVenues.find((v: Venue) => v.id === venueId.toString() || v.name === venueId) || null);
-    }
-
-    window.addEventListener("databaseUpdated", handleDatabaseUpdate as unknown as EventListener)
-
-    return () => {
-      window.removeEventListener("databaseUpdated", handleDatabaseUpdate as unknown as EventListener)
-    }
   }, [venueId])
 
   // Update the toggleSeat function to handle admin reservations

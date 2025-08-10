@@ -36,6 +36,32 @@ async function main() {
     },
   })
 
+  // Add Anastasia admin user
+  const anastasiaUser = await prisma.user.create({
+    data: {
+      email: 'anastasia@actingeurope.eu',
+      password_hash: '$2a$10$ActingEurope2025.hash.for.anastasia', // In production, use proper bcrypt hash
+      first_name: 'Anastasia',
+      last_name: 'Admin',
+      is_admin: true,
+      email_notifications: true,
+      marketing_preferences: false,
+    },
+  })
+
+  // Add Toni admin user
+  const toniUser = await prisma.user.create({
+    data: {
+      email: 'toni@actingeurope.eu',
+      password_hash: '$2a$10$ActingEurope2025.hash.for.toni', // In production, use proper bcrypt hash
+      first_name: 'Toni',
+      last_name: 'Admin',
+      is_admin: true,
+      email_notifications: true,
+      marketing_preferences: false,
+    },
+  })
+
   // Seed Theatres
   console.log('🎭 Seeding theatres...')
   const theatreMap = new Map()

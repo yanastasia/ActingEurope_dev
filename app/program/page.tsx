@@ -8,8 +8,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { useLanguage } from "@/lib/language-context"
-import { Event } from "@/lib/database-storage"
-import { performances, Performance } from "@/lib/performance-data"
+// Removed static import - now using API
+
+// Define Event interface locally
+interface Event {
+  id: string
+  title: string
+  eventType: "performance" | "workshop" | "discussion"
+  date: string
+  time: string
+  venue: string
+  company: string[]
+  description: string
+  imageUrl: string
+  posterUrl: string
+  isFeatured: boolean
+  tags: string[]
+}
 import Link from "next/link"
 
 export default function ProgramPage() {
@@ -23,26 +38,40 @@ export default function ProgramPage() {
   const [types, setTypes] = useState<string[]>(["All Types"])
 
   useEffect(() => {
-    // Only use performance-data.ts as the single source of truth
-    const mappedPerformances: Event[] = performances.map((p: Performance) => ({
-      id: `performance-${p.id}`,
-      title: p.title,
-      eventType: "performance",
-      date: p.date,
-      time: p.time,
-      venue: p.venue,
-      company: p.company,
-      description: p.synopsis,
-      imageUrl: p.imageUrl,
-      posterUrl: p.posterUrl,
-      isFeatured: false,
-      tags: [p.genre, p.language, p.duration].filter(Boolean) as string[],
-    }))
+    const fetchEvents = async () => {
+      try {
+        const response = await fetch('/api/events')
+        if (!response.ok) {
+          throw new Error('Failed to fetch events')
+        }
+        const eventsData = await response.json()
+        
+        const mappedPerformances: Event[] = eventsData.map((event: any) => ({
+          id: `performance-${event.id}`,
+          title: event.title,
+          eventType: event.eventType as "performance" | "workshop" | "discussion",
+          date: event.date,
+          time: event.time,
+          venue: event.venue,
+          company: event.company,
+          description: event.synopsis,
+          imageUrl: event.imageUrl,
+          posterUrl: event.posterUrl,
+          isFeatured: event.isFeatured,
+          tags: [event.genre, event.language, event.duration].filter(Boolean) as string[],
+        }))
 
-    setEvents(mappedPerformances)
-    setDates(["All Dates", ...new Set(mappedPerformances.map(e => e.date))])
-    setVenues(["All Venues", ...new Set(mappedPerformances.map(e => e.venue))])
-    setTypes(["All Types", ...new Set(mappedPerformances.map(e => e.eventType))])
+        setEvents(mappedPerformances)
+        setDates(["All Dates", ...new Set(mappedPerformances.map(e => e.date))])
+        setVenues(["All Venues", ...new Set(mappedPerformances.map(e => e.venue))])
+        setTypes(["All Types", ...new Set(mappedPerformances.map(e => e.eventType))])
+      } catch (error) {
+        console.error('Error fetching events:', error)
+        setEvents([])
+      }
+    }
+
+    fetchEvents()
   }, [])
 
   const filteredEvents = events.filter((event) => {

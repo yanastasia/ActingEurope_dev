@@ -9,7 +9,7 @@ import CountdownTimer from "@/components/countdown-timer"
 import QuickLinkCard from "@/components/quick-link-card"
 import PerformanceCard from "@/components/performance-card"
 import { useLanguage } from "@/lib/language-context"
-import { performances } from "@/lib/performance-data"
+// Removed static import - now using API
 
 export default function Home() {
   const { t } = useLanguage()
@@ -37,46 +37,73 @@ export default function Home() {
     setCurrentSlide((prev) => (prev - 1 + allSlides.length) % allSlides.length)
   }
 
-  // Load performances from performance-data.ts only
+  // Load performances from database
   useEffect(() => {
-    // Use all performances from performance-data.ts as featured
-    const formattedPerformances = performances.map((p) => ({
-      id: `performance-${p.id}`,
-      title: p.title,
-      company: p.company,
-      date: p.date,
-      time: p.time,
-      venue: p.venue,
-      imageUrl: p.imageUrl || "/placeholder.svg?height=1080&width=1920",
-      genre: p.genre,
-      language: p.language,
-      duration: p.duration,
-      featured: true,
-      price: "Free",
-      type: "performance"
-    }));
+    const fetchEvents = async () => {
+      try {
+        const response = await fetch('/api/events')
+        if (!response.ok) {
+          throw new Error('Failed to fetch events')
+        }
+        const events = await response.json()
+        
+        // Format events for the frontend
+        const formattedPerformances = events.map((event: any) => ({
+          id: `performance-${event.id}`,
+          title: event.title,
+          company: event.company,
+          date: event.date,
+          time: event.time,
+          venue: event.venue,
+          imageUrl: event.imageUrl || "/placeholder.svg?height=1080&width=1920",
+          genre: event.genre,
+          language: event.language,
+          duration: event.duration,
+          featured: event.isFeatured,
+          price: event.price,
+          type: "performance",
+          synopsis: event.synopsis,
+          director: event.director,
+          cast: event.cast
+        }));
 
-    // Create hero slide
-    const heroSlide = {
-      id: "hero",
-      type: "hero",
-      title: t("Acting Europe"),
-      subtitle: t("Theatre Without Borders"),
-      description: t("An international festival celebrating cultural exchange and artistic collaboration"),
-      date: t("September 18-21, 2025 • Kyustendil, Bulgaria")
-    };
+        // Create hero slide
+        const heroSlide = {
+          id: "hero",
+          type: "hero",
+          title: t("Acting Europe"),
+          subtitle: t("Theatre Without Borders"),
+          description: t("An international festival celebrating cultural exchange and artistic collaboration."),
+          date: t("September 18-21, 2025 • Kyustendil, Bulgaria")
+        };
 
-    // Combine hero slide with performance slides
-    const combinedSlides = [heroSlide, ...formattedPerformances];
+        // Combine hero slide with performance slides
+        const combinedSlides = [heroSlide, ...formattedPerformances];
 
-    setFeaturedPerformances(formattedPerformances);
-    setAllSlides(combinedSlides);
+        setFeaturedPerformances(formattedPerformances);
+        setAllSlides(combinedSlides);
 
-    // Set single featured performance for the existing section (if needed)
-    if (formattedPerformances.length > 0) {
-      const randomIndex = Math.floor(Math.random() * formattedPerformances.length);
-      setFeaturedPerformance(formattedPerformances[randomIndex]);
+        // Set single featured performance for the existing section (if needed)
+        if (formattedPerformances.length > 0) {
+          const randomIndex = Math.floor(Math.random() * formattedPerformances.length);
+          setFeaturedPerformance(formattedPerformances[randomIndex]);
+        }
+      } catch (error) {
+        console.error('Error fetching events:', error)
+        // Fallback to empty state
+        setFeaturedPerformances([])
+        setAllSlides([{
+          id: "hero",
+          type: "hero",
+          title: t("Acting Europe"),
+          subtitle: t("Theatre Without Borders"),
+          description: t("An international festival celebrating cultural exchange and artistic collaboration"),
+          date: t("September 18-21, 2025 • Kyustendil, Bulgaria")
+        }])
+      }
     }
+
+    fetchEvents()
   }, [t])
 
   return (

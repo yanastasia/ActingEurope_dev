@@ -11,16 +11,26 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import { performances } from "@/lib/performance-data"
+// Removed static import - now using API
 
-export default async function PerformancePage({ params }: { params: { id: string } }) {
+export default async function PerformancePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   
   // Extract original ID if it's prefixed
   const originalId = id.startsWith('performance-') ? id.replace('performance-', '') : id
   
-  // Only use performance-data.ts as the single source of truth
-  const performance = performances.find((p) => p.id === originalId)
+  // Fetch performance from database
+  let performance = null
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/events/${originalId}`, {
+      cache: 'no-store'
+    })
+    if (response.ok) {
+      performance = await response.json()
+    }
+  } catch (error) {
+    console.error('Error fetching performance:', error)
+  }
 
   if (!performance) {
     return (
@@ -95,7 +105,7 @@ export default async function PerformancePage({ params }: { params: { id: string
 
           <h2 className="mb-4 text-2xl font-semibold text-secondary-blue">Synopsis</h2>
           <div className="mb-8 space-y-4">
-            {performance.synopsis.split("\n\n").map((paragraph, index) => (
+            {performance.synopsis.split("\n\n").map((paragraph: string, index: number) => (
               <p key={index} className="text-muted-foreground">
                 {paragraph}
               </p>
@@ -116,7 +126,7 @@ export default async function PerformancePage({ params }: { params: { id: string
                   <div className="flex flex-col">
                     <span className="mb-2 w-24 font-medium">Cast:</span>
                     <ul className="ml-6 list-disc space-y-1">
-                      {performance.cast.map((actor, index) => (
+                      {performance.cast.map((actor: string, index: number) => (
                         <li key={index} className="text-muted-foreground">
                           {actor}
                         </li>

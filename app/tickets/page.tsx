@@ -13,10 +13,25 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import SeatSelection from "@/components/seat-selection"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/lib/language-context"
-import { ds, Event } from "@/lib/database-storage"
-import { performances } from "@/lib/performance-data"
+// Removed static import - now using API
 import { generateAndSendTicket, type GenerateTicketResult } from "@/lib/user-verification"
 import { Loader2 } from "lucide-react"
+
+// Define Event interface locally
+interface Event {
+  id: number
+  title: string
+  eventType: string
+  date: string
+  time: string
+  venue: string
+  company: string[]
+  description: string
+  imageUrl: string
+  isFeatured: boolean
+  price: number
+  tags: string[]
+}
 
 export default function TicketsPage() {
   const { toast } = useToast()
@@ -36,32 +51,56 @@ export default function TicketsPage() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [bookingReference, setBookingReference] = useState("")
 
-  // Load performances from performance-data.ts only
+  // Load performances from database
   useEffect(() => {
-    const getBGNPrice = (euroPrice: string) => {
-      if (!euroPrice) return "Free"
-      const numericPrice = Number.parseFloat(euroPrice.replace("€", ""))
-      return `${(numericPrice * 1.96).toFixed(2)} лв.`
+    const fetchEvents = async () => {
+      try {
+        const response = await fetch('/api/events')
+        if (!response.ok) {
+          throw new Error('Failed to fetch events')
+        }
+        const eventsData = await response.json()
+        
+        const getBGNPrice = (euroPrice: string) => {
+          if (!euroPrice || euroPrice === "Free") return "Free"
+          const numericPrice = Number.parseFloat(euroPrice.replace("€", ""))
+          return `${(numericPrice * 1.96).toFixed(2)} лв.`
+        }
+
+        const mappedPerformances = eventsData.map((event: any) => ({
+          id: `performance-${event.id}`,
+          title: event.title,
+          company: event.company,
+          date: event.date,
+          time: event.time,
+          venue: event.venue,
+          imageUrl: event.imageUrl || "/placeholder.svg?height=200&width=300",
+          price: getBGNPrice(event.price),
+          rawPrice: event.price === "Free" ? 0 : Number.parseFloat(event.price.replace("€", "")),
+        }))
+
+        setAllPerformances(mappedPerformances)
+      } catch (error) {
+        console.error('Error fetching events:', error)
+        setAllPerformances([])
+      }
     }
 
-    // Only use performance-data.ts as the single source of truth
-    const mappedPerformances = performances.map((p) => ({
-      id: `performance-${p.id}`,
-      title: p.title,
-      company: p.company,
-      date: p.date,
-      time: p.time,
-      venue: p.venue,
-      imageUrl: p.imageUrl || "/placeholder.svg?height=200&width=300",
-      price: "Free", // Default price for performances
-      rawPrice: 0, // Default raw price
-    }))
-
-    setAllPerformances(mappedPerformances)
+    fetchEvents()
 
     // Load venues from database storage (for seat selection)
     const loadVenues = async () => {
-      setVenues(await ds.getVenues())
+      try {
+        const response = await fetch('/api/venues')
+        if (!response.ok) {
+          throw new Error('Failed to fetch venues')
+        }
+        const venuesData = await response.json()
+        setVenues(venuesData)
+      } catch (error) {
+        console.error('Error fetching venues:', error)
+        setVenues([])
+      }
     }
     loadVenues()
   }, [])
@@ -145,7 +184,7 @@ export default function TicketsPage() {
         totalAmount: selectedSeats.length * selectedPerformanceData.rawPrice,
         bookingStatus: "confirmed" as const,
         event: {
-          id: selectedPerformanceData.id,
+          id: selectedPerformanceData.id as number,
           title: selectedPerformanceData.title,
           eventType: "performance",
           date: selectedPerformanceData.date,
@@ -161,7 +200,18 @@ export default function TicketsPage() {
         bookingDate: new Date().toISOString(),
       }
 
-      ds.addBooking(booking)
+      // Save booking via API
+      const response = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(booking),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to save booking')
+      }
 
       // Show confirmation
       setStep(4)

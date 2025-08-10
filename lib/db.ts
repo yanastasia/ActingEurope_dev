@@ -1,5 +1,3 @@
-'use server';
-
 import fs from 'fs';
 import path from 'path';
 // WARNING: Storing passwords in plain text is a severe security risk and should NEVER be done in a production environment.
