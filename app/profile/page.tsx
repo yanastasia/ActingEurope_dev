@@ -1,256 +1,380 @@
-import Image from "next/image"
-import Link from "next/link"
-import { Calendar, Clock, MapPin, Languages, Users } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
+"use client"
 
-// Fetch performance from database
-const getPerformance = async (id: string) => {
-  try {
-    // Extract original ID if it's prefixed
-    const originalId = id.startsWith('performance-') ? id.replace('performance-', '') : id
-    
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/events/${originalId}`, {
-      cache: 'no-store'
-    })
-    if (response.ok) {
-      const performance = await response.json()
-      return {
-        id: performance.id,
-        title: performance.title,
-        company: performance.company,
-        director: performance.director,
-        cast: performance.cast || [],
-        date: performance.date,
-        time: performance.time,
-        venue: performance.venue,
-        address: "Theatre Square 1, City Center", // Default address
-        imageUrl: performance.imageUrl || "/placeholder.svg?height=600&width=1200",
-        genre: performance.genre,
-        language: performance.language,
-        duration: performance.duration,
-        synopsis: performance.synopsis || "No synopsis available.",
-        reviews: [
-          {
-            source: "Theatre Today",
-            quote: "A breathtaking performance that brings new relevance to classic theatre.",
-            rating: 5,
-          },
-          {
-            source: "European Stage",
-            quote: "Bold, innovative, and deeply moving - theatre at its finest.",
-            rating: 4.5,
-          },
-        ],
-      }
-    }
-  } catch (error) {
-    console.error('Error fetching performance:', error)
-  }
-  
-  // Fallback data
-  return {
-    id,
-    title: "Performance Not Found",
-    company: "Unknown",
-    director: "Unknown",
-    cast: [],
-    date: "TBA",
-    time: "TBA",
-    venue: "TBA",
-    address: "TBA",
-    imageUrl: "/placeholder.svg?height=600&width=1200",
-    genre: "Drama",
-    language: "English",
-    duration: "120 min",
-    synopsis: "Performance details not available.",
-    reviews: [],
-  }
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
+import { Separator } from "@/components/ui/separator"
+import { Badge } from "@/components/ui/badge"
+import { useToast } from "@/hooks/use-toast"
+import { useLanguage } from "@/lib/language-context"
+import { isAuthenticated, logout, getUserEmail } from "@/lib/auth"
+import { Calendar, Clock, MapPin, Ticket, Settings, User, Heart } from "lucide-react"
+
+interface UserProfile {
+  email: string
+  firstName: string
+  lastName: string
+  phone: string
+  emailNotifications: boolean
+  marketingPreferences: boolean
 }
 
-export default async function PerformancePage({ params }: { params: { id: string } }) {
-  const performance = await getPerformance(params.id)
+interface BookedTicket {
+  id: string
+  eventTitle: string
+  date: string
+  time: string
+  venue: string
+  seats: string[]
+  bookingReference: string
+}
+
+export default function ProfilePage() {
+  const router = useRouter()
+  const { toast } = useToast()
+  const { t } = useLanguage()
+  const [isLoading, setIsLoading] = useState(true)
+  const [profile, setProfile] = useState<UserProfile>({
+    email: "",
+    firstName: "",
+    lastName: "",
+    phone: "",
+    emailNotifications: true,
+    marketingPreferences: false
+  })
+  const [bookedTickets, setBookedTickets] = useState<BookedTicket[]>([])
+  const [favoritePerformances, setFavoritePerformances] = useState<any[]>([])
+  const [activeTab, setActiveTab] = useState("upcoming")
+  const [isSaving, setIsSaving] = useState(false)
+
+  useEffect(() => {
+    // Check authentication
+    if (!isAuthenticated()) {
+      router.push("/auth/login")
+      return
+    }
+
+    // Load user profile
+    const userEmail = getUserEmail()
+    if (userEmail) {
+      setProfile(prev => ({ ...prev, email: userEmail }))
+    }
+
+    setIsLoading(false)
+  }, [router])
+
+  const handleSaveProfile = async () => {
+    setIsSaving(true)
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been successfully updated."
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update profile. Please try again.",
+        variant: "destructive"
+      })
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleLogout = () => {
+    logout()
+    toast({
+      title: t("loggedOutSuccessfully"),
+      description: t("loggedOutSuccessfullyDesc")
+    })
+    router.push("/")
+  }
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-12">
+        <div className="text-center">
+          <p className="text-muted-foreground">{t("loadingProfile")}</p>
+        </div>
+      </div>
+    )
+  }
+
+  const upcomingTickets = bookedTickets.filter(ticket => new Date(ticket.date) >= new Date())
+  const pastTickets = bookedTickets.filter(ticket => new Date(ticket.date) < new Date())
 
   return (
     <div className="container mx-auto px-4 py-12">
-      <Breadcrumb className="mb-6">
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/">Home</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/performances">Performances</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink>{performance.title}</BreadcrumbLink>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-secondary-blue mb-2">Profile</h1>
+        <p className="text-muted-foreground">Manage your account and view your bookings</p>
+      </div>
 
       <div className="grid gap-8 md:grid-cols-3">
-        {/* Main Content */}
-        <div className="md:col-span-2">
-          <div className="mb-6 aspect-video relative overflow-hidden rounded-lg">
-            <Image
-              src={performance.imageUrl || "/placeholder.svg"}
-              alt={performance.title}
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
+        {/* Sidebar */}
+        <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <User className="h-5 w-5" />
+                {profile.firstName || "User"} {profile.lastName}
+              </CardTitle>
+              <CardDescription>{profile.email}</CardDescription>
+            </CardHeader>
+          </Card>
 
-          <h1 className="mb-2 text-3xl font-bold text-secondary-blue md:text-4xl">{performance.title}</h1>
-          <p className="mb-4 text-xl text-muted-foreground">
-            {Array.isArray(performance.company) ? performance.company.join(' & ') : performance.company}
-          </p>
+          <Card>
+            <CardContent className="p-4">
+              <nav className="space-y-2">
+                <Button
+                  variant={activeTab === "upcoming" ? "default" : "ghost"}
+                  className="w-full justify-start"
+                  onClick={() => setActiveTab("upcoming")}
+                >
+                  <Calendar className="mr-2 h-4 w-4" />
+                  {t("upcoming")}
+                </Button>
+                <Button
+                  variant={activeTab === "past" ? "default" : "ghost"}
+                  className="w-full justify-start"
+                  onClick={() => setActiveTab("past")}
+                >
+                  <Clock className="mr-2 h-4 w-4" />
+                  {t("past")}
+                </Button>
+                <Button
+                  variant={activeTab === "favorites" ? "default" : "ghost"}
+                  className="w-full justify-start"
+                  onClick={() => setActiveTab("favorites")}
+                >
+                  <Heart className="mr-2 h-4 w-4" />
+                  {t("favoritePerformances")}
+                </Button>
+                <Button
+                  variant={activeTab === "settings" ? "default" : "ghost"}
+                  className="w-full justify-start"
+                  onClick={() => setActiveTab("settings")}
+                >
+                  <Settings className="mr-2 h-4 w-4" />
+                  {t("accountSettings")}
+                </Button>
+              </nav>
+            </CardContent>
+          </Card>
 
-          <div className="mb-6 flex flex-wrap gap-2">
-            <Badge className="bg-primary-gold/20 text-secondary-blue">{performance.genre}</Badge>
-            <Badge className="bg-muted">{performance.language}</Badge>
-            <Badge className="bg-muted">{performance.duration}</Badge>
-          </div>
-
-          <div className="mb-8 space-y-4 rounded-lg bg-muted/30 p-4">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-primary-gold" />
-              <span className="font-medium">{performance.date}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Clock className="h-5 w-5 text-primary-gold" />
-              <span className="font-medium">{performance.time}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-primary-gold" />
-              <div>
-                <div className="font-medium">{performance.venue}</div>
-                <div className="text-sm text-muted-foreground">{performance.address}</div>
-              </div>
-            </div>
-          </div>
-
-          <h2 className="mb-4 text-2xl font-semibold text-secondary-blue">Synopsis</h2>
-          <div className="mb-8 space-y-4">
-            {performance.synopsis.split("\n\n").map((paragraph: string, index: number) => (
-              <p key={index} className="text-muted-foreground">
-                {paragraph}
-              </p>
-            ))}
-          </div>
-
-          <h2 className="mb-4 text-2xl font-semibold text-secondary-blue">Cast & Crew</h2>
-          <div className="mb-8 space-y-2">
-            <div className="flex">
-              <span className="w-24 font-medium">Director:</span>
-              <span className="text-muted-foreground">{performance.director}</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="mb-2 w-24 font-medium">Cast:</span>
-              <ul className="ml-6 list-disc space-y-1">
-                {performance.cast.map((actor: string, index: number) => (
-                  <li key={index} className="text-muted-foreground">
-                    {actor}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          <h2 className="mb-4 text-2xl font-semibold text-secondary-blue">Reviews</h2>
-          <div className="mb-8 space-y-4">
-            {performance.reviews.map((review, index) => (
-              <div key={index} className="rounded-lg border p-4">
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="font-medium">{review.source}</span>
-                  <div className="flex">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <svg
-                        key={i}
-                        className={`h-4 w-4 ${i < Math.floor(review.rating) ? "text-primary-gold" : "text-muted"}`}
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    ))}
-                    {review.rating % 1 > 0 && (
-                      <svg className="h-4 w-4 text-primary-gold" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    )}
-                  </div>
-                </div>
-                <p className="text-muted-foreground">"{review.quote}"</p>
-              </div>
-            ))}
-          </div>
+          <Button onClick={handleLogout} variant="outline" className="w-full">
+            Logout
+          </Button>
         </div>
 
-        {/* Sidebar */}
-        <div>
-          <div className="sticky top-20 space-y-6 rounded-lg border p-6">
-            <h2 className="text-xl font-semibold text-secondary-blue">Book Your Tickets</h2>
-            <Separator />
+        {/* Main Content */}
+        <div className="md:col-span-2">
+          {activeTab === "upcoming" && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Upcoming {t("performances")}</CardTitle>
+                <CardDescription>Your booked tickets for upcoming events</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {upcomingTickets.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Ticket className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-medium mb-2">{t("noTicketsYet")}</h3>
+                    <p className="text-muted-foreground mb-4">{t("noTicketsYetDesc")}</p>
+                    <Button onClick={() => router.push("/program")}>
+                      {t("browseProgram")}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {upcomingTickets.map((ticket) => (
+                      <div key={ticket.id} className="border rounded-lg p-4">
+                        <div className="flex justify-between items-start mb-2">
+                          <h3 className="font-semibold">{ticket.eventTitle}</h3>
+                          <Badge>{ticket.bookingReference}</Badge>
+                        </div>
+                        <div className="space-y-1 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4" />
+                            {ticket.date}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Clock className="h-4 w-4" />
+                            {ticket.time}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <MapPin className="h-4 w-4" />
+                            {ticket.venue}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Ticket className="h-4 w-4" />
+                            Seats: {ticket.seats.join(", ")}
+                          </div>
+                        </div>
+                        <Button size="sm" className="mt-3">
+                          {t("viewDetails")}
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
-            <div className="space-y-4">
-              <div className="flex justify-between">
-                <span className="font-medium">Date:</span>
-                <span>{performance.date}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-medium">Time:</span>
-                <span>{performance.time}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-medium">Venue:</span>
-                <span>{performance.venue}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-medium">Duration:</span>
-                <span>{performance.duration}</span>
-              </div>
-            </div>
+          {activeTab === "past" && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Past {t("performances")}</CardTitle>
+                <CardDescription>Your previously attended events</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {pastTickets.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Clock className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-medium mb-2">No past events</h3>
+                    <p className="text-muted-foreground">You haven't attended any events yet.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {pastTickets.map((ticket) => (
+                      <div key={ticket.id} className="border rounded-lg p-4 opacity-75">
+                        <div className="flex justify-between items-start mb-2">
+                          <h3 className="font-semibold">{ticket.eventTitle}</h3>
+                          <Badge variant="secondary">{ticket.bookingReference}</Badge>
+                        </div>
+                        <div className="space-y-1 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4" />
+                            {ticket.date}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <MapPin className="h-4 w-4" />
+                            {ticket.venue}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
-            <Separator />
+          {activeTab === "favorites" && (
+            <Card>
+              <CardHeader>
+                <CardTitle>{t("favoritePerformances")}</CardTitle>
+                <CardDescription>Performances you've marked as favorites</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8">
+                  <Heart className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-medium mb-2">{t("noFavoritesYet")}</h3>
+                  <p className="text-muted-foreground mb-4">{t("noFavoritesYetDesc")}</p>
+                  <Button onClick={() => router.push("/program")}>
+                    {t("browseProgram")}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Languages className="h-5 w-5 text-primary-gold" />
-                <span className="text-sm">{performance.language}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-primary-gold" />
-                <span className="text-sm">Suitable for ages 12+</span>
-              </div>
-            </div>
+          {activeTab === "settings" && (
+            <Card>
+              <CardHeader>
+                <CardTitle>{t("accountSettings")}</CardTitle>
+                <CardDescription>{t("updateAccountDetails")}</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-medium mb-4">{t("personalInformation")}</h3>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="firstName">First Name</Label>
+                      <Input
+                        id="firstName"
+                        value={profile.firstName}
+                        onChange={(e) => setProfile(prev => ({ ...prev, firstName: e.target.value }))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="lastName">Last Name</Label>
+                      <Input
+                        id="lastName"
+                        value={profile.lastName}
+                        onChange={(e) => setProfile(prev => ({ ...prev, lastName: e.target.value }))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={profile.email}
+                        disabled
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">Phone</Label>
+                      <Input
+                        id="phone"
+                        value={profile.phone}
+                        onChange={(e) => setProfile(prev => ({ ...prev, phone: e.target.value }))}
+                      />
+                    </div>
+                  </div>
+                </div>
 
-            <Separator />
+                <Separator />
 
-            <div className="space-y-4">
-              <Button className="w-full" size="lg" asChild>
-                <Link href={`/tickets?performance=${performance.id}`}>Book Ticket</Link>
-              </Button>
-              <Button variant="outline" className="w-full" size="lg">
-                Add to Calendar
-              </Button>
-            </div>
+                <div>
+                  <h3 className="text-lg font-medium mb-4">{t("preferences")}</h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label>{t("emailNotifications")}</Label>
+                        <p className="text-sm text-muted-foreground">
+                          {t("emailNotificationsDesc")}
+                        </p>
+                      </div>
+                      <Switch
+                        checked={profile.emailNotifications}
+                        onCheckedChange={(checked) => 
+                          setProfile(prev => ({ ...prev, emailNotifications: checked }))
+                        }
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label>{t("calendarIntegration")}</Label>
+                        <p className="text-sm text-muted-foreground">
+                          {t("calendarIntegrationDesc")}
+                        </p>
+                      </div>
+                      <Switch
+                        checked={profile.marketingPreferences}
+                        onCheckedChange={(checked) => 
+                          setProfile(prev => ({ ...prev, marketingPreferences: checked }))
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
 
-            <div className="mt-6 rounded-lg bg-muted/30 p-4 text-center text-sm">
-              <p className="font-medium">Need assistance?</p>
-              <p className="text-muted-foreground">Contact our box office at:</p>
-              <p className="text-primary-gold">tickets@actingeurope.com</p>
-            </div>
-          </div>
+                <Button onClick={handleSaveProfile} disabled={isSaving}>
+                  {isSaving ? "Saving..." : t("saveChanges")}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>

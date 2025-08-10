@@ -28,6 +28,12 @@ export function setAuthenticated(email: string, role: string): void {
   window.dispatchEvent(new Event("user-logged-in"))
 }
 
+// Get user email
+export function getUserEmail(): string | null {
+  if (typeof window === "undefined") return null
+  return localStorage.getItem("actingEurope_userEmail")
+}
+
 // Clear user authentication
 export function clearAuthentication(): void {
   localStorage.removeItem("actingEurope_auth")
@@ -36,4 +42,9 @@ export function clearAuthentication(): void {
 
   // Dispatch event to notify components
   window.dispatchEvent(new Event("user-logged-out"))
+}
+
+// Logout function (alias for clearAuthentication)
+export function logout(): void {
+  clearAuthentication()
 }

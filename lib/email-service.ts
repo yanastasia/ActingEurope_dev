@@ -52,7 +52,7 @@ export async function sendTicketEmail(email: string, ticketData: any) {
   // Generate PDF ticket
   const pdfBuffer = await generatePDF(ticketData)
 
-  const emailHtml = render(
+  const emailHtml = await render(
     TicketEmail({
       name: ticketData.customerName,
       eventTitle: ticketData.title,
@@ -92,7 +92,7 @@ export async function sendTicketEmail(email: string, ticketData: any) {
 }
 
 export async function sendReminderEmail(email: string, eventData: any) {
-  const emailHtml = render(
+  const emailHtml = await render(
     ReminderEmail({
       name: eventData.customerName,
       eventTitle: eventData.title,
