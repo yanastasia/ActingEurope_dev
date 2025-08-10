@@ -112,6 +112,7 @@ interface ChartTooltipContentProps extends React.ComponentProps<"div"> {
   nameKey?: string
   labelKey?: string
   labelFormatter?: (value: any) => string
+  labelClassName?: string
   formatter?: (value: any, name: string) => [React.ReactNode, string]
   color?: string
 }
@@ -156,7 +157,7 @@ const ChartTooltipContent = React.forwardRef<
       if (labelFormatter) {
         return (
           <div className={cn("font-medium", labelClassName)}>
-            {labelFormatter(value, payload)}
+            {labelFormatter(value)}
           </div>
         )
       }
@@ -206,7 +207,7 @@ const ChartTooltipContent = React.forwardRef<
                 )}
               >
                 {formatter && item?.value !== undefined && item.name ? (
-                  formatter(item.value, item.name, item, index, item.payload)
+                  formatter(item.value, item.name)
                 ) : (
                   <>
                     {itemConfig?.icon ? (

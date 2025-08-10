@@ -270,7 +270,7 @@ export function AuthForm({ type }: AuthFormProps) {
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 <span className="sr-only">{showPassword ? "Hide password" : "Show password"}</span>
-              </Button>-2" onClick={() => setStep(Math.max(1, step - 1))}>
+              </Button>
             </div>
           </div>
 

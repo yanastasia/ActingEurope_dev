@@ -1,6 +1,9 @@
 {
+
   "compilerOptions": {
     "lib": ["dom", "dom.iterable", "esnext"],
+    "typeRoots": ["./node_modules/@types"],
+    "types": ["d3-array", "d3-color", "d3-ease"],
     "allowJs": true,
     "target": "ES6",
     "skipLibCheck": true,

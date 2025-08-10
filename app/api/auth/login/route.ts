@@ -51,6 +51,20 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error('Login error:', error)
+    
+    // If database is unavailable (connection limit reached), provide helpful error message
+    if (error instanceof Error && 
+        (error.message.includes('Request Unit limit') || 
+         error.message.includes('database connections opened') ||
+         error.name === 'PrismaClientInitializationError')) {
+      
+      console.log('Database unavailable during login attempt')
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable. Please try again later.' },
+        { status: 503 }
+      )
+    }
+    
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
