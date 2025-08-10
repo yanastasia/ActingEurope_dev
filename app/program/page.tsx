@@ -82,11 +82,32 @@ export default function ProgramPage() {
     )
   })
 
-  const eventsByDate = filteredEvents.reduce((acc, event) => {
+  // Sort events chronologically by date and time
+  const sortedEvents = filteredEvents.sort((a, b) => {
+    // First sort by date
+    const dateA = new Date(a.date)
+    const dateB = new Date(b.date)
+    if (dateA.getTime() !== dateB.getTime()) {
+      return dateA.getTime() - dateB.getTime()
+    }
+    // If dates are the same, sort by time
+    const [hoursA, minutesA] = a.time.split(':').map(Number)
+    const [hoursB, minutesB] = b.time.split(':').map(Number)
+    const timeA = hoursA * 60 + minutesA // Convert to minutes for comparison
+    const timeB = hoursB * 60 + minutesB
+    return timeA - timeB
+  })
+
+  const eventsByDate = sortedEvents.reduce((acc, event) => {
     if (!acc[event.date]) acc[event.date] = []
     acc[event.date].push(event)
     return acc
   }, {} as Record<string, Event[]>)
+
+  // Sort dates chronologically
+  const sortedDates = Object.keys(eventsByDate).sort((a, b) => {
+    return new Date(a).getTime() - new Date(b).getTime()
+  })
 
   const getBadgeColor = (type: string) => {
     switch (type) {
@@ -141,14 +162,22 @@ export default function ProgramPage() {
         </TabsList>
 
         <TabsContent value="list">
-          {Object.entries(eventsByDate).map(([date, dateEvents]) => (
-            <div key={date} className="mb-8">
-              <div className="mb-4 flex items-center">
-                <Calendar className="mr-2 h-5 w-5 text-primary-gold" />
-                <h2 className="text-xl font-semibold text-secondary-blue">{date}</h2>
-              </div>
-              <div className="space-y-4">
-                {dateEvents.map((event) => (
+          {sortedDates.map((date) => {
+            const dateEvents = eventsByDate[date].sort((a, b) => {
+              const [hoursA, minutesA] = a.time.split(':').map(Number)
+              const [hoursB, minutesB] = b.time.split(':').map(Number)
+              const timeA = hoursA * 60 + minutesA
+              const timeB = hoursB * 60 + minutesB
+              return timeA - timeB
+            })
+            return (
+              <div key={date} className="mb-8">
+                <div className="mb-4 flex items-center">
+                  <Calendar className="mr-2 h-5 w-5 text-primary-gold" />
+                  <h2 className="text-xl font-semibold text-secondary-blue">{date}</h2>
+                </div>
+                <div className="space-y-4">
+                  {dateEvents.map((event) => (
                   <Card key={event.id} className="overflow-hidden">
                     <CardContent className="p-0">
                       <div className="flex flex-col md:flex-row">
@@ -205,9 +234,10 @@ export default function ProgramPage() {
                     </CardContent>
                   </Card>
                 ))}
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </TabsContent>
 
         <TabsContent value="calendar">
