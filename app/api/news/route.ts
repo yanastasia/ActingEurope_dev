@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     if (!title || !excerpt || !imageUrl || !date || !category) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
-    const newArticle = await createNewsArticle(title, content, excerpt, author, date, category, imageUrl); // Added comment to force recompile
+    const newArticle = await createNewsArticle(title, content, excerpt, imageUrl, category, author); // Fixed parameter order
     return NextResponse.json(newArticle, { status: 201 });
   } catch (error) {
     console.error('Error creating news article:', error);
@@ -36,7 +36,7 @@ export async function PUT(request: Request) {
     if (!id || !title || !excerpt || !imageUrl || !date || !category) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
-    const updatedArticle = await updateNewsArticle(id, { title, excerpt, imageUrl, date, category });
+    const updatedArticle = await updateNewsArticle(id, { title, excerpt, imageUrl, publishedAt: new Date(date), category });
     if (!updatedArticle) {
       return NextResponse.json({ message: 'News article not found' }, { status: 404 });
     }

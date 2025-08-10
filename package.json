@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "powershell -ExecutionPolicy Bypass -File .\\build-alternative.ps1",
+    "build": "prisma generate && pnpm exec next build || prisma generate && powershell -ExecutionPolicy Bypass -File .\\build-alternative.ps1",
     "start": "next start",
     "lint": "next lint",
     "db:generate": "prisma generate",

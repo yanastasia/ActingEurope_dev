@@ -19,13 +19,13 @@ export async function POST(req: NextRequest) {
     }
 
 
-    const { email, password, role } = await req.json();
+    const { email, password, firstName, lastName, role } = await req.json();
 
-    if (!email || !password || !role) {
-      return NextResponse.json({ message: 'Email, password, and role are required' }, { status: 400 });
+    if (!email || !password || !firstName || !lastName || !role) {
+      return NextResponse.json({ message: 'Email, password, firstName, lastName, and role are required' }, { status: 400 });
     }
 
-    const newUser = await createUser(email, password, role);
+    const newUser = await createUser(email, password, firstName, lastName, role);
     return NextResponse.json(newUser, { status: 201 });
   } catch (error: any) {
     console.error('Error creating user:', error);

@@ -25,7 +25,7 @@ const isDevelopment = true // For testing, set to false to always send emails. I
 export async function sendVerificationEmail(email: string, verificationToken: string) {
   const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/verify-email?token=${verificationToken}`
 
-  const emailHtml = render(VerificationEmail({ verificationUrl }))
+  const emailHtml = await render(VerificationEmail({ verificationUrl }))
 
   const mailOptions = {
     from: process.env.EMAIL_FROM || "Acting Europe <noreply@actingeurope.com>",
