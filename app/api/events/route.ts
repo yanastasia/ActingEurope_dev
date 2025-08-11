@@ -88,3 +88,62 @@ export async function GET() {
     return NextResponse.json({ error: 'Failed to fetch events' }, { status: 500 })
   }
 }
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json()
+    const {
+      title,
+      eventType,
+      date,
+      time,
+      venue,
+      company,
+      description,
+      imageUrl,
+      isFeatured,
+      price,
+      tags
+    } = body
+
+    // Parse date and time (date comes in YYYY-MM-DD format from HTML date input)
+    const eventDate = new Date(date)
+    const [hours, minutes] = time.split(':')
+    const eventTime = new Date()
+    eventTime.setHours(parseInt(hours), parseInt(minutes), 0, 0)
+
+    // Find venue by name
+    const venueRecord = await prisma.venue.findFirst({
+      where: { name: venue }
+    })
+
+    if (!venueRecord) {
+      return NextResponse.json({ error: 'Venue not found' }, { status: 400 })
+    }
+
+    // Create the event
+    const event = await prisma.event.create({
+      data: {
+        title,
+        event_type: eventType,
+        event_date: eventDate,
+        event_time: eventTime,
+        venue_id: venueRecord.id,
+        theatre_id: 1, // Default theatre ID
+        company: Array.isArray(company) ? company : [company],
+        description,
+        image_url: imageUrl,
+        is_featured: isFeatured,
+        price: parseFloat(price) || 0,
+        genre: tags?.join(', ') || 'Drama',
+        language: 'Bulgarian',
+        duration: '120 min'
+      }
+    })
+
+    return NextResponse.json({ success: true, id: event.id })
+  } catch (error) {
+    console.error('Error creating event:', error)
+    return NextResponse.json({ error: 'Failed to create event' }, { status: 500 })
+  }
+}

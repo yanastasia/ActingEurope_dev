@@ -101,3 +101,77 @@ export async function GET(request: Request, { params }: { params: { id: string }
     return NextResponse.json({ error: 'Failed to fetch event' }, { status: 500 })
   }
 }
+
+export async function PUT(request: Request, { params }: { params: { id: string } }) {
+  try {
+    const { id } = params
+    const body = await request.json()
+    const {
+      title,
+      eventType,
+      date,
+      time,
+      venue,
+      company,
+      description,
+      imageUrl,
+      isFeatured,
+      price,
+      tags
+    } = body
+
+    // Parse date and time (date comes in YYYY-MM-DD format from HTML date input)
+    const eventDate = new Date(date)
+    const [hours, minutes] = time.split(':')
+    const eventTime = new Date()
+    eventTime.setHours(parseInt(hours), parseInt(minutes), 0, 0)
+
+    // Find venue by name
+    const venueRecord = await prisma.venue.findFirst({
+      where: { name: venue }
+    })
+
+    if (!venueRecord) {
+      return NextResponse.json({ error: 'Venue not found' }, { status: 400 })
+    }
+
+    // Update the event
+    const event = await prisma.event.update({
+      where: { id: parseInt(id) },
+      data: {
+        title,
+        event_type: eventType,
+        event_date: eventDate,
+        event_time: eventTime,
+        venue_id: venueRecord.id,
+        company: Array.isArray(company) ? company : [company],
+        description,
+        image_url: imageUrl,
+        is_featured: isFeatured,
+        price: parseFloat(price) || 0,
+        genre: tags?.join(', ') || 'Drama'
+      }
+    })
+
+    return NextResponse.json({ success: true, id: event.id })
+  } catch (error) {
+    console.error('Error updating event:', error)
+    return NextResponse.json({ error: 'Failed to update event' }, { status: 500 })
+  }
+}
+
+export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+  try {
+    const { id } = params
+
+    // Delete the event
+    await prisma.event.delete({
+      where: { id: parseInt(id) }
+    })
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Error deleting event:', error)
+    return NextResponse.json({ error: 'Failed to delete event' }, { status: 500 })
+  }
+}

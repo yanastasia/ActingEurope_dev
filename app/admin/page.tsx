@@ -40,14 +40,26 @@ interface Venue {
   id: string
   name: string
   description: string
-  location: string; // Added location
-  capacity: number; // Added capacity
+  location: string
+  capacity: number
+  sections: VenueSection[]
+}
+
+interface VenueSection {
+  id: string
+  sectionName: string
+  sectionType: 'regular' | 'balcony'
   rows: VenueRow[]
 }
 
 interface VenueRow {
   rowNumber: number
-  seatCount: number
+  seats: VenueSeat[]
+}
+
+interface VenueSeat {
+  seatNumber: number
+  isAccessible: boolean
 }
 
 interface EventFormState {
@@ -69,8 +81,7 @@ interface VenueFormState {
   description: string;
   location: string;
   capacity: number;
-  rowCount: number;
-  seatsPerRow: number;
+  imageUrl: string;
 }
 
 export default function AdminPage() {
@@ -100,12 +111,11 @@ export default function AdminPage() {
   const [venueFormData, setVenueFormData] = useState<VenueFormState>({
     name: "",
     description: "",
-    location: "", // Initialize location
-    capacity: 0,   // Initialize capacity
-    rowCount: 1,
-    seatsPerRow: 10,
+    location: "",
+    capacity: 0,
+    imageUrl: "",
   })
-  const [venueRows, setVenueRows] = useState<VenueRow[]>([{ rowNumber: 1, seatCount: 10 }])
+
   const [isSubmitting, setIsSubmitting] = useState(false)
   useEffect(() => {
     const fetchData = async () => {
@@ -160,77 +170,19 @@ export default function AdminPage() {
   const handleVenueInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target
     if (editingVenue) {
-      setEditingVenue({ ...editingVenue, [id]: value })
-    } else {
-      setVenueFormData((prev) => ({ ...prev, [id]: value }))
-    }
-  }
-
-  const handleRowCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const count = Number.parseInt(e.target.value) || 1
-    if (count < 1) return
-
-    if (editingVenue) {
-      // When editing, adjust the rows array based on the new count
-      const currentRows = [...editingVenue.rows]
-      if (count > currentRows.length) {
-        // Add new rows
-        const newRows = Array.from({ length: count - currentRows.length }, (_, i) => ({
-          rowNumber: currentRows.length + i + 1,
-          seatCount: 10,
-        }))
-        setEditingVenue({
-          ...editingVenue,
-          rows: [...currentRows, ...newRows],
-        })
-      } else if (count < currentRows.length) {
-        // Remove rows
-        setEditingVenue({
-          ...editingVenue,
-          rows: currentRows.slice(0, count),
-        })
-      }
-    } else {
-      // When creating new venue
-      setVenueFormData((prev) => ({ ...prev, rowCount: count }))
-
-      // Update the rows array
-      if (count > venueRows.length) {
-        // Add new rows
-        const newRows = Array.from({ length: count - venueRows.length }, (_, i) => ({
-          rowNumber: venueRows.length + i + 1,
-          seatCount: 10,
-        }))
-        setVenueRows([...venueRows, ...newRows])
-      } else if (count < venueRows.length) {
-        // Remove rows
-        setVenueRows(venueRows.slice(0, count))
-      }
-    }
-  }
-
-  const handleSeatCountChange = (rowIndex: number, value: number) => {
-    if (value < 0) return
-
-    if (editingVenue) {
-      const updatedRows = [...editingVenue.rows]
-      updatedRows[rowIndex] = {
-        ...updatedRows[rowIndex],
-        seatCount: value,
-      }
-      setEditingVenue({
-        ...editingVenue,
-        rows: updatedRows,
+      setEditingVenue({ 
+        ...editingVenue, 
+        [id]: id === 'capacity' ? parseInt(value) || 0 : value 
       })
     } else {
-      const updatedRows = [...venueRows]
-      updatedRows[rowIndex] = {
-        ...updatedRows[rowIndex],
-        seatCount: value,
-      }
-      setVenueRows(updatedRows)
+      setVenueFormData((prev) => ({ 
+        ...prev, 
+        [id]: id === 'capacity' ? parseInt(value) || 0 : value 
+      }))
     }
   }
+
+
 
   const handleSelectChange = (name: string, value: string) => {
     if (editingEvent) {
@@ -364,14 +316,34 @@ export default function AdminPage() {
       return
     }
 
-    // Create new venue
+    // Check for duplicate venue names
+    const existingVenue = venues.find(venue => venue.name.toLowerCase() === venueFormData.name.toLowerCase())
+    if (existingVenue) {
+      toast({
+        title: "Duplicate venue name",
+        description: "A venue with this name already exists. Please choose a different name.",
+        variant: "destructive",
+      })
+      setIsSubmitting(false)
+      return
+    }
+
+    // Create new venue with default section
     const newVenue: Venue = {
       id: `venue-${Date.now()}`,
       name: venueFormData.name,
       description: venueFormData.description,
-      location: venueFormData.location, // Added location
-      capacity: venueFormData.capacity,   // Added capacity
-      rows: venueRows,
+      location: venueFormData.location,
+      capacity: venueFormData.capacity,
+      sections: [{
+        id: 'section-1',
+        sectionName: 'Main',
+        sectionType: 'regular' as const,
+        rows: [{ 
+          rowNumber: 1, 
+          seats: Array.from({ length: 10 }, (_, i) => ({ seatNumber: i + 1, isAccessible: false }))
+        }],
+      }]
     }
 
     // Add to database via API
@@ -392,6 +364,16 @@ export default function AdminPage() {
           setVenues(venuesData || [])
         }
       } else {
+        const errorData = await response.json()
+        if (response.status === 400 && errorData.error) {
+          toast({
+            title: "Duplicate venue name",
+            description: errorData.error,
+            variant: "destructive",
+          })
+          setIsSubmitting(false)
+          return
+        }
         throw new Error('Failed to add venue')
       }
     } catch (error) {
@@ -415,12 +397,11 @@ export default function AdminPage() {
     setVenueFormData({
       name: "",
       description: "",
-      location: "", // Reset location
-      capacity: 0,   // Reset capacity
-      rowCount: 1,
-      seatsPerRow: 10, // Reset seatsPerRow
+      location: "",
+      capacity: 0,
+      imageUrl: "",
     })
-    setVenueRows([{ rowNumber: 1, seatCount: 10 }])
+
 
     setIsSubmitting(false)
   }
@@ -428,17 +409,36 @@ export default function AdminPage() {
   const handleEditVenue = (id: string) => {
     const venueToEdit = venues.find((venue) => venue.id === id)
     if (venueToEdit) {
-      setEditingVenue(venueToEdit)
+      // Ensure the venue has sections for editing
+      let venueWithSections = { ...venueToEdit }
+      
+      // Handle backward compatibility - convert old rows structure to sections
+      if ('rows' in venueToEdit && venueToEdit.rows && !venueToEdit.sections) {
+        venueWithSections.sections = [{
+          id: '1',
+          sectionName: 'Main',
+          sectionType: 'regular' as const,
+          rows: venueToEdit.rows
+        }]
+      } else if (!venueToEdit.sections || venueToEdit.sections.length === 0) {
+        // Create default section if none exist
+        venueWithSections.sections = [{
+          id: '1',
+          sectionName: 'Main',
+          sectionType: 'regular' as const,
+          rows: [{
+            rowNumber: 1,
+            seats: Array.from({ length: 10 }, (_, i) => ({ seatNumber: i + 1, isAccessible: false }))
+          }]
+        }]
+      }
+      
+      setEditingVenue(venueWithSections)
     }
   }
 
   const handleSelectEventForEdit = (id: string) => {
     const eventToEdit = events.find((event) => event.id === id)
-    if (eventToEdit) {
-      setEditingEvent(eventToEdit)
-    }
-
-    // Validate form
     if (!eventToEdit) {
       toast({
         title: "Error",
@@ -448,16 +448,18 @@ export default function AdminPage() {
       return
     }
 
-    if (!eventToEdit.title || !eventToEdit.eventType || !eventToEdit.date || !eventToEdit.time || !eventToEdit.venue) {
-      toast({
-        title: "Missing information",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      })
-      return
+    // Transform the data to match form expectations
+    const transformedEvent = {
+      ...eventToEdit,
+      // Convert DD-MM-YYYY to YYYY-MM-DD for HTML date input
+      date: eventToEdit.date ? eventToEdit.date.split('-').reverse().join('-') : '',
+      // Remove currency prefix from price (€25 -> 25, Free -> 0)
+      price: eventToEdit.price === 'Free' ? '0' : eventToEdit.price.replace(/[€$]/g, ''),
+      // Ensure description field is mapped correctly
+      description: eventToEdit.synopsis || eventToEdit.description || ''
     }
 
-
+    setEditingEvent(transformedEvent)
   }
 
   const handleEditEvent = async (e: React.FormEvent) => {
@@ -536,6 +538,7 @@ export default function AdminPage() {
 
     // Update venue via API
     try {
+      console.log('Updating venue with data:', editingVenue)
       const response = await fetch(`/api/venues/${editingVenue.id}`, {
         method: 'PUT',
         headers: {
@@ -1047,67 +1050,246 @@ export default function AdminPage() {
         <TabsContent value="venues" className="mt-6 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Add New Venue</CardTitle>
-              <CardDescription>Create a new venue for events</CardDescription>
+              <CardTitle>{editingVenue ? "Edit Venue" : "Add New Venue"}</CardTitle>
+              <CardDescription>{editingVenue ? "Update venue information" : "Create a new venue for events"}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="venue-name">Venue Name</Label>
+                <Label htmlFor="name">Venue Name</Label>
                 <Input
-                  id="venue-name"
+                  id="name"
                   placeholder="Enter venue name"
-                  value={venueFormData.name}
-                  onChange={(e) => setVenueFormData({ ...venueFormData, name: e.target.value })}
+                  value={editingVenue ? editingVenue.name : venueFormData.name}
+                  onChange={handleVenueInputChange}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="venue-location">Location</Label>
+                <Label htmlFor="location">Location</Label>
                 <Input
-                  id="venue-location"
+                  id="location"
                   placeholder="Enter venue location"
-                  value={venueFormData.location}
-                  onChange={(e) => setVenueFormData({ ...venueFormData, location: e.target.value })}
+                  value={editingVenue ? editingVenue.location : venueFormData.location}
+                  onChange={handleVenueInputChange}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="venue-capacity">Capacity</Label>
+                <Label htmlFor="capacity">Capacity</Label>
                 <Input
-                  id="venue-capacity"
+                  id="capacity"
                   type="number"
                   placeholder="Enter venue capacity"
-                  value={venueFormData.capacity}
-                  onChange={(e) =>
-                    setVenueFormData({ ...venueFormData, capacity: parseInt(e.target.value) || 0 })
-                  }
+                  value={editingVenue ? editingVenue.capacity : venueFormData.capacity}
+                  onChange={handleVenueInputChange}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="venue-rows">Number of Rows</Label>
-                <Input
-                  id="venue-rows"
-                  type="number"
-                  placeholder="Enter number of rows"
-                  value={venueFormData.rowCount}
-                  onChange={handleRowCountChange}
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  placeholder="Enter venue description"
+                  value={editingVenue ? editingVenue.description : venueFormData.description}
+                  onChange={handleVenueInputChange}
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="venue-seats-per-row">Seats Per Row</Label>
-                <Input
-                  id="venue-seats-per-row"
-                  type="number"
-                  placeholder="Enter seats per row"
-                  value={venueFormData.seatsPerRow}
-                  onChange={(e) => {
-                    const newSeats = parseInt(e.target.value) || 0;
-                    setVenueFormData({ ...venueFormData, seatsPerRow: newSeats });
-                    setVenueRows((prevRows) =>
-                      prevRows.map((row) => ({ ...row, seatCount: newSeats }))
-                    );
-                  }}
-                />
+              {/* Section Configuration */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label>Venue Sections</Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (editingVenue) {
+                        const newSection: VenueSection = {
+                          id: `section-${Date.now()}`,
+                          sectionName: `Section ${editingVenue.sections.length + 1}`,
+                          sectionType: 'regular',
+                          rows: [{
+                            rowNumber: 1,
+                            seats: Array.from({ length: 10 }, (_, i) => ({ seatNumber: i + 1, isAccessible: false }))
+                          }]
+                        }
+                        setEditingVenue({
+                          ...editingVenue,
+                          sections: [...editingVenue.sections, newSection]
+                        })
+                      }
+                    }}
+                  >
+                    Add Section
+                  </Button>
+                </div>
+                
+                {editingVenue?.sections.map((section, sectionIndex) => (
+                  <div key={section.id} className="border-2 p-4 rounded-lg space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <Input
+                          value={section.sectionName}
+                          onChange={(e) => {
+                            const updatedSections = [...editingVenue.sections]
+                            updatedSections[sectionIndex].sectionName = e.target.value
+                            setEditingVenue({
+                              ...editingVenue,
+                              sections: updatedSections
+                            })
+                          }}
+                          className="font-medium"
+                        />
+                        <Select
+                          value={section.sectionType}
+                          onValueChange={(value: 'regular' | 'balcony') => {
+                            const updatedSections = [...editingVenue.sections]
+                            updatedSections[sectionIndex].sectionType = value
+                            setEditingVenue({
+                              ...editingVenue,
+                              sections: updatedSections
+                            })
+                          }}
+                        >
+                          <SelectTrigger className="w-32">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="regular">Regular</SelectItem>
+                            <SelectItem value="balcony">Balcony</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      {editingVenue.sections.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => {
+                            const updatedSections = editingVenue.sections.filter((_, i) => i !== sectionIndex)
+                            setEditingVenue({
+                              ...editingVenue,
+                              sections: updatedSections
+                            })
+                          }}
+                        >
+                          Remove Section
+                        </Button>
+                      )}
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Label className="text-sm">Number of Rows:</Label>
+                        <Input
+                          type="number"
+                          min="1"
+                          value={section.rows.length}
+                          onChange={(e) => {
+                            const count = parseInt(e.target.value) || 1
+                            const updatedSections = [...editingVenue.sections]
+                            const currentRows = [...section.rows]
+                            
+                            if (count > currentRows.length) {
+                              const newRows = Array.from({ length: count - currentRows.length }, (_, i) => ({
+                                rowNumber: currentRows.length + i + 1,
+                                seats: Array.from({ length: 10 }, (_, j) => ({ seatNumber: j + 1, isAccessible: false }))
+                              }))
+                              updatedSections[sectionIndex].rows = [...currentRows, ...newRows]
+                            } else if (count < currentRows.length) {
+                              updatedSections[sectionIndex].rows = currentRows.slice(0, count)
+                            }
+                            
+                            setEditingVenue({
+                              ...editingVenue,
+                              sections: updatedSections
+                            })
+                          }}
+                          className="w-20"
+                        />
+                      </div>
+                    </div>
+                    
+                    {/* Row Configuration for this section */}
+                    <div className="space-y-3">
+                      {section.rows.map((row, rowIndex) => (
+                        <div key={row.rowNumber} className="border p-3 rounded space-y-2">
+                          <div className="flex items-center gap-4">
+                            <Label className="font-medium text-sm">Row {row.rowNumber}</Label>
+                            <div className="flex items-center gap-2">
+                              <Label className="text-xs">Seats:</Label>
+                              <Input
+                                type="number"
+                                min="1"
+                                value={row.seats.length}
+                                onChange={(e) => {
+                                  const seatCount = parseInt(e.target.value) || 1
+                                  const updatedSections = [...editingVenue.sections]
+                                  const currentSeats = [...row.seats]
+                                  
+                                  if (seatCount > currentSeats.length) {
+                                    const newSeats = Array.from({ length: seatCount - currentSeats.length }, (_, i) => ({
+                                      seatNumber: currentSeats.length + i + 1,
+                                      isAccessible: false
+                                    }))
+                                    updatedSections[sectionIndex].rows[rowIndex].seats = [...currentSeats, ...newSeats]
+                                  } else {
+                                    updatedSections[sectionIndex].rows[rowIndex].seats = currentSeats.slice(0, seatCount)
+                                  }
+                                  
+                                  setEditingVenue({
+                                    ...editingVenue,
+                                    sections: updatedSections
+                                  })
+                                }}
+                                className="w-16 text-xs"
+                              />
+                            </div>
+                          </div>
+                          
+                          {/* Seat Configuration */}
+                          <div className="grid grid-cols-10 gap-1">
+                            {row.seats.map((seat, seatIndex) => (
+                              <div key={`${sectionIndex}-${rowIndex}-${seat.seatNumber}`} className="flex flex-col items-center">
+                                <div className={`w-6 h-6 border rounded flex items-center justify-center text-xs ${
+                                  seat.isAccessible ? 'bg-blue-100 border-blue-500' : 'bg-gray-100 border-gray-300'
+                                }`}>
+                                  {seat.seatNumber}
+                          </div>
+                                 <Switch
+                                   checked={seat.isAccessible}
+                                   onCheckedChange={(checked) => {
+                                     const updatedSections = [...editingVenue.sections]
+                                     updatedSections[sectionIndex].rows[rowIndex].seats[seatIndex].isAccessible = checked
+                                     setEditingVenue({
+                                       ...editingVenue,
+                                       sections: updatedSections
+                                     })
+                                   }}
+                                   className="mt-1 scale-75"
+                                 />
+                                 <span className="text-xs text-muted-foreground mt-1">
+                                   {seat.isAccessible ? 'ACC' : 'REG'}
+                                 </span>
+                               </div>
+                             ))}
+                           </div>
+                         </div>
+                       ))}
+                     </div>
+                   </div>
+                 ))}
+                 <p className="text-sm text-muted-foreground">
+                   Toggle switches to mark seats as accessible (blue). Accessible seats will be clearly marked for disabled users.
+                 </p>
+               </div>
+              <div className="flex gap-2">
+                {editingVenue ? (
+                  <>
+                    <Button onClick={handleUpdateVenue}>Update Venue</Button>
+                    <Button variant="outline" onClick={handleCancelEdit}>Cancel</Button>
+                  </>
+                ) : (
+                  <Button onClick={handleAddVenue}>Add Venue</Button>
+                )}
               </div>
-              <Button onClick={handleAddVenue}>Add Venue</Button>
             </CardContent>
           </Card>
 
@@ -1133,10 +1315,19 @@ export default function AdminPage() {
                       <TableCell>{venue.location}</TableCell>
                       <TableCell>{venue.capacity}</TableCell>
                       <TableCell>
-                        <Button variant="outline" size="sm" className="mr-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="mr-2"
+                          onClick={() => handleEditVenue(venue.id)}
+                        >
                           Edit
                         </Button>
-                        <Button variant="destructive" size="sm">
+                        <Button 
+                          variant="destructive" 
+                          size="sm"
+                          onClick={() => handleDeleteVenue(venue.id)}
+                        >
                           Delete
                         </Button>
                       </TableCell>

@@ -75,7 +75,10 @@ model Venue {
   id           Int            @id @default(autoincrement())
   name         String         @db.VarChar(100)
   description  String?        @db.Text
+  address      String?        @db.VarChar(255)
+  city         String?        @db.VarChar(100)
   capacity     Int
+  image_url    String?        @db.VarChar(500)
   created_at   DateTime       @default(now())
   sections     VenueSection[]
   events       Event[]
@@ -106,6 +109,7 @@ model Seat {
   row_number     Int
   seat_number    Int
   is_available   Boolean      @default(true)
+  is_accessible  Boolean      @default(false)
   created_at     DateTime     @default(now())
   venueSection   VenueSection @relation(fields: [venue_section_id], references: [id], onDelete: Cascade)
   booked_seats   BookedSeat[]

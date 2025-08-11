@@ -29,7 +29,7 @@ import Link from "next/link"
 
 export default function ProgramPage() {
   const { t } = useLanguage()
-  const [selectedDate, setSelectedDate] = useState("All Dates")
+  const [selectedDate, setSelectedDate] = useState<string>("All Dates")
   const [selectedVenue, setSelectedVenue] = useState("All Venues")
   const [selectedType, setSelectedType] = useState("All Types")
   const [events, setEvents] = useState<Event[]>([])
@@ -62,7 +62,9 @@ export default function ProgramPage() {
         }))
 
         setEvents(mappedPerformances)
-        setDates(["All Dates", ...new Set(mappedPerformances.map(e => e.date))])
+        const uniqueDates = ["All Dates", ...new Set(mappedPerformances.map(e => e.date))]
+        console.log('Available dates for dropdown:', uniqueDates)
+        setDates(uniqueDates)
         setVenues(["All Venues", ...new Set(mappedPerformances.map(e => e.venue))])
         setTypes(["All Types", ...new Set(mappedPerformances.map(e => e.eventType))])
       } catch (error) {
@@ -131,7 +133,7 @@ export default function ProgramPage() {
           <Filter className="mr-2 h-5 w-5 text-primary-gold" />
           <h2 className="text-lg font-semibold text-secondary-blue">{t("filterEvents")}</h2>
         </div>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-4">
           <Select value={selectedDate} onValueChange={setSelectedDate}>
             <SelectTrigger><SelectValue placeholder={t("selectDate")} /></SelectTrigger>
             <SelectContent>
@@ -152,6 +154,19 @@ export default function ProgramPage() {
               {types.map(type => <SelectItem key={type} value={type}>{type === "All Types" ? t("allTypes") : t(type.toLowerCase())}</SelectItem>)}
             </SelectContent>
           </Select>
+
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => {
+              setSelectedDate("All Dates")
+              setSelectedVenue("All Venues")
+              setSelectedType("All Types")
+            }}
+            className="bg-secondary-blue hover:bg-secondary-blue/90 text-white border-secondary-blue px-3 py-2 text-sm"
+          >
+            Reset
+          </Button>
         </div>
       </div>
 
@@ -197,16 +212,16 @@ export default function ProgramPage() {
                             <img
                               src={event.posterUrl as string}
                               alt={`${event.title} poster`}
-                              className="mb-2 max-h-24 w-auto rounded-md object-contain"
+                              className="mb-2 h-20 w-12 sm:h-24 sm:w-16 md:h-28 md:w-20 lg:h-32 lg:w-24 rounded-md object-cover"
                             />
                           ) : (event.imageUrl && event.imageUrl.trim() !== "") ? (
                             <img
                               src={event.imageUrl}
                               alt={`${event.title} poster`}
-                              className="mb-2 max-h-24 w-auto rounded-md object-contain"
+                              className="mb-2 h-20 w-12 sm:h-24 sm:w-16 md:h-28 md:w-20 lg:h-32 lg:w-24 rounded-md object-cover"
                             />
                           ) : (
-                            <div className="mb-2 h-24 w-20 bg-gray-200 rounded-md flex items-center justify-center text-muted-foreground">
+                            <div className="mb-2 h-20 w-12 sm:h-24 sm:w-16 md:h-28 md:w-20 lg:h-32 lg:w-24 bg-gray-200 rounded-md flex items-center justify-center text-muted-foreground text-xs">
                               No image
                             </div>
                           )}
@@ -242,24 +257,184 @@ export default function ProgramPage() {
 
         <TabsContent value="calendar">
           <div className="rounded-lg border p-4">
-            <div className="mb-4 grid grid-cols-7 gap-1 text-center">
-              {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
-                <div key={day} className="p-2 font-semibold">{day}</div>
-              ))}
-              {Array.from({ length: 35 }).map((_, i) => {
-                const day = i + 1
-                const hasEvents = Object.keys(eventsByDate).some(date => new Date(date).getDate() === day)
-                return (
-                  <div key={`calendar-day-${i}`} className={`aspect-square rounded border p-1 ${hasEvents ? "bg-primary-gold/10 border-primary-gold/30" : ""}`}>
-                    <div className="text-sm font-medium">{day}</div>
-                    {hasEvents && <div className="mt-1 h-1 w-full rounded-full bg-primary-gold"></div>}
+            {(() => {
+              // Get current date or first event date
+              const today = new Date()
+              let firstEventDate = today
+              
+              if (sortedEvents.length > 0) {
+                // Convert DD-MM-YYYY to YYYY-MM-DD format for proper Date parsing
+                const dateParts = sortedEvents[0].date.split('-')
+                if (dateParts.length === 3) {
+                  const [day, month, year] = dateParts
+                  firstEventDate = new Date(`${year}-${month}-${day}`)
+                }
+              }
+              
+              const currentMonth = firstEventDate.getMonth()
+              const currentYear = firstEventDate.getFullYear()
+              
+              // Get first day of month and number of days
+              const firstDayOfMonth = new Date(currentYear, currentMonth, 1)
+              const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0)
+              const daysInMonth = lastDayOfMonth.getDate()
+              const startingDayOfWeek = (firstDayOfMonth.getDay() + 6) % 7 // Convert Sunday=0 to Monday=0
+              
+              // Create calendar grid
+              const calendarDays = []
+              
+              // Add empty cells for days before month starts
+              for (let i = 0; i < startingDayOfWeek; i++) {
+                calendarDays.push(null)
+              }
+              
+              // Add days of the month
+              for (let day = 1; day <= daysInMonth; day++) {
+                calendarDays.push(day)
+              }
+              
+              // Month names
+              const monthNames = [
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+              ]
+              
+              return (
+                <>
+                  <div className="mb-4 text-center">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-xl font-semibold text-secondary-blue">
+                        {monthNames[currentMonth]} {currentYear}
+                      </h3>
+                      {selectedDate && selectedDate !== "All Dates" && (
+                        <div className="text-sm text-primary-gold font-medium">
+                          Selected: {selectedDate.split('-').join('/')}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                )
-              })}
-            </div>
-            <p className="mt-4 text-center text-sm text-muted-foreground">
-              Calendar view is simplified for the MVP. Click on dates with events to see details.
-            </p>
+                  <div className="mb-4 grid grid-cols-7 gap-1 text-center">
+                    {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
+                      <div key={day} className="p-2 font-semibold text-secondary-blue">{day}</div>
+                    ))}
+                    {calendarDays.map((day, index) => {
+                      if (day === null) {
+                        return <div key={`empty-${index}`} className="aspect-square"></div>
+                      }
+                      
+                      // Convert to DD-MM-YYYY format to match event dates
+                      const dateString = `${String(day).padStart(2, '0')}-${String(currentMonth + 1).padStart(2, '0')}-${currentYear}`
+                      const dayEvents = eventsByDate[dateString] || []
+                      const hasEvents = dayEvents.length > 0
+                      const isToday = today.getDate() === day && today.getMonth() === currentMonth && today.getFullYear() === currentYear
+                      const isSelected = selectedDate === dateString
+                      
+                      return (
+                        <div 
+                          key={`calendar-day-${day}`} 
+                          className={`min-h-[120px] rounded border p-1 cursor-pointer transition-colors ${
+                            hasEvents 
+                              ? "bg-primary-gold/10 border-primary-gold/30 hover:bg-primary-gold/20" 
+                              : "bg-gray-50/50 border-gray-200 hover:bg-gray-100"
+                          } ${
+                            isToday ? "ring-2 ring-secondary-blue" : ""
+                          } ${
+                            isSelected ? "ring-2 ring-primary-gold bg-primary-gold/20" : ""
+                          } flex flex-col`}
+                          onClick={() => {
+                            // Allow clicking on any date, not just those with events
+                            setSelectedDate(dateString)
+                          }}
+                        >
+                          <div className={`text-sm font-medium mb-1 ${
+                            isToday ? "text-secondary-blue font-bold" : ""
+                          }`}>{day}</div>
+                          {hasEvents && (
+                            <div className="flex-1 space-y-1 overflow-hidden">
+                              {dayEvents.slice(0, 3).map((event, eventIndex) => (
+                                <div key={eventIndex} className="text-xs bg-primary-gold/20 rounded px-1 py-0.5 truncate">
+                                  <div className="font-medium text-secondary-blue truncate">{event.time}</div>
+                                  <div className="text-gray-700 truncate">{event.title}</div>
+                                </div>
+                              ))}
+                              {dayEvents.length > 3 && (
+                                <div className="text-xs text-primary-gold font-medium">+{dayEvents.length - 3} more</div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                  <div className="mt-4 text-center text-sm text-muted-foreground">
+                    <p>Event names and times are displayed directly in each date.</p>
+                    <p className="mt-1">Click on any date to view events for that day.</p>
+                  </div>
+                  
+                  {/* Selected Date Events Display */}
+                  {selectedDate && selectedDate !== "All Dates" && (
+                    <div className="mt-6 border-t pt-6">
+                      <h4 className="text-lg font-semibold text-secondary-blue mb-4">
+                        Events on {selectedDate.split('-').join('/')}
+                      </h4>
+                      {eventsByDate[selectedDate] && eventsByDate[selectedDate].length > 0 ? (
+                        <div className="space-y-4">
+                        {eventsByDate[selectedDate].map((event, index) => (
+                          <Card key={index} className="overflow-hidden">
+                            <CardContent className="p-4">
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <Badge variant="outline" className="text-xs">
+                                      {event.time}
+                                    </Badge>
+                                    <Badge variant="secondary" className="text-xs">
+                                      {event.eventType}
+                                    </Badge>
+                                  </div>
+                                  <h5 className="font-semibold text-lg mb-1">{event.title}</h5>
+                                  <p className="text-sm text-muted-foreground mb-2">
+                                    <MapPin className="inline h-3 w-3 mr-1" />
+                                    {event.venue}
+                                  </p>
+                                  <p className="text-sm mb-3">{event.company.join(", ")}</p>
+                                  <div className="flex gap-2">
+                                    <Link href={`/tickets?event=${event.id}`}>
+                                      <Button size="sm" className="bg-primary-gold hover:bg-primary-gold/90">
+                                        Book Ticket
+                                      </Button>
+                                    </Link>
+                                    <Link href={`/performances/${event.id}`}>
+                                      <Button size="sm" variant="outline">
+                                        Details
+                                      </Button>
+                                    </Link>
+                                  </div>
+                                </div>
+                                {event.imageUrl && (
+                                  <div className="ml-4 flex-shrink-0">
+                                    <img
+                                      src={event.imageUrl}
+                                      alt={event.title}
+                                      className="w-20 h-20 object-cover rounded"
+                                    />
+                                  </div>
+                                )}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <p>No events scheduled for this date.</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </>
+              )
+            })()}
           </div>
         </TabsContent>
       </Tabs>

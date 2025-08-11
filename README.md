@@ -1,7 +1,321 @@
-# Acting Europe 
+# Acting Europe - Theatre Without Borders
 
-## Overview
+[![Next.js](https://img.shields.io/badge/Next.js-15.2.4-black)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-blue)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org/)
+[![Prisma](https://img.shields.io/badge/Prisma-6.10.1-green)](https://www.prisma.io/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue)](https://www.postgresql.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4.17-38B2AC)](https://tailwindcss.com/)
 
+An international theatre festival platform celebrating cultural exchange and artistic collaboration across Europe. This web application provides a comprehensive solution for managing theatre events, venues, bookings, and user interactions.
 
-## Deployment
+## 🎭 Project Overview
+
+Acting Europe is a modern web application designed to connect theatre enthusiasts, artists, and venues across Europe. The platform facilitates the discovery of theatrical performances, workshops, and cultural discussions while providing robust administrative tools for event management.
+
+## ✨ Key Features
+
+### 🎪 Public Features
+- **Event Discovery**: Browse performances, workshops, and discussions with detailed information
+- **Interactive Venue Maps**: Visual seat selection with accessibility options
+- **Multi-language Support**: Internationalization for European audiences
+- **Responsive Design**: Optimized for desktop, tablet, and mobile devices
+- **News & Updates**: Stay informed about festival news and announcements
+- **Theatre Profiles**: Detailed information about participating theatres
+- **Performance Details**: Comprehensive event information including cast, synopsis, and scheduling
+
+### 🎫 Booking System
+- **Seat Selection**: Interactive venue maps with real-time availability
+- **Accessibility Support**: Special seating for users with disabilities
+- **Booking Management**: Complete booking lifecycle from selection to confirmation
+- **PDF Ticket Generation**: Automated ticket generation and email delivery
+- **Payment Integration**: Secure booking process with status tracking
+
+### 👤 User Management
+- **User Registration & Authentication**: Secure account creation and login
+- **Email Verification**: Account verification system
+- **Profile Management**: User preferences and notification settings
+- **Booking History**: Track past and upcoming bookings
+
+### 🛠️ Administrative Features
+- **Event Management**: Create, edit, and manage performances, workshops, and discussions
+- **Venue Administration**: Configure venues with multi-section seating layouts
+- **User Administration**: Manage user accounts and permissions
+- **News Management**: Create and publish news articles
+- **Analytics Dashboard**: Monitor bookings, events, and user engagement
+- **Content Management**: Upload images, manage descriptions, and organize content
+
+### 🏛️ Venue Management
+- **Multi-Section Venues**: Support for regular and balcony seating
+- **Dynamic Seat Configuration**: Flexible row and seat arrangements
+- **Accessibility Features**: Designated accessible seating areas
+- **Capacity Management**: Automatic capacity calculations
+- **Visual Seat Maps**: Interactive seating charts for users
+
+## 🛠️ Tech Stack
+
+### Frontend
+- **Framework**: Next.js 15.2.4 with App Router
+- **UI Library**: React 19 with TypeScript 5
+- **Styling**: Tailwind CSS 3.4.17 with custom components
+- **Component Library**: Radix UI primitives
+- **Icons**: Lucide React
+- **Forms**: React Hook Form with Zod validation
+- **State Management**: React hooks and context
+- **Theming**: Next Themes with dark/light mode support
+
+### Backend
+- **Runtime**: Node.js with Next.js API routes
+- **Database**: PostgreSQL with Prisma ORM 6.10.1
+- **Authentication**: Custom JWT-based authentication
+- **Email Service**: Nodemailer for transactional emails
+- **PDF Generation**: PDFKit for ticket generation
+- **File Handling**: Next.js built-in file upload
+
+### Development Tools
+- **Language**: TypeScript for type safety
+- **Database Management**: Prisma for schema management and migrations
+- **Code Quality**: ESLint and TypeScript compiler
+- **Package Manager**: npm/pnpm support
+- **Build System**: Next.js optimized build pipeline
+
+### Deployment & Infrastructure
+- **Platform**: Render.com 
+- **Database**: PostgreSQL 
+- **Environment**: Production-ready with environment variables
+- **Monitoring**: Built-in logging and error handling
+
+## 📁 Project Structure
+
+```
+ActingEurope_dev/
+├── app/                          # Next.js App Router
+│   ├── api/                      # API routes
+│   │   ├── auth/                 # Authentication endpoints
+│   │   ├── events/               # Event management
+│   │   ├── venues/               # Venue management
+│   │   ├── users/                # User management
+│   │   └── news/                 # News management
+│   ├── admin/                    # Admin dashboard
+│   ├── auth/                     # Authentication pages
+│   ├── performances/             # Event detail pages
+│   ├── tickets/                  # Booking interface
+│   ├── news/                     # News section
+│   └── participants/             # Theatre profiles
+├── components/                   # Reusable UI components
+│   ├── ui/                       # Base UI components
+│   ├── auth/                     # Authentication components
+│   └── seat-selection.tsx        # Venue seating component
+├── lib/                          # Utility libraries
+│   ├── prisma.ts                 # Database client
+│   ├── auth.ts                   # Authentication utilities
+│   ├── language-context.tsx      # Internationalization
+│   └── database.ts               # Data models and utilities
+├── prisma/                       # Database schema and migrations
+│   ├── schema.prisma             # Database schema
+│   └── seed.ts                   # Database seeding
+├── public/                       # Static assets
+└── emails/                       # Email templates
+```
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- **Node.js** (v18 or higher)
+- **npm** or **pnpm**
+- **PostgreSQL** database (local or remote)
+- **Git**
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd ActingEurope_dev
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   # or
+   pnpm install
+   ```
+
+3. **Environment Setup**
+   
+   Copy the example environment file and configure your variables:
+   ```bash
+   cp .env.example .env.local
+   ```
+   
+   Configure the following environment variables:
+   ```env
+   # Database
+   DATABASE_URL="postgresql://username:password@localhost:5432/actingeurope"
+   
+   # Authentication
+   JWT_SECRET="your-jwt-secret-key"
+   
+   # Email Configuration
+   SMTP_HOST="your-smtp-host"
+   SMTP_PORT=587
+   SMTP_USER="your-email@domain.com"
+   SMTP_PASS="your-email-password"
+   
+   # Application
+   NEXT_PUBLIC_APP_URL="http://localhost:3000"
+   ```
+
+### Database Setup
+
+1. **Generate Prisma Client**
+   ```bash
+   npm run db:generate
+   ```
+
+2. **Push Schema to Database**
+   ```bash
+   npm run db:push
+   ```
+
+3. **Seed the Database**
+   ```bash
+   npm run db:seed
+   ```
+
+### Development
+
+1. **Start the development server**
+   ```bash
+   npm run dev
+   ```
+
+2. **Open your browser**
+   
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+### Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm start` - Start production server
+- `npm run lint` - Run ESLint
+- `npm run db:generate` - Generate Prisma client
+- `npm run db:push` - Push schema to database
+- `npm run db:migrate` - Create and apply migrations
+- `npm run db:seed` - Seed database with initial data
+
+## 🚀 Deployment
+
+### Render.com Deployment (Recommended)
+
+1. **Create PostgreSQL Database**
+   - Log in to [Render Dashboard](https://dashboard.render.com)
+   - Create a new PostgreSQL database
+   - Note the connection string
+
+2. **Deploy Web Service**
+   - Connect your Git repository
+   - Configure build settings:
+     - **Build Command**: `npm install && npm run build`
+     - **Start Command**: `npm start`
+   
+3. **Environment Variables**
+   
+   Set the following in Render dashboard:
+   ```env
+   NODE_ENV=production
+   DATABASE_URL=<your-render-postgres-url>
+   JWT_SECRET=<secure-random-string>
+   SMTP_HOST=<your-smtp-host>
+   SMTP_PORT=587
+   SMTP_USER=<your-email>
+   SMTP_PASS=<your-password>
+   NEXT_PUBLIC_APP_URL=<your-render-app-url>
+   ```
+
+4. **Database Migration**
+   
+   After deployment, run migrations:
+   ```bash
+   npm run db:deploy
+   npm run db:seed
+   ```
+
+### Alternative Deployment Options
+
+- **Vercel**: Full Next.js support with edge functions
+- **Railway**: Simple deployment with PostgreSQL
+- **DigitalOcean App Platform**: Container-based deployment
+- **Self-hosted**: Docker containerization available
+
+## 📊 Database Schema
+
+The application uses a comprehensive PostgreSQL schema with the following main entities:
+
+- **Users**: Authentication and profile management
+- **Theatres**: Theatre information and profiles
+- **Venues**: Physical locations with seating configurations
+- **Events**: Performances, workshops, and discussions
+- **Bookings**: Ticket reservations and seat assignments
+- **News**: Content management for announcements
+
+For detailed schema information, see `prisma/schema.prisma`.
+
+## 🌐 API Documentation
+
+### Authentication Endpoints
+- `POST /api/auth/signup` - User registration
+- `POST /api/auth/login` - User authentication
+- `POST /api/auth/verify-email` - Email verification
+
+### Event Management
+- `GET /api/events` - List all events
+- `GET /api/events/[id]` - Get event details
+- `POST /api/events` - Create event (admin)
+- `PUT /api/events/[id]` - Update event (admin)
+
+### Venue Management
+- `GET /api/venues` - List all venues
+- `GET /api/venues/[id]` - Get venue details
+- `POST /api/venues` - Create venue (admin)
+- `PUT /api/venues/[id]` - Update venue (admin)
+
+### User Management
+- `GET /api/users` - List users (admin)
+- `POST /api/users/create` - Create user (admin)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 👥 Authors
+
+- **Anastasia Yakimovska** - *Project Lead* - [LinkedIn](https://www.linkedin.com/in/yakiman/)
+
+## 🙏 Acknowledgments
+
+- European Commission for supporting cultural exchange initiatives
+- Participating theatres across Europe
+- Open source community for the amazing tools and libraries
+
+## 📞 Support
+
+For support and questions:
+- Create an issue in the repository
+- Contact the development team
+- Check the documentation in `/docs` folder
+
+---
+
+**Acting Europe** - Connecting cultures through the art of theatre 🎭
 

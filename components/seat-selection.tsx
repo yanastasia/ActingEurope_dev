@@ -23,7 +23,13 @@ interface Venue {
 
 interface VenueRow {
   rowNumber: number
-  seatCount: number
+  seats: VenueSeat[]
+}
+
+interface VenueSeat {
+  seatNumber: number
+  isAccessible: boolean
+  isBooked?: boolean
 }
 
 export default function SeatSelection({ venueId, onSeatsSelected, isUserAdmin = false }: SeatSelectionProps) {
@@ -46,11 +52,46 @@ export default function SeatSelection({ venueId, onSeatsSelected, isUserAdmin = 
           name: "Main Theatre",
           description: "Main theatre venue",
           rows: [
-            { rowNumber: 1, seatCount: 10 },
-            { rowNumber: 2, seatCount: 10 },
-            { rowNumber: 3, seatCount: 10 },
-            { rowNumber: 4, seatCount: 10 },
-            { rowNumber: 5, seatCount: 10 }
+            { 
+              rowNumber: 1, 
+              seats: Array.from({ length: 10 }, (_, i) => ({ 
+                seatNumber: i + 1, 
+                isAccessible: i === 0 || i === 9, // First and last seats are accessible
+                isBooked: false 
+              }))
+            },
+            { 
+              rowNumber: 2, 
+              seats: Array.from({ length: 10 }, (_, i) => ({ 
+                seatNumber: i + 1, 
+                isAccessible: i === 0 || i === 9,
+                isBooked: false 
+              }))
+            },
+            { 
+              rowNumber: 3, 
+              seats: Array.from({ length: 10 }, (_, i) => ({ 
+                seatNumber: i + 1, 
+                isAccessible: i === 0 || i === 9,
+                isBooked: false 
+              }))
+            },
+            { 
+              rowNumber: 4, 
+              seats: Array.from({ length: 10 }, (_, i) => ({ 
+                seatNumber: i + 1, 
+                isAccessible: i === 0 || i === 9,
+                isBooked: false 
+              }))
+            },
+            { 
+              rowNumber: 5, 
+              seats: Array.from({ length: 10 }, (_, i) => ({ 
+                seatNumber: i + 1, 
+                isAccessible: i === 0 || i === 9,
+                isBooked: false 
+              }))
+            }
           ]
         }
         setVenue(defaultVenue)
@@ -114,7 +155,7 @@ export default function SeatSelection({ venueId, onSeatsSelected, isUserAdmin = 
       <div className="space-y-2">
         {rows.map((row) => {
           // Skip rows with 0 seats
-          if (row.seatCount === 0) {
+          if (!row.seats || row.seats.length === 0) {
             return (
               <div key={row.rowNumber} className="flex items-center">
                 <div className="mr-2 w-6 text-center font-medium">{row.rowNumber}</div>
@@ -125,50 +166,60 @@ export default function SeatSelection({ venueId, onSeatsSelected, isUserAdmin = 
             )
           }
 
-          // Generate seats for the row
-          const seats = Array.from({ length: row.seatCount }, (_, i) => ({
-            rowNumber: row.rowNumber,
-            seatNumber: i + 1,
-            isAvailable: Math.random() > 0.1, // 90% availability for demo
-          }))
-
           return (
             <div key={row.rowNumber} className="flex items-center">
               <div className="mr-2 w-6 text-center font-medium">{row.rowNumber}</div>
               <div className="flex flex-1 justify-center gap-1">
-                {seats.map((seat) => {
-                  const seatId = `${seat.rowNumber}-${seat.seatNumber}`
+                {row.seats.map((seat) => {
+                  const seatId = `${row.rowNumber}-${seat.seatNumber}`
                   const isSelected = selectedSeats.includes(seatId)
-                  const isUnavailable = !seat.isAvailable
+                  const isBooked = seat.isBooked || false
+                  const isAccessible = seat.isAccessible
 
                   return (
                     <button
                       key={seatId}
-                      className={`h-7 w-7 rounded-t-md text-xs font-medium transition-colors ${
-                        isUnavailable
+                      className={`h-7 w-7 rounded-t-md text-xs font-medium transition-colors relative ${
+                        isBooked
                           ? "cursor-not-allowed bg-gray-200 text-gray-400"
-                          : isSelected
-                            ? "bg-primary-gold text-white"
-                            : "bg-muted hover:bg-primary-gold/30"
+                          : isAccessible
+                            ? isSelected
+                              ? "bg-blue-600 text-white border-2 border-blue-800"
+                              : "bg-blue-100 text-blue-800 border-2 border-blue-300 hover:bg-blue-200"
+                            : isSelected
+                              ? "bg-primary-gold text-white"
+                              : "bg-muted hover:bg-primary-gold/30"
                       }`}
                       onClick={(event) => {
                         if (isUserAdmin && event.type === "contextmenu") {
                           event.preventDefault()
-                          handleReserveSeat(seatId, isUnavailable)
-                        } else if (!isUnavailable) {
+                          handleReserveSeat(seatId, isBooked)
+                        } else if (!isBooked && (!isAccessible || isUserAdmin)) {
                           toggleSeat(seatId)
+                        } else if (isAccessible && !isUserAdmin) {
+                          toast({
+                            title: "Accessible Seat",
+                            description: "This seat is reserved for people with disabilities. Please contact staff if you need assistance.",
+                            variant: "default",
+                          })
                         }
                       }}
                       onContextMenu={(event) => {
                         if (isUserAdmin) {
                           event.preventDefault()
-                          handleReserveSeat(seatId, isUnavailable)
+                          handleReserveSeat(seatId, isBooked)
                         }
                       }}
-                      disabled={isUnavailable && !isUserAdmin}
-                      aria-label={`${t("seat")} ${seatId}`}
+                      disabled={isBooked && !isUserAdmin}
+                      aria-label={`${t("seat")} ${seatId}${isAccessible ? ' (Accessible)' : ''}`}
+                      title={isAccessible ? 'Accessible seat for people with disabilities' : ''}
                     >
                       {seat.seatNumber}
+                      {isAccessible && (
+                        <span className="absolute -top-1 -right-1 text-[8px] bg-blue-600 text-white rounded-full w-3 h-3 flex items-center justify-center">
+                          ♿
+                        </span>
+                      )}
                     </button>
                   )
                 })}
