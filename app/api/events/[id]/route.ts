@@ -30,7 +30,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
         month: '2-digit',
         year: 'numeric',
       }).replace(/\//g, '-'),
-      time: event.event_time.toLocaleTimeString('en-GB', {
+      time: new Date(event.event_time).toLocaleTimeString('en-GB', {
         hour: '2-digit',
         minute: '2-digit',
         hour12: false,

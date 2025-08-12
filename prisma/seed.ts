@@ -1,8 +1,6 @@
-import { PrismaClient } from '../lib/generated/prisma'
 import { theatres, venues, news } from '../lib/database'
 import { performances } from '../lib/performance-data'
-
-const prisma = new PrismaClient()
+import { prisma } from '../lib/prisma'
 
 async function main() {
   console.log('🌱 Starting database seed...')

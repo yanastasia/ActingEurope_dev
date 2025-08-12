@@ -1,6 +1,5 @@
-const { PrismaClient } = require('@prisma/client');
-
-const prisma = new PrismaClient();
+// Import the shared Prisma instance
+const { prisma } = require('./lib/prisma.ts');
 
 async function checkArticles() {
   try {

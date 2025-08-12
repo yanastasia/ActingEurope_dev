@@ -18,7 +18,7 @@ interface Event {
   date: string
   time: string
   venue: string
-  company: string[]
+  company: string | string[]
   description: string
   imageUrl: string
   posterUrl: string
@@ -86,11 +86,13 @@ export default function ProgramPage() {
 
   // Sort events chronologically by date and time
   const sortedEvents = filteredEvents.sort((a, b) => {
-    // First sort by date
-    const dateA = new Date(a.date)
-    const dateB = new Date(b.date)
-    if (dateA.getTime() !== dateB.getTime()) {
-      return dateA.getTime() - dateB.getTime()
+    // First sort by date (convert DD-MM-YYYY to YYYY-MM-DD for comparison)
+    if (a.date !== b.date) {
+      const [dayA, monthA, yearA] = a.date.split('-')
+      const [dayB, monthB, yearB] = b.date.split('-')
+      const dateA = `${yearA}-${monthA}-${dayA}`
+      const dateB = `${yearB}-${monthB}-${dayB}`
+      return dateA.localeCompare(dateB)
     }
     // If dates are the same, sort by time
     const [hoursA, minutesA] = a.time.split(':').map(Number)
@@ -106,9 +108,13 @@ export default function ProgramPage() {
     return acc
   }, {} as Record<string, Event[]>)
 
-  // Sort dates chronologically
+  // Sort dates chronologically (convert DD-MM-YYYY to YYYY-MM-DD for comparison)
   const sortedDates = Object.keys(eventsByDate).sort((a, b) => {
-    return new Date(a).getTime() - new Date(b).getTime()
+    const [dayA, monthA, yearA] = a.split('-')
+    const [dayB, monthB, yearB] = b.split('-')
+    const dateA = `${yearA}-${monthA}-${dayA}`
+    const dateB = `${yearB}-${monthB}-${dayB}`
+    return dateA.localeCompare(dateB)
   })
 
   const getBadgeColor = (type: string) => {
@@ -189,7 +195,9 @@ export default function ProgramPage() {
               <div key={date} className="mb-8">
                 <div className="mb-4 flex items-center">
                   <Calendar className="mr-2 h-5 w-5 text-primary-gold" />
-                  <h2 className="text-xl font-semibold text-secondary-blue">{date}</h2>
+                  <h2 className="text-xl font-semibold text-secondary-blue">
+                    {date}
+                  </h2>
                 </div>
                 <div className="space-y-4">
                   {dateEvents.map((event) => (
@@ -263,12 +271,9 @@ export default function ProgramPage() {
               let firstEventDate = today
               
               if (sortedEvents.length > 0) {
-                // Convert DD-MM-YYYY to YYYY-MM-DD format for proper Date parsing
-                const dateParts = sortedEvents[0].date.split('-')
-                if (dateParts.length === 3) {
-                  const [day, month, year] = dateParts
-                  firstEventDate = new Date(`${year}-${month}-${day}`)
-                }
+                // Date is in DD-MM-YYYY format, convert to YYYY-MM-DD for Date constructor
+                const [day, month, year] = sortedEvents[0].date.split('-');
+                firstEventDate = new Date(`${year}-${month}-${day}T00:00:00`)
               }
               
               const currentMonth = firstEventDate.getMonth()
@@ -308,7 +313,10 @@ export default function ProgramPage() {
                       </h3>
                       {selectedDate && selectedDate !== "All Dates" && (
                         <div className="text-sm text-primary-gold font-medium">
-                          Selected: {selectedDate.split('-').join('/')}
+                          Selected: {(() => {
+                            const [day, month, year] = selectedDate.split('-');
+                            return new Date(`${year}-${month}-${day}T00:00:00`).toLocaleDateString('en-GB');
+                          })()}
                         </div>
                       )}
                     </div>
@@ -397,7 +405,7 @@ export default function ProgramPage() {
                                     <MapPin className="inline h-3 w-3 mr-1" />
                                     {event.venue}
                                   </p>
-                                  <p className="text-sm mb-3">{event.company.join(", ")}</p>
+                                  <p className="text-sm mb-3">{Array.isArray(event.company) ? event.company.join(", ") : event.company}</p>
                                   <div className="flex gap-2">
                                     <Link href={`/tickets?event=${event.id}`}>
                                       <Button size="sm" className="bg-primary-gold hover:bg-primary-gold/90">

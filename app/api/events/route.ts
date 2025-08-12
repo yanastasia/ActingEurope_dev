@@ -27,15 +27,10 @@ export async function GET() {
       // Handle time formatting more safely
       let timeString = '00:00';
       if (event.event_time) {
-        if (typeof event.event_time === 'string') {
-          // If it's already a string in HH:MM format
-          timeString = event.event_time.substring(0, 5);
-        } else {
-          // If it's a Date object, extract time
-          const timeDate = new Date(event.event_time);
-          if (!isNaN(timeDate.getTime())) {
-            timeString = timeDate.toTimeString().substring(0, 5);
-          }
+        // event_time is a DateTime from Prisma, convert to time string
+        const timeDate = new Date(event.event_time);
+        if (!isNaN(timeDate.getTime())) {
+          timeString = timeDate.toTimeString().substring(0, 5);
         }
       }
       
@@ -43,7 +38,7 @@ export async function GET() {
         id: event.id.toString(),
         title: event.title,
         company: event.company,
-        date: eventDate.toISOString().split('T')[0].split('-').reverse().join('-'), // DD-MM-YYYY format
+        date: eventDate.toISOString().split('T')[0].split('-').reverse().join('-'), // DD-MM-YYYY format for display
         time: timeString, // HH:MM format
         venue: event.venue?.name || 'TBA',
         imageUrl: event.image_url || '/placeholder.svg?height=1080&width=1920',
