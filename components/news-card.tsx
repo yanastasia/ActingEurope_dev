@@ -10,12 +10,12 @@ interface NewsCardProps {
   id: string | number
   title: string
   date: string
-  excerpt: string
+  content: string
   imageUrl: string
   category: string
 }
 
-export default function NewsCard({ id, title, date, excerpt, imageUrl, category }: NewsCardProps) {
+export default function NewsCard({ id, title, date, content, imageUrl, category }: NewsCardProps) {
   const { language, t } = useLanguage();
   return (
     <Card className="overflow-hidden transition-all hover:shadow-md">
@@ -34,7 +34,7 @@ export default function NewsCard({ id, title, date, excerpt, imageUrl, category 
           <span>{date}</span>
         </div>
         <CardTitle className="line-clamp-2 text-xl text-secondary-blue">{title}</CardTitle>
-        <CardDescription className="line-clamp-2">{excerpt}</CardDescription>
+        <CardDescription className="line-clamp-2">{content.length > 150 ? content.substring(0, 150) + '...' : content}</CardDescription>
       </CardHeader>
       <CardFooter className="p-4 pt-0">
         <Link href={`/news/${id}?lang=${language}`}>

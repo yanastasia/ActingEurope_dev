@@ -162,6 +162,14 @@ const translations = {
     macedonian: "Macedonian",
     serbian: "Serbian",
 
+    // News Article Page
+    backToNews: "Back to News",
+    articleNotFound: "Article Not Found",
+    articleNotFoundDesc: "The requested article could not be found.",
+    by: "By",
+    lastUpdated: "Last updated",
+    failedToLoadArticle: "Failed to load article",
+
     // Profile
     settings: "Settings",
     account: "Account",
@@ -353,6 +361,14 @@ const translations = {
     bulgarian: "Български",
     macedonian: "Македонски",
     serbian: "Сръбски",
+
+    // News Article Page
+    backToNews: "Назад към новините",
+    articleNotFound: "Статията не е намерена",
+    articleNotFoundDesc: "Заявената статия не може да бъде намерена.",
+    by: "От",
+    lastUpdated: "Последно обновено",
+    failedToLoadArticle: "Неуспешно зареждане на статията",
 
     // Profile
     settings: "Настройки",
@@ -547,6 +563,14 @@ const translations = {
     macedonian: "Македонски",
     serbian: "Српски",
 
+    // News Article Page
+    backToNews: "Назад кон вестите",
+    articleNotFound: "Статијата не е пронајдена",
+    articleNotFoundDesc: "Побараната статија не може да биде пронајдена.",
+    by: "Од",
+    lastUpdated: "Последно ажурирано",
+    failedToLoadArticle: "Неуспешно вчитување на статијата",
+
     // Profile
     settings: "Поставки",
     account: "Сметка",
@@ -739,6 +763,14 @@ const translations = {
     bulgarian: "Бугарски",
     macedonian: "Македонски",
     serbian: "Српски",
+
+    // News Article Page
+    backToNews: "Назад на вести",
+    articleNotFound: "Чланак није пронађен",
+    articleNotFoundDesc: "Тражени чланак није могао бити пронађен.",
+    by: "Од",
+    lastUpdated: "Последње ажурирано",
+    failedToLoadArticle: "Неуспешно учитавање чланка",
 
     // Profile
     settings: "Подешавања",

@@ -175,7 +175,7 @@ const AdminNewsPage = () => {
           body: JSON.stringify({ 
             id: editingArticle.id, 
             title: newArticleData.title,
-            excerpt: newArticleData.content, // API expects 'excerpt' not 'content'
+            content: newArticleData.content,
             imageUrl,
             date: editingArticle.publishedAt || editingArticle.createdAt, // Required by API
             category: newArticleData.category,

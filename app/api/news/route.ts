@@ -1,5 +1,5 @@
-import { getNewsArticles, createNewsArticleWithTranslations, updateNewsArticle, deleteNewsArticleWithTranslations } from '@/lib/database-operations';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { getNewsArticles, updateNewsArticle, deleteNewsArticleWithTranslations, createNewsArticleWithTranslations } from '@/lib/database-operations';
 
 export async function GET(request: Request) {
   try {
@@ -22,8 +22,17 @@ export async function POST(request: Request) {
     }
     
     const authorName = author || "Admin";
-    const newArticles = await createNewsArticleWithTranslations(title, content, undefined, imageUrl, category, authorName);
-    return NextResponse.json(newArticles, { status: 201 });
+    
+    // Create articles with translations
+    const newsArticles = await createNewsArticleWithTranslations(
+      title,
+      content,
+      imageUrl || '',
+      category,
+      authorName
+    );
+    
+    return NextResponse.json(newsArticles, { status: 201 });
   } catch (error) {
     console.error('Error creating news article:', error);
     return NextResponse.json({ message: 'Error creating news article' }, { status: 500 });
@@ -32,14 +41,13 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
   try {
-    const { id, title, excerpt, imageUrl, date, category, contentLanguage, translationGroup } = await request.json();
-    if (!id || !title || !excerpt || !imageUrl || !date || !category || !contentLanguage) {
+    const { id, title, content, imageUrl, date, category, contentLanguage, translationGroup } = await request.json();
+    if (!id || !title || !content || !imageUrl || !date || !category || !contentLanguage) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
     const updatedArticle = await updateNewsArticle(id, { 
       title, 
-      content: excerpt, // Use excerpt as content since admin sends content as excerpt
-      excerpt, 
+      content, 
       imageUrl, 
       publishedAt: new Date(date), 
       category, 

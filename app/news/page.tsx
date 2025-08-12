@@ -34,7 +34,7 @@ const NewsPage = () => {
             key={article.id}
             title={article.title}
             id={article.id}
-            excerpt={article.excerpt || ''}
+            content={article.content || ''}
             imageUrl={article.imageUrl || ''}
             date={article.publishedAt ? new Date(article.publishedAt).toLocaleDateString() : new Date(article.createdAt).toLocaleDateString()}
             category={article.category || ''}

@@ -4,7 +4,6 @@ import bcrypt from 'bcryptjs';
 export interface NewsArticle {
   id: number;
   title: string;
-  excerpt: string | null;
   content: string;
   imageUrl: string | null;
   category: string | null;
@@ -109,7 +108,6 @@ export const getNewsArticles = async (language: string = 'en'): Promise<NewsArti
     return articles.map(article => ({
       id: article.id,
       title: article.title,
-      excerpt: article.excerpt,
       content: article.content,
       imageUrl: article.image_url,
       category: article.category,
@@ -123,39 +121,47 @@ export const getNewsArticles = async (language: string = 'en'): Promise<NewsArti
     }));
   }
 
-export const createNewsArticle = async (title: string, content: string, excerpt?: string, imageUrl?: string, category?: string, author?: string, contentLanguage: string = 'en', translationGroup?: string): Promise<NewsArticle> => {
-    const article = await prisma.newsArticle.create({
-      data: {
-        title,
-        content,
-        excerpt,
-        image_url: imageUrl,
-        category,
-        author,
-        is_published: true,
-        content_language: contentLanguage,
-        translation_group: translationGroup
-      }
-    });
-    
-    return {
-      id: article.id,
-      title: article.title,
-      excerpt: article.excerpt,
-      content: article.content,
-      imageUrl: article.image_url,
-      category: article.category,
-      author: article.author,
-      publishedAt: article.published_at,
-      isPublished: article.is_published,
-      createdAt: article.created_at,
-      updatedAt: article.updated_at,
-      contentLanguage: article.content_language,
-      translationGroup: article.translation_group
-    };
-  }
+export const createNewsArticle = async (
+  title: string,
+  content: string,
+  imageUrl?: string,
+  category?: string,
+  author?: string,
+  contentLanguage: string = 'en',
+  translationGroup?: string
+): Promise<NewsArticle> => {
+  const articleData = {
+    title,
+    content,
+    image_url: imageUrl,
+    category,
+    author,
+    is_published: true,
+    content_language: contentLanguage,
+    translation_group: translationGroup
+  };
+  
+  const article = await prisma.newsArticle.create({
+    data: articleData
+  });
+  
+  return {
+    id: article.id,
+    title: article.title,
+    content: article.content,
+    imageUrl: article.image_url,
+    category: article.category,
+    author: article.author,
+    publishedAt: article.published_at,
+    isPublished: article.is_published,
+    createdAt: article.created_at,
+    updatedAt: article.updated_at,
+    contentLanguage: article.content_language,
+    translationGroup: article.translation_group
+  };
+}
 
-export const createNewsArticleWithTranslations = async (title: string, content: string, excerpt?: string, imageUrl?: string, category?: string, author?: string): Promise<NewsArticle[]> => {
+export const createNewsArticleWithTranslations = async (title: string, content: string, imageUrl?: string, category?: string, author?: string): Promise<NewsArticle[]> => {
     const languages = ['en', 'bg', 'mk', 'sr'];
     const translationGroup = `news_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const articles: NewsArticle[] = [];
@@ -164,7 +170,6 @@ export const createNewsArticleWithTranslations = async (title: string, content: 
       const article = await createNewsArticle(
         title,
         content,
-        excerpt,
         imageUrl,
         category,
         author,
@@ -184,7 +189,6 @@ export const updateNewsArticle = async (id: number, updatedFields: Partial<NewsA
         data: {
           title: updatedFields.title,
           content: updatedFields.content,
-          excerpt: updatedFields.excerpt,
           image_url: updatedFields.imageUrl,
           category: updatedFields.category,
           author: updatedFields.author,
@@ -198,7 +202,6 @@ export const updateNewsArticle = async (id: number, updatedFields: Partial<NewsA
       return {
         id: article.id,
         title: article.title,
-        excerpt: article.excerpt,
         content: article.content,
         imageUrl: article.image_url,
         category: article.category,
@@ -258,6 +261,38 @@ export const deleteNewsArticleWithTranslations = async (id: number): Promise<boo
   }
 }
 
+export const getNewsArticlesByTranslationGroup = async (translationGroup: string): Promise<NewsArticle[]> => {
+  try {
+    const articles = await prisma.newsArticle.findMany({
+      where: {
+        translation_group: translationGroup,
+        is_published: true
+      },
+      orderBy: {
+        content_language: 'asc'
+      }
+    });
+
+    return articles.map(article => ({
+      id: article.id,
+      title: article.title,
+      content: article.content,
+      imageUrl: article.image_url,
+      category: article.category,
+      author: article.author,
+      publishedAt: article.published_at,
+      isPublished: article.is_published,
+      createdAt: article.created_at,
+      updatedAt: article.updated_at,
+      contentLanguage: article.content_language,
+      translationGroup: article.translation_group
+    }));
+  } catch (error) {
+    console.error('Error fetching articles by translation group:', error);
+    return [];
+  }
+}
+
 export const getNewsArticleById = async (id: number, language: string = 'en'): Promise<NewsArticle | null> => {
   try {
     // First get the original article to find its translation group
@@ -308,7 +343,6 @@ export const getNewsArticleById = async (id: number, language: string = 'en'): P
     return {
       id: article.id,
       title: article.title,
-      excerpt: article.excerpt,
       content: article.content,
       imageUrl: article.image_url,
       category: article.category,

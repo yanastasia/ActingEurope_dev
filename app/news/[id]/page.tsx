@@ -42,11 +42,15 @@ const NewsArticlePage = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
+        console.log('=== ARTICLE DEBUG INFO ===');
         console.log('Fetched article data:', data);
         console.log('Current language:', urlLang);
         console.log('Article content language:', data.contentLanguage);
         console.log('Article title:', data.title);
         console.log('Article content preview:', data.content.substring(0, 100) + '...');
+
+        console.log('Article ID:', data.id);
+        console.log('=== END DEBUG INFO ===');
         setArticle(data);
       } catch (error) {
         console.error('Failed to fetch news article:', error);
@@ -79,22 +83,25 @@ const NewsArticlePage = () => {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Article Not Found</h1>
-          <p className="text-gray-600 mb-4">The requested article could not be found.</p>
+          <h1 className="text-2xl font-bold mb-4">{t('articleNotFound')}</h1>
+          <p className="text-gray-600 mb-4">{t('articleNotFoundDesc')}</p>
           <Button onClick={handleBackToNews}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to News
+            {t('backToNews')}
           </Button>
         </div>
       </div>
     );
   }
 
-  const languageNames = {
-    en: 'English',
-    bg: 'Bulgarian', 
-    mk: 'Macedonian',
-    sr: 'Serbian'
+  const getLanguageName = (lang: string) => {
+    switch (lang) {
+      case 'en': return t('english');
+      case 'bg': return t('bulgarian');
+      case 'mk': return t('macedonian');
+      case 'sr': return t('serbian');
+      default: return lang.toUpperCase();
+    }
   };
 
   return (
@@ -103,7 +110,7 @@ const NewsArticlePage = () => {
       <div className="mb-6">
         <Button variant="outline" onClick={handleBackToNews}>
           <ArrowLeft className="mr-2 h-4 w-4" />
-          {t('backToNews') || 'Back to News'}
+          {t('backToNews')}
         </Button>
       </div>
 
@@ -124,10 +131,10 @@ const NewsArticlePage = () => {
               </span>
             )}
             {article.author && (
-              <span>By {article.author}</span>
+              <span>{t('by')} {article.author}</span>
             )}
             <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">
-              {languageNames[article.contentLanguage as keyof typeof languageNames] || article.contentLanguage.toUpperCase()}
+              {getLanguageName(article.contentLanguage)}
             </span>
           </div>
         </header>
@@ -159,7 +166,7 @@ const NewsArticlePage = () => {
         {/* Article Footer */}
         <footer className="mt-8 pt-6 border-t border-gray-200">
           <div className="text-sm text-gray-500">
-            Last updated: {new Date(article.updatedAt).toLocaleDateString()}
+            {t('lastUpdated')}: {new Date(article.updatedAt).toLocaleDateString()}
           </div>
         </footer>
       </article>

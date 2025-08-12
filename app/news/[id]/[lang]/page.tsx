@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
+import { useLanguage, type Language } from '@/lib/language-context';
 
 interface NewsArticle {
   id: number;
@@ -29,8 +30,19 @@ export default function NewsArticlePage() {
   const [article, setArticle] = useState<NewsArticle | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { language, setLanguage, t } = useLanguage();
 
   const { id, lang } = params;
+
+  // Update global language context based on URL parameter
+  useEffect(() => {
+    if (lang && ['en', 'bg', 'mk', 'sr'].includes(lang as string) && lang !== language) {
+      const validLanguages: Language[] = ['en', 'bg', 'mk', 'sr'];
+      if (validLanguages.includes(lang as Language)) {
+        setLanguage(lang as Language);
+      }
+    }
+  }, [lang, language, setLanguage]);
 
   useEffect(() => {
     const fetchArticle = async () => {
@@ -46,7 +58,7 @@ export default function NewsArticlePage() {
         setArticle(data);
       } catch (error) {
         console.error('Error fetching article:', error);
-        setError('Failed to load article');
+        setError(t('failedToLoadArticle'));
       } finally {
         setLoading(false);
       }
@@ -79,12 +91,12 @@ export default function NewsArticlePage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">Article Not Found</h1>
-          <p className="text-gray-600 mb-6">{error || 'The requested article could not be found.'}</p>
+          <h1 className="text-2xl font-bold text-red-600 mb-4">{t('articleNotFound')}</h1>
+          <p className="text-gray-600 mb-6">{error || t('articleNotFoundDesc')}</p>
           <Link href="/news">
             <Button>
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to News
+              {t('backToNews')}
             </Button>
           </Link>
         </div>
@@ -97,7 +109,7 @@ export default function NewsArticlePage() {
       <div className="max-w-4xl mx-auto">
         <Link href="/news" className="inline-flex items-center text-primary-gold hover:underline mb-6">
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to News
+          {t('backToNews')}
         </Link>
         
         <Card>
@@ -109,10 +121,10 @@ export default function NewsArticlePage() {
                 </Badge>
               )}
               <Badge variant="outline">
-                {lang === 'en' ? 'English' : 
-                 lang === 'mk' ? 'Macedonian' : 
-                 lang === 'bg' ? 'Bulgarian' : 
-                 lang === 'sr' ? 'Serbian' : lang}
+                {lang === 'en' ? t('english') : 
+                 lang === 'mk' ? t('macedonian') : 
+                 lang === 'bg' ? t('bulgarian') : 
+                 lang === 'sr' ? t('serbian') : lang}
               </Badge>
             </div>
             <CardTitle className="text-3xl font-bold text-secondary-blue mb-4">
