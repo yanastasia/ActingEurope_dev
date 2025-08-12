@@ -217,6 +217,32 @@ const translations = {
     workshop: "Workshop",
     discussion: "Discussion",
     backToNews: "Back to News",
+
+    // About page
+    aboutUs: "About Us",
+    aboutText: "Welcome to Acting Europe, your premier destination for theatrical events and performances across Europe.\nWe are dedicated to bringing you the best of European theatre, from classic plays to contemporary productions,\nshowcasing the rich cultural diversity and artistic talent of the continent.\n\nOur mission is to connect theatre enthusiasts with unforgettable experiences, providing comprehensive\ninformation on upcoming shows, venues, and ticketing. We believe in the power of live performance to inspire,\nEntertain, and provoke thought, and we strive to make it accessible to everyone.\n\nFounded by a team of passionate theatre lovers, Acting Europe is committed to supporting the arts community\nand promoting cultural exchange. Join us on a journey through the vibrant world of European theatre!",
+    editAboutPage: "Edit About Page",
+    saveChanges: "Save Changes",
+
+    // Contact page
+    contactUs: "Contact Us",
+    contactDescription: "Have a question, suggestion, or just want to say hello? We'd love to hear from you!\nPlease fill out the form below or reach out to us using the contact information provided.",
+    sendMessage: "Send us a Message",
+    yourName: "Your Name",
+    enterYourName: "Enter your name",
+    yourEmail: "Your Email",
+    enterYourEmail: "Enter your email address",
+    subject: "Subject",
+    enterSubject: "Enter subject",
+    message: "Message",
+    enterYourMessage: "Enter your message",
+    sendMessageButton: "Send Message",
+    ourInformation: "Our Information",
+    address: "Address",
+    phone: "Phone",
+    businessHours: "Business Hours",
+    businessHoursText: "Monday - Friday, 9:00 AM - 5:00 PM (CET)",
+    followUsContact: "Follow Us",
   },
   bg: {
     // Navigation
@@ -417,6 +443,32 @@ const translations = {
     workshop: "Работилница",
     discussion: "Дискусия",
     backToNews: "Назад към новините",
+
+    // About page
+    aboutUs: "За нас",
+    aboutText: "Добре дошли в Актинг Европа, вашата основна дестинация за театрални събития и представления в цяла Европа.\nНие сме посветени да ви донесем най-доброто от европейския театър, от класически драми до съвременни продукции,\nпоказвайки богатото културно разнообразие и артистичен талант на континента.\n\nНашата мисия е да свържем театралните ентусиасти с незабравими преживявания, предоставяйки изчерпателна\nинформация за предстоящи представления, места и билетиране. Ние вярваме в силата на живото представление да вдъхновява,\nзабавлява и предизвиква размисъл, и се стремим да го направим достъпно за всички.\n\nОснована от екип от страстни любители на театъра, Актинг Европа е посветена на подкрепата на артистичната общност\nи насърчаването на културния обмен. Присъединете се към нас в пътешествие през живия свят на европейския театър!",
+    editAboutPage: "Редактирай страницата за нас",
+    saveChanges: "Запази промените",
+
+    // Contact page
+    contactUs: "Свържете се с нас",
+    contactDescription: "Имате въпрос, предложение или просто искате да поздравите? Бихме искали да чуем от вас!\nМоля, попълнете формуляра по-долу или се свържете с нас, използвайки контактната информация.",
+    sendMessage: "Изпратете ни съобщение",
+    yourName: "Вашето име",
+    enterYourName: "Въведете вашето име",
+    yourEmail: "Вашият имейл",
+    enterYourEmail: "Въведете вашия имейл адрес",
+    subject: "Тема",
+    enterSubject: "Въведете тема",
+    message: "Съобщение",
+    enterYourMessage: "Въведете вашето съобщение",
+    sendMessageButton: "Изпрати съобщение",
+    ourInformation: "Наша информация",
+    address: "Адрес",
+    phone: "Телефон",
+    businessHours: "Работно време",
+    businessHoursText: "Понеделник - Петък, 9:00 - 17:00 (CET)",
+    followUsContact: "Последвайте ни",
   },
   mk: {
     // Navigation
@@ -618,6 +670,32 @@ const translations = {
     workshop: "Работилница",
     discussion: "Дискусија",
     backToNews: "Назад кон вестите",
+
+    // About page
+    aboutUs: "За нас",
+    aboutText: "Добредојдовте во Актинг Европа, вашата главна дестинација за театарски настани и претстави низ Европа.\nНие сме посветени да ви го донесеме најдоброто од европскиот театар, од класични драми до современи продукции,\nприкажувајќи го богатото културно разновидност и уметнички талент на континентот.\n\nНашата мисија е да ги поврземе театарските ентузијасти со незаборавни искуства, обезбедувајќи сеопфатни\nинформации за претстојните претстави, места и билетирање. Ние веруваме во моќта на живата претстава да инспирира,\nзабавува и предизвикува размислување, и се стремиме да ја направиме достапна за сите.\n\nОснована од тим на страсни љубители на театарот, Актинг Европа е посветена на поддршката на уметничката заедница\nи промовирањето на културната размена. Придружете ни се на патување низ живиот свет на европскиот театар!",
+    editAboutPage: "Уреди страница за нас",
+    saveChanges: "Зачувај промени",
+
+    // Contact page
+    contactUs: "Контактирајте не",
+    contactDescription: "Имате прашање, предлог или само сакате да поздравите? Би сакале да слушнеме од вас!\nВе молиме пополнете го формуларот подолу или контактирајте не користејќи ги контакт информациите.",
+    sendMessage: "Испратете ни порака",
+    yourName: "Вашето име",
+    enterYourName: "Внесете го вашето име",
+    yourEmail: "Вашиот е-маил",
+    enterYourEmail: "Внесете ја вашата е-маил адреса",
+    subject: "Предмет",
+    enterSubject: "Внесете предмет",
+    message: "Порака",
+    enterYourMessage: "Внесете ја вашата порака",
+    sendMessageButton: "Испрати порака",
+    ourInformation: "Наши информации",
+    address: "Адреса",
+    phone: "Телефон",
+    businessHours: "Работно време",
+    businessHoursText: "Понеделник - Петок, 9:00 - 17:00 (CET)",
+    followUsContact: "Следете не",
   },
   sr: {
     // Navigation
@@ -820,6 +898,32 @@ const translations = {
     workshop: "Радионица",
     discussion: "Дискусија",
     backToNews: "Назад на вести",
+
+    // About page
+    aboutUs: "О нама",
+    aboutText: "Добродошли у Актинг Европу, вашу главну дестинацију за позоришне догађаје и представе широм Европе.\nПосвећени смо томе да вам донесемо најбоље од европског позоришта, од класичних драма до савремених продукција,\nприказујући богато културно разноликост и уметнички талент континента.\n\nНаша мисија је да повежемо позоришне ентузијасте са незаборавним искуствима, пружајући свеобухватне\nинформације о предстојећим представама, местима и продаји карата. Верујемо у моћ живе представе да инспирише,\nзабави и изазове размишљање, и тежимо да је учинимо доступном свима.\n\nОснована од стране тима страсних љубитеља позоришта, Актинг Европа је посвећена подршци уметничке заједнице\nи промовисању културне размене. Придружите нам се на путовању кроз живахан свет европског позоришта!",
+    editAboutPage: "Уреди страницу о нама",
+    saveChanges: "Сачувај промене",
+
+    // Contact page
+    contactUs: "Контактирајте нас",
+    contactDescription: "Имате питање, предлог или само желите да поздравите? Волели бисмо да чујемо од вас!\nМолимо попуните формулар испод или нас контактирајте користећи контакт информације.",
+    sendMessage: "Пошаљите нам поруку",
+    yourName: "Ваше име",
+    enterYourName: "Унесите ваше име",
+    yourEmail: "Ваш е-маил",
+    enterYourEmail: "Унесите вашу е-маил адресу",
+    subject: "Предмет",
+    enterSubject: "Унесите предмет",
+    message: "Порука",
+    enterYourMessage: "Унесите вашу поруку",
+    sendMessageButton: "Пошаљи поруку",
+    ourInformation: "Наше информације",
+    address: "Адреса",
+    phone: "Телефон",
+    businessHours: "Радно време",
+    businessHoursText: "Понедељак - Петак, 9:00 - 17:00 (CET)",
+    followUsContact: "Пратите нас",
   },
 }
 
