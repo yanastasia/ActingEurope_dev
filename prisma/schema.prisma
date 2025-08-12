@@ -40,6 +40,8 @@ model Theatre {
   history     String?         @db.Text
   website     String?         @db.VarChar(255)
   founded_year Int?
+  content_language String     @default("en") @db.VarChar(5)
+  translation_group String?   @db.VarChar(100)
   created_at  DateTime        @default(now())
   updated_at  DateTime        @updatedAt
   images      TheatreImage[]
@@ -131,6 +133,8 @@ model Event {
   image_url      String?    @db.VarChar(500)
   poster_url     String?    @db.VarChar(500)
   language       String?    @db.VarChar(50)
+  content_language String   @default("en") @db.VarChar(5)
+  translation_group String? @db.VarChar(100)
   genre          String?    @db.VarChar(100)
   company        String[]   @default([])
   director       String?    @db.VarChar(255)
@@ -196,10 +200,47 @@ model NewsArticle {
   category    String?  @db.VarChar(100)
   image_url   String?  @db.VarChar(500)
   author      String?  @db.VarChar(100)
+  content_language String @default("en") @db.VarChar(5)
+  translation_group String? @db.VarChar(100)
   published_at DateTime?
   is_published Boolean  @default(false)
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 
   @@map("news_articles")
+}
+
+model AboutPage {
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(255)
+  content     String   @db.Text
+  mission     String?  @db.Text
+  vision      String?  @db.Text
+  history     String?  @db.Text
+  image_url   String?  @db.VarChar(500)
+  content_language String @default("en") @db.VarChar(5)
+  translation_group String? @db.VarChar(100)
+  is_published Boolean  @default(false)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@map("about_pages")
+}
+
+model ContactPage {
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(255)
+  content     String   @db.Text
+  address     String?  @db.Text
+  phone       String?  @db.VarChar(50)
+  email       String?  @db.VarChar(255)
+  office_hours String? @db.Text
+  map_embed   String?  @db.Text
+  content_language String @default("en") @db.VarChar(5)
+  translation_group String? @db.VarChar(100)
+  is_published Boolean  @default(false)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@map("contact_pages")
 }

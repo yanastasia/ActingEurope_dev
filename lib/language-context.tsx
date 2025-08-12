@@ -208,6 +208,7 @@ const translations = {
     performance: "Performance",
     workshop: "Workshop",
     discussion: "Discussion",
+    backToNews: "Back to News",
   },
   bg: {
     // Navigation
@@ -396,8 +397,10 @@ const translations = {
     noEventsMatchFilter: "Няма събития, отговарящи на критериите за филтриране. Моля, опитайте с различни филтри.",
 
     // Event types
+    performance: "Представление",
     workshop: "Работилница",
     discussion: "Дискусия",
+    backToNews: "Назад към новините",
   },
   mk: {
     // Navigation
@@ -587,8 +590,10 @@ const translations = {
     noEventsMatchFilter: "Нема настани што одговараат на вашите критериуми за филтрирање. Пробајте различни филтри.",
 
     // Event types
+    performance: "Претстава",
     workshop: "Работилница",
     discussion: "Дискусија",
+    backToNews: "Назад кон вестите",
   },
   sr: {
     // Navigation
@@ -779,8 +784,10 @@ const translations = {
       "Нема догађаја који одговарају вашим критеријумима филтрирања. Покушајте са другачијим филтрима.",
 
     // Event types
+    performance: "Представа",
     workshop: "Радионица",
     discussion: "Дискусија",
+    backToNews: "Назад на вести",
   },
 }
 

@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { Calendar, Ticket, FileText, AlertTriangle, ShieldCheck, Pencil, Trash2, MapPin } from "lucide-react"
+import { Calendar, Ticket, FileText, AlertTriangle, ShieldCheck, Pencil, Trash2, MapPin, Info, Phone } from "lucide-react"
 import { isAdmin } from "@/lib/auth"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/lib/language-context"
@@ -31,6 +31,8 @@ interface Event {
   isFeatured: boolean
   price: string
   tags: string[]
+  contentLanguage: string
+  translationGroup?: string
 }
 
 
@@ -74,6 +76,8 @@ interface EventFormState {
   isFeatured: boolean;
   price: string;
   tags: string[];
+  contentLanguage: string;
+  translationGroup?: string;
 }
 
 interface VenueFormState {
@@ -107,6 +111,8 @@ export default function AdminPage() {
     isFeatured: false,
     price: "20.00",
     tags: [],
+    contentLanguage: "en",
+    translationGroup: undefined,
   })
   const [venueFormData, setVenueFormData] = useState<VenueFormState>({
     name: "",
@@ -294,8 +300,9 @@ export default function AdminPage() {
       description: "",
       imageUrl: "/placeholder.svg?height=400&width=600",
       isFeatured: false,
-      price: "20.00",
+      price: "Free",
       tags: [] as string[],
+      contentLanguage: "en"
     })
 
     setIsSubmitting(false)
@@ -413,12 +420,12 @@ export default function AdminPage() {
       let venueWithSections = { ...venueToEdit }
       
       // Handle backward compatibility - convert old rows structure to sections
-      if ('rows' in venueToEdit && venueToEdit.rows && !venueToEdit.sections) {
+      if ('rows' in venueToEdit && (venueToEdit as any).rows && !venueToEdit.sections) {
         venueWithSections.sections = [{
           id: '1',
           sectionName: 'Main',
           sectionType: 'regular' as const,
-          rows: venueToEdit.rows
+          rows: (venueToEdit as any).rows || []
         }]
       } else if (!venueToEdit.sections || venueToEdit.sections.length === 0) {
         // Create default section if none exist
@@ -456,7 +463,7 @@ export default function AdminPage() {
       // Remove currency prefix from price (€25 -> 25, Free -> 0)
       price: eventToEdit.price === 'Free' ? '0' : eventToEdit.price.replace(/[€$]/g, ''),
       // Ensure description field is mapped correctly
-      description: eventToEdit.synopsis || eventToEdit.description || ''
+      description: eventToEdit.description || ''
     }
 
     setEditingEvent(transformedEvent)
@@ -692,7 +699,7 @@ export default function AdminPage() {
         <div className="flex items-center gap-2">
           <ShieldCheck className="h-6 w-6 text-primary-gold" />
           <h1 className="text-3xl font-bold text-secondary-blue">Admin Dashboard</h1>
-         </div>
+        </div>
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
            <a href="/admin/news" className="block">
              <Card className="hover:shadow-lg transition-shadow duration-200">
@@ -712,7 +719,7 @@ export default function AdminPage() {
       </div>
 
       <Tabs defaultValue="events" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 md:w-[800px]">
+        <TabsList className="grid w-full grid-cols-6 md:w-[1000px]">
           <TabsTrigger value="events" className="gap-2">
             <Calendar className="h-4 w-4" />
             Events
@@ -725,7 +732,18 @@ export default function AdminPage() {
             <Ticket className="h-4 w-4" />
             Reservations
           </TabsTrigger>
-          <TabsTrigger value="news">News</TabsTrigger>
+          <TabsTrigger value="news" className="gap-2">
+            <FileText className="h-4 w-4" />
+            News
+          </TabsTrigger>
+          <TabsTrigger value="about" className="gap-2">
+            <Info className="h-4 w-4" />
+            About
+          </TabsTrigger>
+          <TabsTrigger value="contact" className="gap-2">
+            <Phone className="h-4 w-4" />
+            Contact
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="events" className="mt-6 space-y-6">
@@ -843,6 +861,21 @@ export default function AdminPage() {
                       value={editingEvent ? editingEvent.tags?.join(", ") : formData.tags.join(", ")}
                       onChange={handleTagsChange}
                     />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="contentLanguage">Content Language *</Label>
+                    <Select value={editingEvent.contentLanguage} onValueChange={(value) => setEditingEvent({ ...editingEvent, contentLanguage: value })}>
+                      <SelectTrigger id="contentLanguage">
+                        <SelectValue placeholder="Select language" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="en">English</SelectItem>
+                        <SelectItem value="mk">Macedonian</SelectItem>
+                        <SelectItem value="bg">Bulgarian</SelectItem>
+                        <SelectItem value="sr">Serbian</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="flex items-center space-x-2">
@@ -975,6 +1008,21 @@ export default function AdminPage() {
                     />
                   </div>
 
+                  <div className="space-y-2">
+                    <Label htmlFor="contentLanguage">Content Language *</Label>
+                    <Select value={formData.contentLanguage} onValueChange={(value) => handleSelectChange("contentLanguage", value)}>
+                      <SelectTrigger id="contentLanguage">
+                        <SelectValue placeholder="Select language" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="en">English</SelectItem>
+                        <SelectItem value="mk">Macedonian</SelectItem>
+                        <SelectItem value="bg">Bulgarian</SelectItem>
+                        <SelectItem value="sr">Serbian</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
                   <div className="flex items-center space-x-2">
                     <Switch id="featured" checked={formData.isFeatured} onCheckedChange={handleFeaturedToggle} />
                     <Label htmlFor="featured">Featured Event (displayed on homepage)</Label>
@@ -1012,7 +1060,7 @@ export default function AdminPage() {
                       <div className="capitalize">{event.eventType}</div>
                       <div>{event.date}</div>
                       <div>{event.venue}</div>
-                      <div>{event.price ? `${(Number.parseFloat(event.price) * 1.96).toFixed(2)} лв.` : "Free"}</div>
+                      <div>{event.price ? `${(Number.parseFloat(event.price) * 1.96).toFixed(2)} BGN` : "Free"}</div>
                       <div className="truncate">{event.tags?.join(", ") || "None"}</div>
                       <div>{event.isFeatured ? "Yes" : "No"}</div>
                       <div className="flex gap-2">
@@ -1356,9 +1404,53 @@ export default function AdminPage() {
           <Card>
             <CardHeader>
               <CardTitle>News Management</CardTitle>
+              <CardDescription>Manage news articles and content</CardDescription>
             </CardHeader>
             <CardContent>
-              {/* News Management Content */}
+              <div className="text-center">
+                <p className="text-muted-foreground mb-4">
+                  Manage news articles from the dedicated news management page.
+                </p>
+                <Button onClick={() => router.push('/admin/news')}>
+                  Go to News Management
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="about">
+          <Card>
+            <CardHeader>
+              <CardTitle>About Page Management</CardTitle>
+              <CardDescription>Manage about page content in multiple languages</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center">
+                <p className="text-muted-foreground mb-4">
+                  Create and manage about page content for different languages.
+                </p>
+                <Button onClick={() => router.push('/admin/about')}>
+                  Go to About Management
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="contact">
+          <Card>
+            <CardHeader>
+              <CardTitle>Contact Page Management</CardTitle>
+              <CardDescription>Manage contact page content in multiple languages</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center">
+                <p className="text-muted-foreground mb-4">
+                  Create and manage contact page content for different languages.
+                </p>
+                <Button onClick={() => router.push('/admin/contact')}>
+                  Go to Contact Management
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

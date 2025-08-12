@@ -4,9 +4,10 @@ import { Calendar } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { useLanguage } from "@/lib/language-context"
 
 interface NewsCardProps {
-  id: string
+  id: string | number
   title: string
   date: string
   excerpt: string
@@ -15,6 +16,7 @@ interface NewsCardProps {
 }
 
 export default function NewsCard({ id, title, date, excerpt, imageUrl, category }: NewsCardProps) {
+  const { language, t } = useLanguage();
   return (
     <Card className="overflow-hidden transition-all hover:shadow-md">
       <div className="aspect-video relative overflow-hidden">
@@ -35,8 +37,8 @@ export default function NewsCard({ id, title, date, excerpt, imageUrl, category 
         <CardDescription className="line-clamp-2">{excerpt}</CardDescription>
       </CardHeader>
       <CardFooter className="p-4 pt-0">
-        <Link href={`/news/${id}`}>
-          <Button variant="outline">Read More</Button>
+        <Link href={`/news/${id}?lang=${language}`}>
+          <Button variant="outline">{t('readMore')}</Button>
         </Link>
       </CardFooter>
     </Card>
