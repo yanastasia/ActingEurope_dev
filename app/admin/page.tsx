@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { Calendar, Ticket, FileText, AlertTriangle, ShieldCheck, Pencil, Trash2, MapPin, Info, Phone } from "lucide-react"
+import { Calendar, Ticket, FileText, AlertTriangle, ShieldCheck, Pencil, Trash2, MapPin, Info, Phone, Building } from "lucide-react"
 import { isAdmin } from "@/lib/auth"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/lib/language-context"
@@ -746,6 +746,16 @@ export default function AdminPage() {
                </CardContent>
              </Card>
            </a>
+           <a href="/admin/theatres" className="block">
+             <Card className="hover:shadow-lg transition-shadow duration-200">
+               <CardHeader>
+                 <CardTitle>Manage Theatres</CardTitle>
+               </CardHeader>
+               <CardContent>
+                 <p className="text-gray-600">Add, edit, and delete theatre information.</p>
+               </CardContent>
+             </Card>
+           </a>
         </div>
         <div className="mt-2 flex items-center gap-2">
           <p className="text-muted-foreground">Logged in as administrator:</p>
@@ -754,7 +764,7 @@ export default function AdminPage() {
       </div>
 
       <Tabs defaultValue="events" className="w-full">
-        <TabsList className="grid w-full grid-cols-6 md:w-[1000px]">
+        <TabsList className="grid w-full grid-cols-7 md:w-[1200px]">
           <TabsTrigger value="events" className="gap-2">
             <Calendar className="h-4 w-4" />
             Events
@@ -778,6 +788,10 @@ export default function AdminPage() {
           <TabsTrigger value="contact" className="gap-2">
             <Phone className="h-4 w-4" />
             Contact
+          </TabsTrigger>
+          <TabsTrigger value="theatres" className="gap-2">
+            <Building className="h-4 w-4" />
+            Theatres
           </TabsTrigger>
         </TabsList>
 
@@ -1484,6 +1498,24 @@ export default function AdminPage() {
                 </p>
                 <Button onClick={() => router.push('/admin/contact')}>
                   Go to Contact Management
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="theatres">
+          <Card>
+            <CardHeader>
+              <CardTitle>Theatre Management</CardTitle>
+              <CardDescription>Manage theatre and participant information</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center">
+                <p className="text-muted-foreground mb-4">
+                  Create and manage theatre profiles and participant information.
+                </p>
+                <Button onClick={() => router.push('/admin/theatres')}>
+                  Go to Theatre Management
                 </Button>
               </div>
             </CardContent>

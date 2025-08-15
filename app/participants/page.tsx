@@ -17,14 +17,19 @@ interface Theatre {
   description: string
   history: string
   website?: string
-  foundedYear: number
+  founded_year: number
   images: {
     id: number
-    imageUrl: string
+    image_url: string
     caption?: string
-    isPrimary: boolean
+    is_primary: boolean
   }[]
-  tags: string[]
+  tags: {
+    id: number
+    theatre_id: number
+    tag_name: string
+    created_at: string
+  }[]
 }
 
 export default function ParticipantsPage() {
@@ -104,7 +109,7 @@ export default function ParticipantsPage() {
           <Card key={theatre.id} className="overflow-hidden transition-all hover:shadow-lg cursor-pointer" onClick={() => openModal(theatre)}>
             <div className="aspect-video relative overflow-hidden">
               <Image
-                src={theatre.images.find((img) => img.isPrimary)?.imageUrl || "/placeholder.svg"}
+                src={theatre.images.find((img) => img.is_primary)?.image_url || "/placeholder.svg"}
                 alt={theatre.name}
                 fill
                 className="object-cover transition-transform hover:scale-105"
@@ -124,7 +129,7 @@ export default function ParticipantsPage() {
               <CardTitle className="line-clamp-2 text-xl text-secondary-blue">{theatre.name}</CardTitle>
               <CardDescription className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
-                {t('founded')} {theatre.foundedYear}
+                {t('founded')} {theatre.founded_year}
               </CardDescription>
             </CardHeader>
 
@@ -134,7 +139,7 @@ export default function ParticipantsPage() {
               <div className="mb-4 flex flex-wrap gap-1">
                 {theatre.tags.slice(0, 3).map((tag, index) => (
                   <Badge key={index} variant="outline" className="text-xs">
-                    {tag}
+                    {tag.tag_name}
                   </Badge>
                 ))}
                 {theatre.tags.length > 3 && (
@@ -176,7 +181,7 @@ export default function ParticipantsPage() {
               {/* Image Gallery */}
               <div className="relative h-64 md:h-96">
                 <Image
-                  src={selectedTheatre.images[currentImageIndex]?.imageUrl || '/placeholder.svg'}
+                  src={selectedTheatre.images[currentImageIndex]?.image_url || '/placeholder.svg'}
                   alt={selectedTheatre.name}
                   fill
                   className="object-cover"
@@ -231,7 +236,7 @@ export default function ParticipantsPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
-                    <span>{t('founded')} {selectedTheatre.foundedYear}</span>
+                    <span>{t('founded')} {selectedTheatre.founded_year}</span>
                   </div>
                 </div>
                 
@@ -254,7 +259,7 @@ export default function ParticipantsPage() {
                   <div className="flex flex-wrap gap-2">
                     {selectedTheatre.tags.map((tag, index) => (
                       <Badge key={index} variant="secondary">
-                        {tag}
+                        {tag.tag_name}
                       </Badge>
                     ))}
                   </div>

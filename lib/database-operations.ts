@@ -218,6 +218,93 @@ export const updateNewsArticle = async (id: number, updatedFields: Partial<NewsA
     }
   }
 
+// Theatre operations
+export const createTheatre = async (
+  name: string,
+  city: string,
+  country: string,
+  description?: string,
+  history?: string,
+  website?: string,
+  foundedYear?: number,
+  contentLanguage: string = 'en',
+  translationGroup?: string,
+  images: any[] = [],
+  tags: string[] = []
+) => {
+  const theatre = await prisma.theatre.create({
+    data: {
+      name,
+      city,
+      country,
+      description,
+      history,
+      website,
+      founded_year: foundedYear,
+      content_language: contentLanguage,
+      translation_group: translationGroup,
+      images: {
+        create: images.map((img: any) => ({
+          image_url: img.image_url,
+          caption: img.caption,
+          is_primary: img.is_primary || false
+        }))
+      },
+      tags: {
+        create: tags.map((tag: string) => ({
+          tag_name: tag
+        }))
+      }
+    },
+    include: {
+      images: true,
+      tags: true,
+      _count: {
+        select: {
+          events: true
+        }
+      }
+    }
+  });
+  
+  return theatre;
+}
+
+export const createTheatreWithTranslations = async (
+  name: string,
+  city: string,
+  country: string,
+  description?: string,
+  history?: string,
+  website?: string,
+  foundedYear?: number,
+  images: any[] = [],
+  tags: string[] = []
+) => {
+  const languages = ['en', 'bg', 'mk', 'sr'];
+  const translationGroup = `theatre_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  const theatres = [];
+  
+  for (const language of languages) {
+    const theatre = await createTheatre(
+      name,
+      city,
+      country,
+      description,
+      history,
+      website,
+      foundedYear,
+      language,
+      translationGroup,
+      images,
+      tags
+    );
+    theatres.push(theatre);
+  }
+  
+  return theatres;
+}
+
 export const deleteNewsArticle = async (id: number): Promise<boolean> => {
     try {
       await prisma.newsArticle.delete({
