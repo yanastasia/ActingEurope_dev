@@ -6,7 +6,7 @@ This guide covers the complete workflow for setting up, building, and running th
 
 - Node.js (v18 or higher)
 - npm or pnpm
-- PostgreSQL database (local or remote)
+- Supabase account and project (recommended) or PostgreSQL database
 - Git
 
 ## Environment Setup
@@ -26,7 +26,58 @@ This guide covers the complete workflow for setting up, building, and running th
 
 3. **Environment variables**
    - Copy `.env.example` to `.env.local`
-   - Configure your database connection string and other required variables
+   - Configure your Supabase database connection strings and other required variables
+   
+   **Supabase Configuration:**
+   ```env
+   # Database URLs (from Supabase Project Settings > Database)
+   DATABASE_URL="postgresql://postgres.xxx:password@aws-0-eu-central-2.pooler.supabase.com:6543/postgres"
+   DIRECT_URL="postgresql://postgres.xxx:password@aws-0-eu-central-2.pooler.supabase.com:5432/postgres"
+   
+   # Other required variables
+   JWT_SECRET="your-secure-jwt-secret"
+   NEXT_PUBLIC_APP_URL="http://localhost:3000"
+   ```
+   
+   **Important Notes:**
+   - `DATABASE_URL` uses port 6543 for connection pooling (recommended for most operations)
+   - `DIRECT_URL` uses port 5432 for direct connections (required for migrations)
+   - Get both URLs from your Supabase project dashboard
+
+## Supabase Setup
+
+### 1. Create Supabase Project
+
+1. **Sign up for Supabase**
+   - Go to [supabase.com](https://supabase.com)
+   - Create a free account
+   - Create a new project
+
+2. **Get Database Connection Strings**
+   - Navigate to Project Settings > Database
+   - Copy the "Connection string" for pooled connections (port 6543)
+   - Copy the "Direct connection" string (port 5432)
+   - Use these in your `.env.local` file
+
+3. **Configure Environment Variables**
+   ```env
+   DATABASE_URL="your-pooled-connection-string"
+   DIRECT_URL="your-direct-connection-string"
+   ```
+
+### 2. Migration from Other Databases
+
+If migrating from another PostgreSQL database:
+
+1. **Backup existing data**
+   ```bash
+   pg_dump -h old-host -p old-port -U username -d database_name > backup.sql
+   ```
+
+2. **Restore to Supabase**
+   ```bash
+   psql "your-supabase-direct-connection-string" < backup.sql
+   ```
 
 ## Database Workflow
 
@@ -76,6 +127,8 @@ npx tsx prisma/seed.ts
 - Sample theatres and venues
 - Performance data
 - News articles (if any)
+- Sample about page content in multiple languages
+- Sample contact page content in multiple languages
 
 **Current Admin Accounts:**
 - **Anastasia**: `anastasia@actingeurope.eu` / `ActingEurope2025!`
@@ -211,6 +264,28 @@ npm run db:push --force-reset
 npm run db:seed
 ```
 
+## Content Management System
+
+The application now includes a fully database-connected CMS for dynamic content:
+
+### About Page Management
+- Database-stored content with multi-language support
+- Admin interface for editing title and content
+- Automatic fallback to translation files if no database content exists
+- API endpoints: `/api/about` (GET, POST, PUT, DELETE)
+
+### Contact Page Management
+- Database-stored contact information (address, phone, email, hours)
+- Admin interface for editing all contact details
+- Multi-language support for all contact content
+- API endpoints: `/api/contact` (GET, POST, PUT)
+
+### File Upload System
+- Real file upload functionality via `/api/upload`
+- Automatic file validation (type and size)
+- Secure filename sanitization
+- Files stored in `public/uploads/` directory
+
 ## File Structure
 
 ```
@@ -222,7 +297,11 @@ npm run db:seed
 │   ├── database-operations.ts # Database helper functions
 │   └── database.ts           # Mock data and utilities
 ├── app/api/                  # API routes (server-side)
+│   ├── about/                # About page content management
+│   ├── contact/              # Contact page content management
+│   └── upload/               # File upload handling
 ├── components/               # React components
+├── public/uploads/           # Uploaded files directory
 └── .env.local               # Environment variables
 ```
 

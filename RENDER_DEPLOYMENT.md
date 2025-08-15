@@ -1,31 +1,33 @@
-# Render Database Deployment Guide
+# Render Deployment Guide with Supabase Database
 
-This guide will help you deploy the ActingEurope application with a MySQL database on Render.
+This guide will help you deploy the ActingEurope application on Render.com using Supabase as the database provider.
 
 ## Prerequisites
 
 - A Render account (sign up at [render.com](https://render.com))
+- A Supabase account (sign up at [supabase.com](https://supabase.com))
 - Your code pushed to a Git repository (GitHub, GitLab, or Bitbucket)
 
-## Step 1: Create a PostgreSQL Database on Render
+## Step 1: Setup Supabase Database
 
-1. **Log in to Render Dashboard**
-   - Go to [dashboard.render.com](https://dashboard.render.com)
-   - Click "New +" and select "PostgreSQL"
+1. **Create Supabase Project**
+   - Go to [supabase.com](https://supabase.com)
+   - Sign up and create a new project
+   - Choose a project name and database password
+   - Select a region closest to your users
 
-2. **Configure Database Settings**
-   - **Name**: `actingeurope-db`
-   - **Database Name**: `actingeurope`
-   - **User**: `actingeurope_user`
-   - **Region**: Choose closest to your users
-   - **Plan**: Start with Free tier
+2. **Get Database Connection Strings**
+   - Navigate to Project Settings > Database
+   - Copy the "Connection string" (pooled connection - port 6543)
+   - Copy the "Direct connection" string (port 5432)
+   - You'll need both for the deployment
 
-3. **Create the Database**
-   - Click "Create Database"
-   - Wait for the database to be provisioned (usually 2-3 minutes)
-   - Note down the connection details from the database dashboard
+3. **Configure Database Settings**
+   - The database is automatically provisioned
+   - Supabase provides connection pooling by default
+   - Free tier includes 500MB storage and 2GB bandwidth
 
-**Note**: You don't need pgAdmin for this deployment. Render provides a web-based database dashboard, and you can manage your database through Prisma commands and the Render dashboard.
+**Note**: Supabase provides a comprehensive dashboard for database management, including a built-in SQL editor and table viewer.
 
 ## Step 2: Deploy the Web Service
 
@@ -47,25 +49,26 @@ This guide will help you deploy the ActingEurope application with a MySQL databa
 
    ```
    NODE_ENV=production
-   DATABASE_URL=postgresql://actingeurope_user:p1EOPq8RfGjCEN7MqPcKehFVOucDRrTn@dpg-d2a8sfer433s73a7rm0g-a/actingeurope
-   NEXTAUTH_SECRET=your-generated-secret-key
-   NEXTAUTH_URL=https://your-app-name.onrender.com
+   DATABASE_URL=your-supabase-pooled-connection-string
+   DIRECT_URL=your-supabase-direct-connection-string
+   JWT_SECRET=your-generated-secret-key
+   NEXT_PUBLIC_APP_URL=https://your-app-name.onrender.com
    ```
 
-   **Important**: Replace the DATABASE_URL with the actual connection string from your database dashboard.
+   **Important**: Replace the connection strings with the actual URLs from your Supabase project dashboard.
    
-   **For your specific database, use**:
+   **Example format**:
    ```
-   DATABASE_URL=postgresql://actingeurope_user:p1EOPq8RfGjCEN7MqPcKehFVOucDRrTn@dpg-d2a8sfer433s73a7rm0g-a.oregon-postgres.render.com:5432/actingeurope
+   DATABASE_URL=postgresql://postgres.xxx:password@aws-0-eu-central-2.pooler.supabase.com:6543/postgres
+   DIRECT_URL=postgresql://postgres.xxx:password@aws-0-eu-central-2.pooler.supabase.com:5432/postgres
    ```
 
 ## Step 3: Database Setup and Migration
 
-1. **Get Database Connection String**
-   - Go to your database dashboard on Render
-   - Copy the "External Connection String"
-   - It should look like: `postgresql://actingeurope_user:password@dpg-xxxxx-a.oregon-postgres.render.com:5432/actingeurope`
-   - Your specific connection string is: `postgresql://actingeurope_user:p1EOPq8RfGjCEN7MqPcKehFVOucDRrTn@dpg-d2a8sfer433s73a7rm0g-a.oregon-postgres.render.com:5432/actingeurope`
+1. **Verify Database Connection**
+   - Ensure both DATABASE_URL and DIRECT_URL are correctly set in Render
+   - The pooled connection (DATABASE_URL) is used for application queries
+   - The direct connection (DIRECT_URL) is used for migrations and schema changes
 
 2. **Run Database Migrations**
    After your web service is deployed, you need to set up the database schema:
@@ -101,16 +104,17 @@ This guide will help you deploy the ActingEurope application with a MySQL databa
 ## Environment Variables Reference
 
 ### Required Variables
-- `DATABASE_URL`: MySQL connection string from Render
-- `NEXTAUTH_SECRET`: Random secret for NextAuth.js
-- `NEXTAUTH_URL`: Your app's URL on Render
+- `DATABASE_URL`: Supabase pooled connection string (port 6543)
+- `DIRECT_URL`: Supabase direct connection string (port 5432)
+- `JWT_SECRET`: Random secret for authentication
+- `NEXT_PUBLIC_APP_URL`: Your app's URL on Render
 - `NODE_ENV`: Set to "production"
 
 ### Optional Variables
-- `EMAIL_SERVER_HOST`: SMTP server for emails
-- `EMAIL_SERVER_PORT`: SMTP port (usually 587)
-- `EMAIL_SERVER_USER`: SMTP username
-- `EMAIL_SERVER_PASSWORD`: SMTP password
+- `SMTP_HOST`: SMTP server for emails
+- `SMTP_PORT`: SMTP port (usually 587)
+- `SMTP_USER`: SMTP username
+- `SMTP_PASS`: SMTP password
 - `EMAIL_FROM`: From email address
 
 ## Database Schema Overview
@@ -129,15 +133,18 @@ The application includes these main data entities:
 - **bookings**: User ticket bookings
 - **booked_seats**: Seat reservations
 - **news_articles**: News and announcements
+- **about_pages**: Dynamic about page content with multi-language support
+- **contact_pages**: Dynamic contact page content with multi-language support
 
 ## Troubleshooting
 
 ### Common Issues
 
 1. **Database Connection Errors**
-   - Verify DATABASE_URL is correct
-   - Check if database is running in Render dashboard
-   - Ensure database and web service are in the same region
+   - Verify both DATABASE_URL and DIRECT_URL are correct
+   - Check Supabase project status in dashboard
+   - Ensure connection strings include correct ports (6543 for pooled, 5432 for direct)
+   - Verify database password and project reference are correct
 
 2. **Build Failures**
    - Check build logs in Render dashboard
@@ -176,9 +183,9 @@ npx prisma migrate reset
    - Generate secure random strings for secrets
 
 2. **Database Access**
-   - Database is only accessible from your Render services
-   - Use connection pooling for better performance
-   - Monitor database usage and performance
+   - Supabase provides built-in connection pooling
+   - Monitor database usage in Supabase dashboard
+   - Free tier has usage limits (check Supabase dashboard for current usage)
 
 3. **Application Security**
    - Keep dependencies updated
@@ -192,14 +199,15 @@ npx prisma migrate reset
 3. **Backups**: Render automatically backs up your database
 4. **Updates**: Keep dependencies and Render services updated
 
-## Database Management Without pgAdmin
+## Database Management
 
-**You don't need pgAdmin for this deployment.** Here are the alternatives:
+**Supabase provides comprehensive database management tools:**
 
-### 1. Render Dashboard
-- Access your database through the Render web interface
-- View connection details, metrics, and logs
-- Monitor database performance and usage
+### 1. Supabase Dashboard
+- Access your database through the Supabase web interface
+- Built-in SQL editor for running queries
+- Table editor for viewing and editing data
+- Real-time monitoring and analytics
 
 ### 2. Prisma Studio (Recommended)
 ```bash
@@ -213,7 +221,7 @@ npx prisma studio
 ### 3. Command Line Tools
 ```bash
 # Connect directly via psql (if installed)
-psql postgresql://actingeurope_user:p1EOPq8RfGjCEN7MqPcKehFVOucDRrTn@dpg-d2a8sfer433s73a7rm0g-a.oregon-postgres.render.com:5432/actingeurope
+psql "your-supabase-direct-connection-string"
 
 # Or use Prisma CLI for database operations
 npx prisma db push    # Push schema changes
@@ -237,4 +245,9 @@ If you encounter issues:
 
 ---
 
-**Note**: This setup uses the free tier of Render services. For production applications with higher traffic, consider upgrading to paid plans for better performance and reliability.
+**Note**: This setup uses the free tier of both Render and Supabase services. The combination provides:
+- **Render**: Free web service hosting with automatic deployments
+- **Supabase**: Free PostgreSQL database with 500MB storage, connection pooling, and comprehensive dashboard
+- **Benefits**: Better database management tools, built-in connection pooling, and real-time monitoring
+
+For production applications with higher traffic, consider upgrading to paid plans for better performance and reliability.

@@ -94,9 +94,65 @@ GET /api/news/translations/news_1754912095182_ehp6w0401
 3. **Translation Status**: Track which languages have been translated for each article
 4. **Automatic Fallbacks**: Better handling when translations are missing
 
+## Recent Database Integration Improvements
+
+### About and Contact Page Database Integration
+
+**Implementation Date**: Recent development session
+
+**Changes Made**:
+1. **About Page (`app/about/page.tsx`)**:
+   - Connected to database via `/api/about` endpoints
+   - Dynamic content loading with language support
+   - Admin editing interface for real-time content updates
+   - Fallback system: Database → Translation files → English default
+
+2. **Contact Page (`app/contact/page.tsx`)**:
+   - Connected to database via `/api/contact` endpoints
+   - Dynamic contact information (address, phone, email, hours)
+   - Admin editing interface for all contact details
+   - Multi-language support for all contact content
+
+3. **File Upload System (`app/api/upload/route.ts`)**:
+   - Real file upload functionality replacing placeholder URLs
+   - Integrated into admin panel (`app/admin/page.tsx`)
+   - File validation, sanitization, and secure storage
+
+**Database Schema Additions**:
+```sql
+AboutPage {
+  id: number
+  title: string
+  content: string
+  language: string
+  created_at: DateTime
+  updated_at: DateTime
+}
+
+ContactPage {
+  id: number
+  title: string
+  description: string
+  address: string
+  phone: string
+  email: string
+  business_hours: string
+  language: string
+  created_at: DateTime
+  updated_at: DateTime
+}
+```
+
+**Translation Integration**:
+- Database content takes priority over translation files
+- Seamless fallback to existing translation system
+- Language switching maintains content consistency
+- Admin can edit content in any supported language
+
 ## Migration Notes
 
 No database migration is required as:
 - The `translation_group` field already exists
 - The existing data structure supports the new functionality
 - All changes are backward compatible
+- New tables (AboutPage, ContactPage) are created automatically by Prisma

@@ -44,6 +44,9 @@ Acting Europe is a modern web application designed to connect theatre enthusiast
 - **News Management**: Create and publish news articles
 - **Analytics Dashboard**: Monitor bookings, events, and user engagement
 - **Content Management**: Upload images, manage descriptions, and organize content
+- **Dynamic Page Content**: Edit about and contact page content directly from the admin interface
+- **File Upload System**: Real file upload functionality for images and documents
+- **Database-Connected CMS**: All content is stored in and retrieved from the database
 
 ### 🏛️ Venue Management
 - **Multi-Section Venues**: Support for regular and balcony seating
@@ -81,7 +84,7 @@ Acting Europe is a modern web application designed to connect theatre enthusiast
 
 ### Deployment & Infrastructure
 - **Platform**: Render.com 
-- **Database**: PostgreSQL 
+- **Database**: Supabase PostgreSQL with connection pooling
 - **Environment**: Production-ready with environment variables
 - **Monitoring**: Built-in logging and error handling
 
@@ -151,8 +154,9 @@ ActingEurope_dev/
    
    Configure the following environment variables:
    ```env
-   # Database
-   DATABASE_URL="postgresql://username:password@localhost:5432/actingeurope"
+   # Database (Supabase)
+   DATABASE_URL="postgresql://postgres.xxx:password@aws-0-eu-central-2.pooler.supabase.com:6543/postgres"
+   DIRECT_URL="postgresql://postgres.xxx:password@aws-0-eu-central-2.pooler.supabase.com:5432/postgres"
    
    # Authentication
    JWT_SECRET="your-jwt-secret-key"
@@ -210,10 +214,10 @@ ActingEurope_dev/
 
 ### Render.com Deployment (Recommended)
 
-1. **Create PostgreSQL Database**
-   - Log in to [Render Dashboard](https://dashboard.render.com)
-   - Create a new PostgreSQL database
-   - Note the connection string
+1. **Setup Supabase Database**
+   - Create a [Supabase](https://supabase.com) account and project
+   - Get your database connection strings from Project Settings > Database
+   - Note both the pooled connection URL (port 6543) and direct connection URL (port 5432)
 
 2. **Deploy Web Service**
    - Connect your Git repository
@@ -226,7 +230,8 @@ ActingEurope_dev/
    Set the following in Render dashboard:
    ```env
    NODE_ENV=production
-   DATABASE_URL=<your-render-postgres-url>
+   DATABASE_URL=<your-supabase-pooled-connection-url>
+   DIRECT_URL=<your-supabase-direct-connection-url>
    JWT_SECRET=<secure-random-string>
    SMTP_HOST=<your-smtp-host>
    SMTP_PORT=587
@@ -260,6 +265,8 @@ The application uses a comprehensive PostgreSQL schema with the following main e
 - **Events**: Performances, workshops, and discussions
 - **Bookings**: Ticket reservations and seat assignments
 - **News**: Content management for announcements
+- **About Pages**: Dynamic about page content with multi-language support
+- **Contact Pages**: Dynamic contact page content with multi-language support
 
 For detailed schema information, see `prisma/schema.prisma`.
 
@@ -285,6 +292,16 @@ For detailed schema information, see `prisma/schema.prisma`.
 ### User Management
 - `GET /api/users` - List users (admin)
 - `POST /api/users/create` - Create user (admin)
+
+### Content Management
+- `GET /api/about` - Get about page content by language
+- `POST /api/about` - Create about page content (admin)
+- `PUT /api/about` - Update about page content (admin)
+- `DELETE /api/about` - Delete about page content (admin)
+- `GET /api/contact` - Get contact page content by language
+- `POST /api/contact` - Create contact page content (admin)
+- `PUT /api/contact` - Update contact page content (admin)
+- `POST /api/upload` - Upload files (admin)
 
 ## 🤝 Contributing
 

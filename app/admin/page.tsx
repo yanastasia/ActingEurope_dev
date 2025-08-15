@@ -206,13 +206,48 @@ export default function AdminPage() {
     }
   }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // In a real app, this would upload the file to a server
-    // For this demo, we'll just use a placeholder
-    if (editingEvent) {
-      setEditingEvent({ ...editingEvent, imageUrl: "/placeholder.svg?height=400&width=600" })
-    } else {
-      setFormData((prev) => ({ ...prev, imageUrl: "/placeholder.svg?height=400&width=600" }))
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const imageUrl = data.url;
+        
+        if (editingEvent) {
+          setEditingEvent({ ...editingEvent, imageUrl });
+        } else {
+          setFormData((prev) => ({ ...prev, imageUrl }));
+        }
+        
+        toast({
+          title: "Success",
+          description: "Image uploaded successfully",
+        });
+      } else {
+        const errorData = await response.json();
+        toast({
+          title: "Error",
+          description: errorData.error || "Failed to upload image",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      toast({
+        title: "Error",
+        description: "Failed to upload image",
+        variant: "destructive",
+      });
     }
   }
 
