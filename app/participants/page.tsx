@@ -1,27 +1,107 @@
-import Image from "next/image"
-import Link from "next/link"
-import { MapPin, Calendar, ExternalLink } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { getTheatres } from "@/lib/database"
+'use client'
 
-export default async function ParticipantsPage() {
-  const theatres = await getTheatres()
+import { useState, useEffect } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { MapPin, Calendar, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useLanguage } from '@/lib/language-context'
+
+interface Theatre {
+  id: number
+  name: string
+  city: string
+  country: string
+  description: string
+  history: string
+  website?: string
+  foundedYear: number
+  images: {
+    id: number
+    imageUrl: string
+    caption?: string
+    isPrimary: boolean
+  }[]
+  tags: string[]
+}
+
+export default function ParticipantsPage() {
+  const { t, language } = useLanguage()
+  const [theatres, setTheatres] = useState<Theatre[]>([])
+  const [selectedTheatre, setSelectedTheatre] = useState<Theatre | null>(null)
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchTheatres = async () => {
+      setLoading(true)
+      try {
+        const response = await fetch(`/api/theatres?language=${language}`)
+        if (response.ok) {
+          const theatreData = await response.json()
+          setTheatres(theatreData)
+        } else {
+          console.error('Failed to fetch theatres')
+        }
+      } catch (error) {
+        console.error('Error fetching theatres:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchTheatres()
+  }, [language])
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-12">
+        <div className="text-center">
+          <p>{t('loading')} {t('participants').toLowerCase()}...</p>
+        </div>
+      </div>
+    )
+  }
+
+  const openModal = (theatre: Theatre) => {
+    setSelectedTheatre(theatre)
+    setCurrentImageIndex(0)
+  }
+
+  const closeModal = () => {
+    setSelectedTheatre(null)
+    setCurrentImageIndex(0)
+  }
+
+  const nextImage = () => {
+    if (selectedTheatre && selectedTheatre.images.length > 1) {
+      setCurrentImageIndex((prev) => 
+        prev === selectedTheatre.images.length - 1 ? 0 : prev + 1
+      )
+    }
+  }
+
+  const prevImage = () => {
+    if (selectedTheatre && selectedTheatre.images.length > 1) {
+      setCurrentImageIndex((prev) => 
+        prev === 0 ? selectedTheatre.images.length - 1 : prev - 1
+      )
+    }
+  }
 
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="mb-12 text-center">
-        <h1 className="mb-4 text-4xl font-bold text-secondary-blue">Participating Theatres</h1>
+        <h1 className="mb-4 text-4xl font-bold text-secondary-blue">{t('participants')}</h1>
         <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-          Discover the prestigious theatres from across the Balkans that make Acting Europe a celebration of regional
-          theatrical excellence and cultural exchange.
+          {t('participantsDescription')}
         </p>
       </div>
 
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {theatres.map((theatre) => (
-          <Card key={theatre.id} className="overflow-hidden transition-all hover:shadow-lg">
+          <Card key={theatre.id} className="overflow-hidden transition-all hover:shadow-lg cursor-pointer" onClick={() => openModal(theatre)}>
             <div className="aspect-video relative overflow-hidden">
               <Image
                 src={theatre.images.find((img) => img.isPrimary)?.imageUrl || "/placeholder.svg"}
@@ -44,7 +124,7 @@ export default async function ParticipantsPage() {
               <CardTitle className="line-clamp-2 text-xl text-secondary-blue">{theatre.name}</CardTitle>
               <CardDescription className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
-                Founded in {theatre.foundedYear}
+                {t('founded')} {theatre.foundedYear}
               </CardDescription>
             </CardHeader>
 
@@ -59,17 +139,17 @@ export default async function ParticipantsPage() {
                 ))}
                 {theatre.tags.length > 3 && (
                   <Badge variant="outline" className="text-xs">
-                    +{theatre.tags.length - 3} more
+                    +{theatre.tags.length - 3} {t('more')}
                   </Badge>
                 )}
               </div>
 
               <div className="flex justify-between">
-                <Button variant="outline" size="sm" asChild>
-                  <Link href={`/participants/${theatre.id}`}>Learn More</Link>
+                <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); openModal(theatre); }}>
+                  {t('learnMore')}
                 </Button>
                 {theatre.website && (
-                  <Button variant="ghost" size="sm" asChild>
+                  <Button variant="ghost" size="sm" asChild onClick={(e) => e.stopPropagation()}>
                     <a href={theatre.website} target="_blank" rel="noopener noreferrer">
                       <ExternalLink className="h-4 w-4" />
                     </a>
@@ -81,12 +161,114 @@ export default async function ParticipantsPage() {
         ))}
       </div>
 
+      {/* Modal */}
+      {selectedTheatre && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" onClick={closeModal}>
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="relative">
+              <button
+                onClick={closeModal}
+                className="absolute top-4 right-4 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
+              >
+                ✕
+              </button>
+              
+              {/* Image Gallery */}
+              <div className="relative h-64 md:h-96">
+                <Image
+                  src={selectedTheatre.images[currentImageIndex]?.imageUrl || '/placeholder.svg'}
+                  alt={selectedTheatre.name}
+                  fill
+                  className="object-cover"
+                />
+                {selectedTheatre.images.length > 1 && (
+                  <>
+                    <button
+                      onClick={prevImage}
+                      className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={nextImage}
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </button>
+                  </>
+                )}
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+                  {selectedTheatre.images.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentImageIndex(index)}
+                      className={`w-2 h-2 rounded-full ${
+                        index === currentImageIndex ? 'bg-white' : 'bg-white/50'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+              
+              {/* Content */}
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-3xl font-bold">{selectedTheatre.name}</h2>
+                  {selectedTheatre.website && (
+                    <Link href={selectedTheatre.website} target="_blank" rel="noopener noreferrer">
+                      <Button variant="outline">
+                        <ExternalLink className="h-4 w-4 mr-2" />
+                        {t('visitWebsite')}
+                      </Button>
+                    </Link>
+                  )}
+                </div>
+                
+                <div className="flex items-center gap-4 mb-6 text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4" />
+                    <span>{selectedTheatre.city}, {selectedTheatre.country}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    <span>{t('founded')} {selectedTheatre.foundedYear}</span>
+                  </div>
+                </div>
+                
+                <div className="mb-6">
+                  <h3 className="text-xl font-semibold mb-3">{t('about')}</h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {selectedTheatre.description}
+                  </p>
+                </div>
+                
+                <div className="mb-6">
+                  <h3 className="text-xl font-semibold mb-3">{t('history')}</h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {selectedTheatre.history}
+                  </p>
+                </div>
+                
+                <div>
+                  <h3 className="text-xl font-semibold mb-3">{t('tags')}</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedTheatre.tags.map((tag, index) => (
+                      <Badge key={index} variant="secondary">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="mt-16 rounded-lg bg-muted/30 p-8 text-center">
-        <h2 className="mb-4 text-2xl font-semibold text-secondary-blue">Cultural Exchange Through Theatre</h2>
+        <h2 className="mb-4 text-2xl font-semibold text-secondary-blue">{t('culturalExchange')}</h2>
         <p className="mx-auto max-w-3xl text-muted-foreground">
-          Acting Europe brings together these distinguished theatres to create a unique platform for cultural dialogue
-          and artistic collaboration. Each participating theatre contributes its unique perspective, creating a rich
-          tapestry of Balkan theatrical traditions and contemporary innovations.
+          {t('culturalExchangeDesc')}
         </p>
       </div>
     </div>

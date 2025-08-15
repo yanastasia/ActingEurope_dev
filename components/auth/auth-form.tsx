@@ -153,8 +153,8 @@ export function AuthForm({ type }: AuthFormProps) {
     return (
       <Card className="mx-auto w-full max-w-md border-primary-gold/20 shadow-md">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold text-secondary-blue">Verification Email Sent</CardTitle>
-          <CardDescription>Please check your email to complete your registration</CardDescription>
+          <CardTitle className="text-2xl font-bold text-secondary-blue">{t("verificationEmailSent")}</CardTitle>
+          <CardDescription>{t("checkEmailToComplete")}</CardDescription>
         </CardHeader>
         <CardContent className="text-center">
           <div className="mb-6 rounded-full bg-green-100 p-3 inline-block">
@@ -163,20 +163,19 @@ export function AuthForm({ type }: AuthFormProps) {
             </svg>
           </div>
           <p className="mb-4">
-            We've sent a verification email to <strong>{formData.email}</strong>
+            {t("verificationEmailSentTo")} <strong>{formData.email}</strong>
           </p>
           <p className="text-sm text-muted-foreground mb-6">
-            Please click the verification link in the email to complete your registration. The link will expire in 24
-            hours.
+            {t("clickVerificationLink")}
           </p>
           <Button variant="outline" onClick={() => router.push("/")}>
-            Return to Home
+            {t("returnToHome")}
           </Button>
 
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           <div className="text-center text-sm">
-            Didn't receive the email?{" "}
+            {t("didntReceiveEmail")}{" "}
             <button
               className="font-medium text-primary-gold hover:underline"
               onClick={async () => {
@@ -185,13 +184,13 @@ export function AuthForm({ type }: AuthFormProps) {
                   const verificationToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
                   await sendVerificationEmailAction(formData.email, verificationToken)
                   toast({
-                    title: "Verification email resent",
-                    description: "Please check your email to verify your account.",
-                  })
+                     title: t("verificationEmailResent"),
+                     description: t("checkEmailToComplete"),
+                   })
                 } catch (error) {
                   toast({
-                    title: "Error",
-                    description: "Failed to resend verification email. Please try again.",
+                    title: t("error"),
+                    description: t("failedToResendEmail"),
                     variant: "destructive",
                   })
                 } finally {
@@ -200,7 +199,7 @@ export function AuthForm({ type }: AuthFormProps) {
               }}
               disabled={isLoading}
             >
-              {isLoading ? "Sending..." : "Resend verification email"}
+              {isLoading ? t("sending") : t("resendVerificationEmail")}
             </button>
           </div>
         </CardFooter>
@@ -212,19 +211,19 @@ export function AuthForm({ type }: AuthFormProps) {
     <Card className="mx-auto w-full max-w-md border-primary-gold/20 shadow-md">
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-secondary-blue">
-          {type === "login" ? "Sign In" : "Create Account"}
+          {type === "login" ? t("welcomeBack") : t("joinActingEurope")}
         </CardTitle>
         <CardDescription>
           {type === "login"
-            ? "Enter your credentials to access your account"
-            : "Register to book tickets and access exclusive content"}
+            ? t("enterCredentials")
+            : t("createAccountToBook")}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           {type === "signup" && (
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="name">{t("fullName")}</Label>
               <Input
                 id="name"
                 name="name"
@@ -237,7 +236,7 @@ export function AuthForm({ type }: AuthFormProps) {
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t("email")}</Label>
             <Input
               id="email"
               name="email"
@@ -250,7 +249,7 @@ export function AuthForm({ type }: AuthFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t("password")}</Label>
             <div className="relative">
               <Input
                 id="password"
@@ -269,7 +268,7 @@ export function AuthForm({ type }: AuthFormProps) {
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                <span className="sr-only">{showPassword ? "Hide password" : "Show password"}</span>
+                <span className="sr-only">{showPassword ? t("hidePassword") : t("showPassword")}</span>
               </Button>
             </div>
           </div>
@@ -277,7 +276,7 @@ export function AuthForm({ type }: AuthFormProps) {
           {type === "signup" && (
             <>
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Label htmlFor="confirmPassword">{t("confirmPassword")}</Label>
                 <Input
                   id="confirmPassword"
                   name="confirmPassword"
@@ -299,12 +298,12 @@ export function AuthForm({ type }: AuthFormProps) {
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {type === "login" ? "Signing in..." : "Creating account..."}
+                {type === "login" ? t("signingIn") : t("creatingAccount")}
               </>
             ) : type === "login" ? (
-              "Sign In"
+              t("signIn")
             ) : (
-              "Create Account"
+              t("createAccount")
             )}
           </Button>
         </form>
@@ -313,16 +312,16 @@ export function AuthForm({ type }: AuthFormProps) {
         <div className="text-center text-sm">
           {type === "login" ? (
             <>
-              Don't have an account?{" "}
+              {t("dontHaveAccount")}{" "}
               <Link href="/auth/signup" className="font-medium text-primary-gold hover:underline">
-                Sign up
+                {t("signUp")}
               </Link>
             </>
           ) : (
             <>
-              Already have an account?{" "}
+              {t("alreadyHaveAccount")}{" "}
               <Link href="/auth/login" className="font-medium text-primary-gold hover:underline">
-                Sign in
+                {t("signIn")}
               </Link>
             </>
           )}

@@ -86,7 +86,7 @@ export default function ContactPage() {
     fetchContactContent();
   }, [language, t]);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -94,7 +94,7 @@ export default function ContactPage() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Handle form submission here
     toast.success('Message sent successfully!');
@@ -140,7 +140,7 @@ export default function ContactPage() {
     }
   };
 
-  const handleContactContentChange = (field, value) => {
+  const handleContactContentChange = (field: string, value: string) => {
     setContactContent(prev => ({
       ...prev,
       [field]: value
