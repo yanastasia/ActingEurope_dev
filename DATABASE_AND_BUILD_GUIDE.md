@@ -266,7 +266,28 @@ npm run db:seed
 
 ## Content Management System
 
-The application now includes a fully database-connected CMS for dynamic content:
+The application now includes a fully database-connected CMS for dynamic content with multilingual support and shared admin access:
+
+### Theatre Management with Translation Groups
+- Automatic multilingual theatre creation in all supported languages (English, Bulgarian, Macedonian, Serbian)
+- Translation group system for linking related content across languages
+- Enhanced admin interface with language navigation for grouped content
+- Shared admin access - all admins can edit any theatre content
+- Database functions: `createTheatre()` and `createTheatreWithTranslations()`
+- API endpoints: `/api/theatres` (GET, POST, PUT, DELETE)
+
+### News Management with Translation Groups
+- Automatic multilingual news article creation
+- Translation group display in admin interface
+- Consistent multilingual content creation pattern
+- API endpoints: `/api/news` (GET, POST, PUT, DELETE)
+
+### Shared Admin Access System
+- No content ownership restrictions in database schema
+- All admin users can edit content created by any other admin
+- Role-based access control (admin and super_admin roles)
+- Authorization based on user roles, not content ownership
+- Consistent across all content types (theatres, news, about pages, contact pages)
 
 ### About Page Management
 - Database-stored content with multi-language support

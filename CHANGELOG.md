@@ -6,6 +6,25 @@ All notable changes to the Acting Europe project will be documented in this file
 
 ### Added
 
+#### Multilingual Content Management
+- **Theatre Management with Translation Groups**: Implemented automatic multilingual theatre creation
+  - New theatres are automatically created in all supported languages (English, Bulgarian, Macedonian, Serbian)
+  - Translation group system for linking related content across languages
+  - Enhanced admin interface with language navigation for grouped content
+  - API endpoints: `GET`, `POST`, `PUT`, `DELETE /api/theatres` with multilingual support
+  - Database functions: `createTheatre` and `createTheatreWithTranslations` in `lib/database-operations.ts`
+
+- **Shared Admin Access System**: All content is accessible and editable by all admin users
+  - Removed content ownership restrictions from database schema
+  - All admin users can edit content created by any other admin
+  - Role-based access control (admin and super_admin roles)
+  - No `created_by` or ownership fields in content tables
+
+- **Enhanced News Management**: Improved news article management with translation grouping
+  - Automatic multilingual news article creation
+  - Translation group display in admin interface
+  - Consistent multilingual content creation pattern across all content types
+
 #### Infrastructure
 - **Database Migration to Supabase**: Successfully migrated from Render PostgreSQL to Supabase
   - Improved connection pooling with dedicated pooled and direct connection URLs

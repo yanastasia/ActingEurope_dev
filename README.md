@@ -41,12 +41,16 @@ Acting Europe is a modern web application designed to connect theatre enthusiast
 - **Event Management**: Create, edit, and manage performances, workshops, and discussions
 - **Venue Administration**: Configure venues with multi-section seating layouts
 - **User Administration**: Manage user accounts and permissions
-- **News Management**: Create and publish news articles
+- **News Management**: Create and publish news articles with automatic multilingual support
+- **Theatre Management**: Comprehensive theatre profiles with automatic translation group creation
 - **Analytics Dashboard**: Monitor bookings, events, and user engagement
 - **Content Management**: Upload images, manage descriptions, and organize content
 - **Dynamic Page Content**: Edit about and contact page content directly from the admin interface
 - **File Upload System**: Real file upload functionality for images and documents
 - **Database-Connected CMS**: All content is stored in and retrieved from the database
+- **Shared Admin Access**: All content created by any admin is accessible and editable by all other admins
+- **Multilingual Content Creation**: Automatic creation of content in all supported languages (English, Bulgarian, Macedonian, Serbian)
+- **Translation Group Management**: Content is automatically grouped by translation for easy management across languages
 
 ### 🏛️ Venue Management
 - **Multi-Section Venues**: Support for regular and balcony seating
@@ -259,14 +263,21 @@ ActingEurope_dev/
 
 The application uses a comprehensive PostgreSQL schema with the following main entities:
 
-- **Users**: Authentication and profile management
-- **Theatres**: Theatre information and profiles
+- **Users**: Authentication and profile management with role-based access control
+- **Theatres**: Theatre information and profiles with multilingual support and translation grouping
 - **Venues**: Physical locations with seating configurations
 - **Events**: Performances, workshops, and discussions
 - **Bookings**: Ticket reservations and seat assignments
-- **News**: Content management for announcements
+- **News Articles**: Content management for announcements with automatic multilingual creation
 - **About Pages**: Dynamic about page content with multi-language support
 - **Contact Pages**: Dynamic contact page content with multi-language support
+- **Translation Groups**: Automatic grouping system for multilingual content management
+
+### Key Features:
+- **Shared Admin Access**: No content ownership restrictions - all admins can edit any content
+- **Automatic Multilingual Creation**: Content is automatically created in all supported languages (English, Bulgarian, Macedonian, Serbian)
+- **Translation Group Management**: Related content across languages is grouped for easy management
+- **Role-Based Permissions**: Admin and super_admin roles with appropriate access controls
 
 For detailed schema information, see `prisma/schema.prisma`.
 
@@ -292,6 +303,20 @@ For detailed schema information, see `prisma/schema.prisma`.
 ### User Management
 - `GET /api/users` - List users (admin)
 - `POST /api/users/create` - Create user (admin)
+
+### Theatre Management
+- `GET /api/theatres` - List all theatres with translation grouping
+- `GET /api/theatres/[id]` - Get theatre details
+- `POST /api/theatres` - Create theatre with automatic multilingual versions (admin)
+- `PUT /api/theatres/[id]` - Update theatre (admin)
+- `DELETE /api/theatres/[id]` - Delete theatre (admin)
+
+### News Management
+- `GET /api/news` - List all news articles with translation grouping
+- `GET /api/news/[id]` - Get news article details
+- `POST /api/news` - Create news article with automatic multilingual versions (admin)
+- `PUT /api/news/[id]` - Update news article (admin)
+- `DELETE /api/news/[id]` - Delete news article (admin)
 
 ### Content Management
 - `GET /api/about` - Get about page content by language

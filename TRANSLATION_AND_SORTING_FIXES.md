@@ -94,7 +94,57 @@ GET /api/news/translations/news_1754912095182_ehp6w0401
 3. **Translation Status**: Track which languages have been translated for each article
 4. **Automatic Fallbacks**: Better handling when translations are missing
 
-## Recent Database Integration Improvements
+## Recent Multilingual Content Management Improvements
+
+### Theatre Management with Translation Groups
+
+**Enhancement**: Extended the translation group system to theatre management with automatic multilingual creation.
+
+**Implementation**:
+1. **Automatic Multilingual Creation**: New theatres are automatically created in all supported languages
+2. **Translation Group System**: Theatres are linked across languages using `translation_group` field
+3. **Enhanced Admin Interface**: Theatre management page now groups theatres by translation group
+4. **Database Functions**: Added `createTheatreWithTranslations()` for automatic multilingual creation
+
+**Files Modified**:
+- `app/admin/theatres/page.tsx`: Enhanced UI with translation group display
+- `app/api/theatres/route.ts`: Updated to use `createTheatreWithTranslations()`
+- `lib/database-operations.ts`: Added theatre creation functions
+
+**Database Structure**:
+```sql
+Theatre {
+  id: number
+  name: string
+  // ... other fields
+  content_language: string     -- Language code (en, bg, mk, sr)
+  translation_group: string    -- Common identifier for all translations
+}
+```
+
+**Example Theatre Translation Group**:
+```
+Translation Group: "theatre_1_group"
+├── Theatre ID 1 (English - en)
+├── Theatre ID 15 (Bulgarian - bg)
+├── Theatre ID 16 (Macedonian - mk)
+└── Theatre ID 17 (Serbian - sr)
+```
+
+### Shared Admin Access System
+
+**Enhancement**: Implemented shared admin access where all content is accessible and editable by all admin users.
+
+**Key Features**:
+- No content ownership restrictions in database schema
+- All admin users can edit content created by any other admin
+- Role-based access control (admin and super_admin roles)
+- Consistent across all content types (theatres, news, about pages, contact pages)
+
+**Implementation Details**:
+- Removed `created_by`, `author_id`, or `user_id` fields from content tables
+- API endpoints check admin role via `hasAdminAccess()` helper function
+- Authorization based on user roles, not content ownership
 
 ### About and Contact Page Database Integration
 

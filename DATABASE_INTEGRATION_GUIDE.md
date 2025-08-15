@@ -8,7 +8,63 @@ The application has been enhanced with full database integration for dynamic con
 
 ## Features Implemented
 
-### 1. About Page Database Integration
+### 1. Multilingual Theatre Management
+
+**Location**: `app/admin/theatres/page.tsx`, `app/api/theatres/route.ts`
+
+**Features**:
+- Automatic multilingual theatre creation in all supported languages
+- Translation group system for linking related content across languages
+- Enhanced admin interface with language navigation for grouped content
+- Shared admin access - all admins can edit any theatre content
+- Database functions for single and multilingual theatre creation
+
+**API Endpoints**:
+- `GET /api/theatres` - Fetch all theatres with translation grouping
+- `POST /api/theatres` - Create theatre with automatic multilingual versions
+- `PUT /api/theatres/[id]` - Update specific theatre
+- `DELETE /api/theatres/[id]` - Delete specific theatre
+
+**Database Functions**:
+- `createTheatre()` - Create single theatre entry
+- `createTheatreWithTranslations()` - Create theatre in all languages with shared translation_group
+
+**Database Schema**:
+```sql
+Theatre {
+  id: number
+  name: string
+  city: string
+  country: string
+  description: string
+  history: string
+  website: string?
+  founded_year: number?
+  content_language: string
+  translation_group: string?
+  created_at: DateTime
+  updated_at: DateTime
+}
+```
+
+**Supported Languages**: English (en), Bulgarian (bg), Macedonian (mk), Serbian (sr)
+
+### 2. Shared Admin Access System
+
+**Features**:
+- No content ownership restrictions in database schema
+- All admin users can edit content created by any other admin
+- Role-based access control (admin and super_admin roles)
+- Authorization based on user roles, not content ownership
+- Consistent across all content types (theatres, news, about pages, contact pages)
+
+**Implementation**:
+- No `created_by`, `author_id`, or `user_id` fields in content tables
+- API endpoints check admin role via `hasAdminAccess()` helper function
+- Authorization header validation for admin operations
+- Shared content management across all admin users
+
+### 3. About Page Database Integration
 
 **Location**: `app/about/page.tsx`
 

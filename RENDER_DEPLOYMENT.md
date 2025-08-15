@@ -119,11 +119,11 @@ This guide will help you deploy the ActingEurope application on Render.com using
 
 ## Database Schema Overview
 
-The application includes these main data entities:
+The application includes these main data entities with multilingual support and shared admin access:
 
 ### Core Tables
-- **users**: User accounts and authentication
-- **theatres**: Theatre organizations and participants
+- **users**: User accounts and authentication with role-based access control (admin, super_admin)
+- **theatres**: Theatre organizations and participants with automatic multilingual creation
 - **theatre_images**: Images for theatre profiles
 - **theatre_tags**: Tags/categories for theatres
 - **venues**: Performance venues and spaces
@@ -132,9 +132,21 @@ The application includes these main data entities:
 - **events**: Performances, workshops, and discussions
 - **bookings**: User ticket bookings
 - **booked_seats**: Seat reservations
-- **news_articles**: News and announcements
+- **news_articles**: News and announcements with automatic multilingual creation
 - **about_pages**: Dynamic about page content with multi-language support
 - **contact_pages**: Dynamic contact page content with multi-language support
+
+### Multilingual Features
+- **Translation Groups**: Automatic linking of content across languages (English, Bulgarian, Macedonian, Serbian)
+- **Automatic Content Creation**: When creating theatres or news articles, versions are automatically created in all supported languages
+- **Language Navigation**: Admin interface provides easy navigation between language versions of grouped content
+- **Consistent Multilingual Pattern**: All content types follow the same translation group system
+
+### Shared Admin Access
+- **No Content Ownership**: Database schema does not include `created_by` or ownership fields
+- **Role-Based Authorization**: Access control based on user roles (admin/super_admin) rather than content ownership
+- **Universal Edit Access**: All admin users can edit content created by any other admin
+- **Consistent Across Content Types**: Shared access applies to theatres, news, about pages, and contact pages
 
 ## Troubleshooting
 
