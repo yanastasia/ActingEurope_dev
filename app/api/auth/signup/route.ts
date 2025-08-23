@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createUser, getUserByEmail } from '@/lib/database-operations'
+import { isAdminEmail } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,8 +23,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Determine user role based on email domain
+    const userRole = isAdminEmail(email) ? 'admin' : 'client'
+    
     // Create new user
-    const newUser = await createUser(email, password, firstName, lastName)
+    const newUser = await createUser(email, password, firstName, lastName, userRole)
     
     // Return success (without password hash)
     return NextResponse.json({

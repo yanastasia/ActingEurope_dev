@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Eye, EyeOff, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from "@/hooks/use-toast"
 import { clientAuth } from "@/lib/supabase-client"
 import { useLanguage } from "@/lib/language-context"
+import { isAdminEmail, setAuthenticated } from "@/lib/auth"
 
 interface SupabaseAuthFormProps {
   type: "login" | "signup"
@@ -18,6 +19,7 @@ interface SupabaseAuthFormProps {
 
 export function SupabaseAuthForm({ type }: SupabaseAuthFormProps) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { toast } = useToast()
   const { t } = useLanguage()
   const [isLoading, setIsLoading] = useState(false)
@@ -48,9 +50,12 @@ export function SupabaseAuthForm({ type }: SupabaseAuthFormProps) {
         }
 
         if (formData.password.length < 6) {
-          throw new Error("Password must be at least 6 characters")
+          throw new Error(t("passwordMustBe6Chars"))
         }
 
+        // Check if user is admin (skip email verification for admins)
+        const isAdmin = isAdminEmail(formData.email)
+        
         // Sign up with Supabase
         const { data, error } = await clientAuth.signUp(
           formData.email,
@@ -58,7 +63,8 @@ export function SupabaseAuthForm({ type }: SupabaseAuthFormProps) {
           {
             first_name: formData.name.split(' ')[0] || '',
             last_name: formData.name.split(' ').slice(1).join(' ') || '',
-            full_name: formData.name
+            full_name: formData.name,
+            is_admin: isAdmin
           }
         )
 
@@ -66,20 +72,41 @@ export function SupabaseAuthForm({ type }: SupabaseAuthFormProps) {
           throw new Error(error.message)
         }
 
-        if (data.user && !data.session) {
-          // Email confirmation required
-          setVerificationSent(true)
-          toast({
-            title: "Check your email",
-            description: "We've sent you a confirmation link to verify your account.",
-          })
-        } else if (data.session) {
-          // User is automatically signed in
-          toast({
-            title: "Account created successfully",
-            description: "Welcome to Acting Europe!",
-          })
-          router.push("/profile")
+        if (data.session) {
+          // User is automatically signed in (autoconfirm enabled)
+          const userRole = isAdmin ? "admin" : "user"
+          setAuthenticated(formData.email, userRole)
+          
+          if (isAdmin) {
+            toast({
+              title: t("accountCreatedSuccessfully"),
+              description: t("welcomeToActingEurope") + " " + t("asAdministrator"),
+            })
+            router.push("/admin")
+          } else {
+            toast({
+              title: t("accountCreatedSuccessfully"),
+              description: t("welcomeToActingEurope"),
+            })
+            router.push("/")
+          }
+        } else if (data.user && !data.session) {
+          // Email confirmation required (fallback for when autoconfirm is disabled)
+          if (isAdmin) {
+            // Admin users don't need email verification - redirect immediately
+            setAuthenticated(formData.email, "admin")
+            toast({
+              title: t("accountCreatedSuccessfully"),
+              description: t("welcomeToActingEurope") + " " + t("asAdministrator"),
+            })
+            router.push("/admin")
+          } else {
+            setVerificationSent(true)
+            toast({
+              title: t("checkEmailConfirmation"),
+              description: t("confirmationLinkSentDesc"),
+            })
+          }
         }
       } else {
         // Sign in with Supabase
@@ -93,18 +120,46 @@ export function SupabaseAuthForm({ type }: SupabaseAuthFormProps) {
         }
 
         if (data.session) {
-          toast({
-            title: "Welcome back!",
-            description: "You have been successfully signed in.",
+          // Set authentication state for login
+          const isAdminUser = isAdminEmail(formData.email)
+          const userRole = isAdminUser ? "admin" : "user"
+          
+          console.log('Login Debug:', {
+            email: formData.email,
+            isAdminUser,
+            userRole,
+            sessionUser: data.session.user.email
           })
-          router.push("/profile")
+          
+          setAuthenticated(formData.email, userRole)
+          
+          toast({
+            title: t("welcomeBack"),
+            description: t("signedInSuccessfully"),
+          })
+          
+          // Check for redirect parameter
+          const redirectTo = searchParams.get('redirectTo')
+          
+          // Redirect based on user role and redirect parameter
+          if (isAdminUser) {
+            console.log('Redirecting admin user to /admin')
+            // Dispatch custom event for admin page
+            window.dispatchEvent(new CustomEvent('user-logged-in'))
+            const adminRedirect = redirectTo && redirectTo.startsWith('/admin') ? redirectTo : '/admin'
+            router.push(adminRedirect)
+          } else {
+            console.log('Redirecting regular user to /', { redirectTo })
+            const userRedirect = redirectTo && !redirectTo.startsWith('/admin') ? redirectTo : '/'
+            router.push(userRedirect)
+          }
         }
       }
     } catch (error) {
       console.error("Auth error:", error)
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        title: t("error"),
+        description: error instanceof Error ? error.message : t("unexpectedError"),
         variant: "destructive",
       })
     } finally {
@@ -115,8 +170,8 @@ export function SupabaseAuthForm({ type }: SupabaseAuthFormProps) {
   const handleForgotPassword = async () => {
     if (!formData.email) {
       toast({
-        title: "Email required",
-        description: "Please enter your email address first.",
+        title: t("emailRequired"),
+        description: t("enterEmailFirst"),
         variant: "destructive",
       })
       return
@@ -129,13 +184,13 @@ export function SupabaseAuthForm({ type }: SupabaseAuthFormProps) {
       }
 
       toast({
-        title: "Password reset sent",
-        description: "Check your email for password reset instructions.",
+        title: t("passwordResetSent"),
+        description: t("checkEmailPasswordReset"),
       })
     } catch (error) {
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to send reset email",
+        title: t("error"),
+        description: error instanceof Error ? error.message : t("failedToSendReset"),
         variant: "destructive",
       })
     }
@@ -145,21 +200,21 @@ export function SupabaseAuthForm({ type }: SupabaseAuthFormProps) {
     return (
       <Card className="w-full max-w-md mx-auto">
         <CardHeader className="text-center">
-          <CardTitle>Check Your Email</CardTitle>
+          <CardTitle>{t("checkYourEmail")}</CardTitle>
           <CardDescription>
-            We've sent a confirmation link to {formData.email}
+            {t("confirmationLinkSent")} {formData.email}
           </CardDescription>
         </CardHeader>
         <CardContent className="text-center">
           <p className="text-sm text-muted-foreground mb-4">
-            Click the link in your email to verify your account and complete the signup process.
+            {t("clickLinkToVerify")}
           </p>
           <Button
             variant="outline"
             onClick={() => setVerificationSent(false)}
             className="w-full"
           >
-            Back to Sign Up
+            {t("backToSignUp")}
           </Button>
         </CardContent>
       </Card>
@@ -169,18 +224,18 @@ export function SupabaseAuthForm({ type }: SupabaseAuthFormProps) {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader className="text-center">
-        <CardTitle>{type === "login" ? "Sign In" : "Create Account"}</CardTitle>
+        <CardTitle>{type === "login" ? t("signIn") : t("createAccount")}</CardTitle>
         <CardDescription>
           {type === "login"
-            ? "Welcome back! Please sign in to your account."
-            : "Join Acting Europe to discover amazing performances."}
+            ? t("welcomeBackSignIn")
+            : t("joinActingEuropeDiscover")}
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
           {type === "signup" && (
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="name">{t("fullName")}</Label>
               <Input
                 id="name"
                 name="name"
@@ -188,12 +243,12 @@ export function SupabaseAuthForm({ type }: SupabaseAuthFormProps) {
                 value={formData.name}
                 onChange={handleChange}
                 required
-                placeholder="Enter your full name"
+                placeholder={t("enterFullName")}
               />
             </div>
           )}
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t("email")}</Label>
             <Input
               id="email"
               name="email"
@@ -201,11 +256,11 @@ export function SupabaseAuthForm({ type }: SupabaseAuthFormProps) {
               value={formData.email}
               onChange={handleChange}
               required
-              placeholder="Enter your email"
+              placeholder={t("enterYourEmail")}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t("password")}</Label>
             <div className="relative">
               <Input
                 id="password"
@@ -214,7 +269,7 @@ export function SupabaseAuthForm({ type }: SupabaseAuthFormProps) {
                 value={formData.password}
                 onChange={handleChange}
                 required
-                placeholder="Enter your password"
+                placeholder={t("enterYourPassword")}
                 minLength={6}
               />
               <Button
@@ -234,7 +289,7 @@ export function SupabaseAuthForm({ type }: SupabaseAuthFormProps) {
           </div>
           {type === "signup" && (
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">{t("confirmPassword")}</Label>
               <Input
                 id="confirmPassword"
                 name="confirmPassword"
@@ -242,7 +297,7 @@ export function SupabaseAuthForm({ type }: SupabaseAuthFormProps) {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 required
-                placeholder="Confirm your password"
+                placeholder={t("confirmYourPassword")}
                 minLength={6}
               />
             </div>
@@ -251,7 +306,7 @@ export function SupabaseAuthForm({ type }: SupabaseAuthFormProps) {
         <CardFooter className="flex flex-col space-y-4">
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {type === "login" ? "Sign In" : "Create Account"}
+            {type === "login" ? t("signIn") : t("createAccount")}
           </Button>
           
           {type === "login" && (
@@ -261,23 +316,23 @@ export function SupabaseAuthForm({ type }: SupabaseAuthFormProps) {
               onClick={handleForgotPassword}
               className="text-sm"
             >
-              Forgot your password?
+              {t("forgotPassword")}
             </Button>
           )}
           
           <div className="text-center text-sm">
             {type === "login" ? (
               <>
-                Don't have an account?{" "}
+                {t("dontHaveAccount")}{" "}
                 <Link href="/auth/signup" className="text-primary hover:underline">
-                  Sign up
+                  {t("signUp")}
                 </Link>
               </>
             ) : (
               <>
-                Already have an account?{" "}
+                {t("alreadyHaveAccount")}{" "}
                 <Link href="/auth/login" className="text-primary hover:underline">
-                  Sign in
+                  {t("signIn")}
                 </Link>
               </>
             )}

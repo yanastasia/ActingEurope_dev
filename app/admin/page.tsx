@@ -15,9 +15,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Calendar, Ticket, FileText, AlertTriangle, ShieldCheck, Trash2, MapPin, Info, Phone, Building, Edit } from "lucide-react"
-import { isAdmin } from "@/lib/auth"
+import { isAdmin, isAdminEmail } from "@/lib/auth"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/lib/language-context"
+import { useAuth } from "@/components/providers/supabase-auth-provider"
 // Event type definition
 interface Event {
   id: string
@@ -108,6 +109,7 @@ export default function AdminPage() {
   const router = useRouter()
   const { toast } = useToast()
   const { t } = useLanguage()
+  const { user, session, loading: authLoading } = useAuth()
   const [isLoading, setIsLoading] = useState(true)
   const [authorized, setAuthorized] = useState(false)
   const [adminEmail, setAdminEmail] = useState("")
@@ -226,22 +228,41 @@ export default function AdminPage() {
   }, [events, selectedLanguage])
 
   useEffect(() => {
-    // Check if user is admin
-    if (typeof window !== "undefined") {
-      const adminStatus = isAdmin()
-      setAuthorized(adminStatus)
-
-      // Get admin email for display
-      setAdminEmail(localStorage.getItem("actingEurope_userEmail") || "")
-
-      setIsLoading(false)
-
-      // Redirect non-admin users
-      if (!adminStatus) {
-        router.push("/auth/login")
-      }
+    // Wait for auth provider to finish loading
+    if (authLoading) {
+      return
     }
-  }, [router])
+
+    // Check if user is authenticated and is admin
+    if (!user || !session) {
+      // User is not logged in
+      console.log('No user session, redirecting to login')
+      router.push("/auth/login?redirectTo=%2Fadmin")
+      return
+    }
+
+    // Check if user is admin based on email
+    const userEmail = user.email || ""
+    const isAdminUser = isAdminEmail(userEmail)
+    
+    console.log('Admin check:', { 
+      userEmail, 
+      isAdminUser, 
+      hasSession: !!session 
+    })
+    
+    if (!isAdminUser) {
+      // User is logged in but not admin
+      console.log('User is not admin, redirecting to home')
+      router.push("/")
+      return
+    }
+
+    // User is authenticated and is admin
+    setAuthorized(true)
+    setAdminEmail(userEmail)
+    setIsLoading(false)
+  }, [user, session, authLoading, router])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target
@@ -1011,7 +1032,7 @@ export default function AdminPage() {
     })
   }
 
-  if (isLoading) {
+  if (isLoading || authLoading) {
     return (
       <div className="container flex min-h-[calc(100vh-4rem)] items-center justify-center">
         <div className="flex flex-col items-center">

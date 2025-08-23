@@ -19,6 +19,7 @@ import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/components/providers/supabase-auth-provider"
 import LanguageSwitcher from "@/components/language-switcher"
 import { useLanguage } from "@/lib/language-context"
+import { isAdminEmail } from "@/lib/auth"
 
 export default function Navigation() {
   const pathname = usePathname()
@@ -38,8 +39,8 @@ export default function Navigation() {
     { href: "/contact", labelKey: "contact" },
   ]
 
-  // Check if user is admin based on user metadata
-  const userIsAdmin = user?.user_metadata?.role === 'admin' || user?.app_metadata?.role === 'admin'
+  // Check if user is admin based on email domain
+  const userIsAdmin = user?.email ? isAdminEmail(user.email) : false
 
   const handleLogout = async () => {
     try {

@@ -11,7 +11,7 @@ import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/lib/language-context"
-import { isAuthenticated, logout, getUserEmail } from "@/lib/auth"
+import { useAuth } from "@/components/providers/supabase-auth-provider"
 import { Calendar, Clock, MapPin, Ticket, Settings, User, Heart } from "lucide-react"
 
 interface UserProfile {
@@ -37,6 +37,7 @@ export default function ProfilePage() {
   const router = useRouter()
   const { toast } = useToast()
   const { t } = useLanguage()
+  const { user, signOut, loading: authLoading } = useAuth()
   const [isLoading, setIsLoading] = useState(true)
   const [profile, setProfile] = useState<UserProfile>({
     email: "",
@@ -53,19 +54,25 @@ export default function ProfilePage() {
 
   useEffect(() => {
     // Check authentication
-    if (!isAuthenticated()) {
+    if (!authLoading && !user) {
       router.push("/auth/login")
       return
     }
 
     // Load user profile
-    const userEmail = getUserEmail()
-    if (userEmail) {
-      setProfile(prev => ({ ...prev, email: userEmail }))
+    if (user?.email) {
+      setProfile(prev => ({ 
+        ...prev, 
+        email: user.email || '',
+        firstName: user.user_metadata?.first_name || '',
+        lastName: user.user_metadata?.last_name || ''
+      }))
     }
 
-    setIsLoading(false)
-  }, [router])
+    if (!authLoading) {
+      setIsLoading(false)
+    }
+  }, [router, user, authLoading])
 
   const handleSaveProfile = async () => {
     setIsSaving(true)
@@ -88,16 +95,24 @@ export default function ProfilePage() {
     }
   }
 
-  const handleLogout = () => {
-    logout()
-    toast({
-      title: t("loggedOutSuccessfully"),
-      description: t("loggedOutSuccessfullyDesc")
-    })
-    router.push("/")
+  const handleLogout = async () => {
+    try {
+      await signOut()
+      toast({
+        title: t("loggedOutSuccessfully"),
+        description: t("loggedOutSuccessfullyDesc")
+      })
+      router.push("/")
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to sign out. Please try again.",
+        variant: "destructive"
+      })
+    }
   }
 
-  if (isLoading) {
+  if (isLoading || authLoading) {
     return (
       <div className="container mx-auto px-4 py-12">
         <div className="text-center">

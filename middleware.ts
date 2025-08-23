@@ -25,9 +25,23 @@ export async function middleware(request: NextRequest) {
     }
   )
 
+  // Refresh session to ensure we have the latest user data
+  const { data: { session } } = await supabase.auth.getSession()
+  
   const {
     data: { user },
   } = await supabase.auth.getUser()
+  
+  // Debug logging
+  if (request.nextUrl.pathname.startsWith('/admin')) {
+    console.log('Middleware Debug:', {
+      pathname: request.nextUrl.pathname,
+      hasUser: !!user,
+      hasSession: !!session,
+      userEmail: user?.email,
+      cookies: request.cookies.getAll().map(c => c.name)
+    })
+  }
 
   // Protected routes that require authentication
   const protectedRoutes = [
@@ -57,9 +71,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl)
   }
 
-  // Redirect to profile if accessing auth routes while authenticated
+  // Redirect authenticated users away from auth routes
   if (isAuthRoute && user) {
-    return NextResponse.redirect(new URL('/profile', request.url))
+    // Check if user is admin based on email
+    const isAdmin = user.email?.endsWith('@actingeurope.eu') || user.email?.endsWith('@admin.actingeurope.eu')
+    const redirectUrl = isAdmin ? '/admin' : '/profile'
+    return NextResponse.redirect(new URL(redirectUrl, request.url))
   }
 
   return response

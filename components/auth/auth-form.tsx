@@ -77,25 +77,42 @@ export function AuthForm({ type }: AuthFormProps) {
           throw new Error(result.error || 'Signup failed')
         }
 
-        // Send verification email
-        const verificationToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-        const verificationResult = await sendVerificationEmailAction(formData.email, verificationToken)
+        const user = result.user
 
-        if (!verificationResult.success) {
-          throw new Error("Failed to send verification email. Please try again.")
-        }
+        // Check if user is admin (skip email verification for admins)
+        if (isAdminEmail(formData.email)) {
+          // Admin users don't need email verification - log them in immediately
+          setAuthenticated(user.email, user.isAdmin ? 'admin' : 'user')
 
-        // Show verification sent message
-        setVerificationSent(true)
+          toast({
+            title: "Account created successfully",
+            description: "Welcome to Acting Europe as Administrator!",
+          })
 
-        toast({
-          title: "Verification email sent",
-          description: "Please check your email to verify your account.",
-        })
+          // Redirect admin to admin panel
+          router.push("/admin")
+          return
+        } else {
+          // Regular users need email verification
+          const verificationToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+          const verificationResult = await sendVerificationEmailAction(formData.email, verificationToken)
 
-        // Do not log in immediately after signup; wait for email verification
-        router.push("/verify-email")
-        return  
+          if (!verificationResult.success) {
+            throw new Error("Failed to send verification email. Please try again.")
+          }
+
+          // Show verification sent message
+          setVerificationSent(true)
+
+          toast({
+            title: "Verification email sent",
+            description: "Please check your email to verify your account.",
+          })
+
+          // Do not log in immediately after signup; wait for email verification
+          router.push("/verify-email")
+          return
+        }  
       } else {
         // Login flow - call API
         const response = await fetch('/api/auth/login', {

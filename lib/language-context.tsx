@@ -132,6 +132,59 @@ const translations = {
 
     // Registration
     signupDisclaimer: "By signing up, you agree to receive promotional emails from Acting Europe.",
+    
+    // Auth Form
+    checkYourEmail: "Check Your Email",
+    confirmationLinkSent: "We've sent a confirmation link to",
+    clickLinkToVerify: "Click the link in your email to verify your account and complete the signup process.",
+    backToSignUp: "Back to Sign Up",
+    welcomeBackSignIn: "Welcome back! Please sign in to your account.",
+    joinActingEuropeDiscover: "Join Acting Europe to discover amazing performances.",
+    enterFullName: "Enter your full name",
+    enterYourEmail: "Enter your email",
+    enterYourPassword: "Enter your password",
+    confirmYourPassword: "Confirm your password",
+    
+    // Toast Messages
+    checkEmailConfirmation: "Check your email",
+    confirmationLinkSentDesc: "We've sent you a confirmation link to verify your account.",
+    accountCreatedSuccessfully: "Account created successfully",
+    welcomeToActingEurope: "Welcome to Acting Europe!",
+    signedInSuccessfully: "You have been successfully signed in.",
+    emailRequired: "Email required",
+    enterEmailFirst: "Please enter your email address first.",
+    passwordResetSent: "Password reset sent",
+    checkEmailPasswordReset: "Check your email for password reset instructions.",
+    failedToSendReset: "Failed to send reset email",
+    passwordMustBe6Chars: "Password must be at least 6 characters",
+    unexpectedError: "An unexpected error occurred",
+
+    // Email Verification Page
+    emailVerification: "Email Verification",
+    verifyingEmailAddress: "Verifying your email address...",
+    emailHasBeenVerified: "Your email has been verified",
+    verificationFailed: "Verification failed",
+    pleaseWaitVerifying: "Please wait while we verify your email address...",
+    emailSuccessfullyVerified: "Your email address has been successfully verified!",
+    accessAllFeatures: "You can now access all features of the Acting Europe platform.",
+    verificationFailedMessage: "Verification failed",
+    pleaseWait: "Please wait...",
+    goToYourProfile: "Go to Your Profile",
+    returnToSignUp: "Return to Sign Up",
+    noVerificationToken: "No verification token provided",
+    verificationFailedGeneric: "Verification failed",
+    errorDuringVerification: "An error occurred during verification",
+
+    // Authentication Error Page
+    authenticationError: "Authentication Error",
+    authLinkProblem: "There was a problem with your authentication link.",
+    authLinkExpiredOrUsed: "The authentication link you clicked may have expired or been used already.",
+    thisCanHappenIf: "This can happen if:",
+    linkOlderThan24Hours: "The link is older than 24 hours",
+    alreadyUsedLink: "You've already used this link to verify your email",
+    linkCorrupted: "The link was corrupted during transmission",
+    trySigningUpAgain: "Try Signing Up Again",
+    signInInstead: "Sign In Instead",
 
     // Venues
     mainStage: "Main Stage",
@@ -342,7 +395,6 @@ const translations = {
     yourName: "Your Name",
     enterYourName: "Enter your name",
     yourEmail: "Your Email",
-    enterYourEmail: "Enter your email address",
     subject: "Subject",
     enterSubject: "Enter subject",
     message: "Message",
@@ -692,6 +744,60 @@ const translations = {
 
     // Registration
     signupDisclaimer: "Регистрирайки се, вие се съгласявате да получавате промоционални имейли от Актинг Европа.",
+    
+    // Auth Form
+    checkYourEmail: "Проверете имейла си",
+    confirmationLinkSent: "Изпратихме връзка за потвърждение до",
+    clickLinkToVerify: "Кликнете върху връзката в имейла си, за да потвърдите акаунта си и да завършите процеса на регистрация.",
+    backToSignUp: "Обратно към регистрацията",
+    welcomeBackSignIn: "Добре дошли отново! Моля, влезте в акаунта си.",
+    joinActingEuropeDiscover: "Присъединете се към Актинг Европа, за да откриете невероятни представления.",
+    enterFullName: "Въведете пълното си име",
+    enterYourPassword: "Въведете паролата си",
+    confirmYourPassword: "Потвърдете паролата си",
+    forgotPassword: "Забравили сте паролата си?",
+    
+    // Toast Messages
+    checkEmailConfirmation: "Проверете имейла си",
+    confirmationLinkSentDesc: "Изпратихме ви връзка за потвърждение, за да потвърдите акаунта си.",
+    accountCreatedSuccessfully: "Акаунтът е създаден успешно",
+    welcomeToActingEurope: "Добредошли в Актинг Европа!",
+
+    signedInSuccessfully: "Успешно влязохте в системата.",
+    emailRequired: "Имейлът е задължителен",
+    enterEmailFirst: "Моля, първо въведете имейл адреса си.",
+    passwordResetSent: "Изпратена е заявка за нулиране на паролата",
+    checkEmailPasswordReset: "Проверете имейла си за инструкции за нулиране на паролата.",
+    failedToSendReset: "Неуспешно изпращане на имейл за нулиране",
+    passwordMustBe6Chars: "Паролата трябва да бъде поне 6 символа",
+    unexpectedError: "Възникна неочаквана грешка",
+
+    // Email Verification Page
+    emailVerification: "Потвърждение на имейл",
+    verifyingEmailAddress: "Потвърждаваме имейл адреса ви...",
+    emailHasBeenVerified: "Имейлът ви е потвърден",
+    verificationFailed: "Потвърждението неуспешно",
+    pleaseWaitVerifying: "Моля, изчакайте, докато потвърдим имейл адреса ви...",
+    emailSuccessfullyVerified: "Имейл адресът ви е успешно потвърден!",
+    accessAllFeatures: "Сега можете да достъпите всички функции на платформата Acting Europe.",
+    verificationFailedMessage: "Потвърждението неуспешно",
+    pleaseWait: "Моля, изчакайте...",
+    goToYourProfile: "Отидете към профила си",
+    returnToSignUp: "Върнете се към регистрацията",
+    noVerificationToken: "Не е предоставен токен за потвърждение",
+    verificationFailedGeneric: "Потвърждението неуспешно",
+    errorDuringVerification: "Възникна грешка по време на потвърждението",
+
+    // Authentication Error Page
+    authenticationError: "Грешка при удостоверяване",
+    authLinkProblem: "Възникна проблем с вашата връзка за удостоверяване.",
+    authLinkExpiredOrUsed: "Връзката за удостоверяване, на която кликнахте, може да е изтекла или вече да е използвана.",
+    thisCanHappenIf: "Това може да се случи, ако:",
+    linkOlderThan24Hours: "Връзката е по-стара от 24 часа",
+    alreadyUsedLink: "Вече сте използвали тази връзка за потвърждение на имейла си",
+    linkCorrupted: "Връзката е повредена по време на предаването",
+    trySigningUpAgain: "Опитайте да се регистрирате отново",
+    signInInstead: "Влезте вместо това",
   },
   mk: {
     // Navigation
@@ -1031,6 +1137,61 @@ const translations = {
 
     // Registration
     signupDisclaimer: "Со регистрирањето, се согласувате да примате промотивни е-маили од Актинг Европа.",
+    
+    // Auth Form
+    checkYourEmail: "Проверете го вашиот е-маил",
+    confirmationLinkSent: "Испративме врска за потврда до",
+    clickLinkToVerify: "Кликнете на врската во вашиот е-маил за да ја потврдите сметката и да го завршите процесот на регистрација.",
+    backToSignUp: "Назад кон регистрацијата",
+    welcomeBackSignIn: "Добредојдовте назад! Ве молиме најавете се во вашата сметка.",
+    joinActingEuropeDiscover: "Придружете се на Актинг Европа за да откријте неверојатни претстави.",
+    enterFullName: "Внесете го вашето полно име",
+    enterYourPassword: "Внесете ја вашата лозинка",
+    confirmYourPassword: "Потврдете ја вашата лозинка",
+    forgotPassword: "Ја заборавивте лозинката?",
+
+    
+    // Toast Messages
+    checkEmailConfirmation: "Проверете го вашиот е-маил",
+    confirmationLinkSentDesc: "Ви испративме врска за потврда за да ја потврдите вашата сметка.",
+    accountCreatedSuccessfully: "Сметката е успешно создадена",
+    welcomeToActingEurope: "Добредојдовте во Актинг Европа!",
+
+    signedInSuccessfully: "Успешно се најавивте.",
+    emailRequired: "Е-маилот е задолжителен",
+    enterEmailFirst: "Ве молиме прво внесете ја вашата е-маил адреса.",
+    passwordResetSent: "Испратена е заявка за ресетирање на лозинката",
+    checkEmailPasswordReset: "Проверете го вашиот е-маил за инструкции за ресетирање на лозинката.",
+    failedToSendReset: "Неуспешно испраќање на е-маил за ресетирање",
+    passwordMustBe6Chars: "Лозинката мора да биде најмалку 6 карактери",
+    unexpectedError: "Се случи неочекувана грешка",
+
+    // Email Verification Page
+    emailVerification: "Потврда на е-маил",
+    verifyingEmailAddress: "Ја потврдуваме вашата е-маил адреса...",
+    emailHasBeenVerified: "Вашиот е-маил е потврден",
+    verificationFailed: "Потврдата неуспешна",
+    pleaseWaitVerifying: "Ве молиме почекајте додека ја потврдуваме вашата е-маил адреса...",
+    emailSuccessfullyVerified: "Вашата е-маил адреса е успешно потврдена!",
+    accessAllFeatures: "Сега можете да пристапите до сите функции на платформата Acting Europe.",
+    verificationFailedMessage: "Потврдата неуспешна",
+    pleaseWait: "Ве молиме почекајте...",
+    goToYourProfile: "Одете до вашиот профил",
+    returnToSignUp: "Вратете се кон регистрацијата",
+    noVerificationToken: "Не е обезбеден токен за потврда",
+    verificationFailedGeneric: "Потврдата неуспешна",
+    errorDuringVerification: "Се случи грешка при потврдата",
+
+    // Authentication Error Page
+    authenticationError: "Грешка при автентификација",
+    authLinkProblem: "Се појави проблем со вашиот лин за автентификација.",
+    authLinkExpiredOrUsed: "Линкот за автентификација на кој кликнавте можеби е истечен или веќе е искористен.",
+    thisCanHappenIf: "Ова може да се случи ако:",
+    linkOlderThan24Hours: "Линкот е постар од 24 часа",
+    alreadyUsedLink: "Веќе го имате искористено овој линк за потврда на вашиот е-маил",
+    linkCorrupted: "Линкот е оштетен при пренесувањето",
+    trySigningUpAgain: "Обидете се да се регистрирате повторно",
+    signInInstead: "Најавете се наместо тоа",
   },
   sr: {
     // Navigation
@@ -1371,6 +1532,59 @@ const translations = {
 
     // Registration
     signupDisclaimer: "Регистровањем се слажете да примате промотивне имејлове од Актинг Европе.",
+    
+    // Auth Form
+    checkYourEmail: "Проверите ваш е-маил",
+    confirmationLinkSent: "Послали смо везу за потврду на",
+    clickLinkToVerify: "Кликните на везу у вашем е-маилу да потврдите налог и завршите процес регистрације.",
+    backToSignUp: "Назад на регистрацију",
+    welcomeBackSignIn: "Добродошли назад! Молимо пријавите се на ваш налог.",
+    joinActingEuropeDiscover: "Придружите се Актинг Европи да откријете невероватне представе.",
+    enterFullName: "Унесите ваше пуно име",
+    enterYourPassword: "Унесите вашу лозинку",
+    confirmYourPassword: "Потврдите вашу лозинку",
+    forgotPassword: "Заборавили сте лозинку?",
+    
+    // Toast Messages
+    checkEmailConfirmation: "Проверите ваш е-маил",
+    confirmationLinkSentDesc: "Послали смо вам везу за потврду да потврдите ваш налог.",
+    accountCreatedSuccessfully: "Налог је успешно направљен",
+    welcomeToActingEurope: "Добродошли у Актинг Европу!",
+    signedInSuccessfully: "Успешно сте се пријавили.",
+    emailRequired: "Е-маил је обавезан",
+    enterEmailFirst: "Молимо прво унесите вашу е-маил адресу.",
+    passwordResetSent: "Послат је захтев за ресетовање лозинке",
+    checkEmailPasswordReset: "Проверите ваш е-маил за инструкције за ресетовање лозинке.",
+    failedToSendReset: "Неуспешно слање е-маила за ресетовање",
+    passwordMustBe6Chars: "Лозинка мора имати најмање 6 карактера",
+    unexpectedError: "Догодила се неочекивана грешка",
+
+    // Email Verification Page
+    emailVerification: "Потврда е-маила",
+    verifyingEmailAddress: "Потврђујемо вашу е-маил адресу...",
+    emailHasBeenVerified: "Ваш е-маил је потврђен",
+    verificationFailed: "Потврда неуспешна",
+    pleaseWaitVerifying: "Молимо сачекајте док потврђујемо вашу е-маил адресу...",
+    emailSuccessfullyVerified: "Ваша е-маил адреса је успешно потврђена!",
+    accessAllFeatures: "Сада можете приступити свим функцијама платформе Acting Europe.",
+    verificationFailedMessage: "Потврда неуспешна",
+    pleaseWait: "Молимо сачекајте...",
+    goToYourProfile: "Идите на ваш профил",
+    returnToSignUp: "Вратите се на регистрацију",
+    noVerificationToken: "Није обезбеђен токен за потврду",
+    verificationFailedGeneric: "Потврда неуспешна",
+    errorDuringVerification: "Догодила се грешка током потврде",
+
+    // Authentication Error Page
+    authenticationError: "Грешка при аутентификацији",
+    authLinkProblem: "Дошло је до проблема са вашом везом за аутентификацију.",
+    authLinkExpiredOrUsed: "Веза за аутентификацију на коју сте кликнули можда је истекла или је већ коришћена.",
+    thisCanHappenIf: "Ово се може десити ако:",
+    linkOlderThan24Hours: "Веза је старија од 24 сата",
+    alreadyUsedLink: "Већ сте користили ову везу за потврду вашег е-маила",
+    linkCorrupted: "Веза је оштећена током преноса",
+    trySigningUpAgain: "Покушајте поново да се региструјете",
+    signInInstead: "Пријавите се уместо тога",
   },
 }
 

@@ -5,40 +5,40 @@ const { v4: uuidv4 } = require('uuid');
 // Theatre mappings by language (using actual database IDs)
 const theatreMap = {
   'Macedonian National Theatre': {
-    en: 160, // "Ivan Vazov" National Theatre [EN] (fallback)
-    mk: 150, // Македонски национален театар [MK]
-    bg: 149, // Македонски национален театър [BG]
-    sr: 151  // Македонски национални театар [SR]
+    en: 170, // Народен театър "Иван Вазов" [BG] (fallback)
+    mk: 174, // Македонски национален театар [MK]
+    bg: 173, // Македонски национален театър [BG]
+    sr: 175  // Македонско национално позориште [SR]
   },
   'National Theatre in Niš': {
-    en: 160, // "Ivan Vazov" National Theatre [EN] (fallback)
-    mk: 141, // Национален театар во Ниш [MK]
-    bg: 140, // Национален театър в Ниш [BG]
-    sr: 142  // Народно позориште у Нишу [SR]
+    en: 170, // Народен театър "Иван Вазов" [BG] (fallback)
+    mk: 177, // Национален театар во Ниш [MK]
+    bg: 176, // Национален театър в Ниш [BG]
+    sr: 178  // Народно позориште у Нишу [SR]
   },
   '"Ivan Vazov" National Theatre': {
-    en: 160,  // "Ivan Vazov" National Theatre [EN]
-    mk: 154, // "Ivan Vazov" National Theatre [MK]
-    bg: 153, // "Иван Вазов" Национален Театър [BG]
-    sr: 155  // "Ivan Vazov" National Theatre [SR]
+    en: 170,  // Народен театър "Иван Вазов" [BG]
+    mk: 171, // Народен театар "Иван Вазов" [MK]
+    bg: 170, // Народен театър "Иван Вазов" [BG]
+    sr: 172  // Народно позориште "Иван Вазов" [SR]
   },
   'OSAIK "39 Monkeys"': {
-    en: 160, // "Ivan Vazov" National Theatre [EN] (fallback)
-    mk: 144, // ОСАИК "39 Мајмуни" [MK]
-    bg: 143, // ОСАИК "39 Маймуни" [BG]
-    sr: 145  // ОСАИК "39 Мајмуна" [SR]
+    en: 170, // Народен театър "Иван Вазов" [BG] (fallback)
+    mk: 180, // ОСАИК "39 Мајмуни" [MK]
+    bg: 179, // ОСАИК "39 Маймуни" [BG]
+    sr: 181  // ОСАИК "39 Мајмуна" [SR]
   },
   'Intimate Theatre Bitola': {
-    en: 160, // "Ivan Vazov" National Theatre [EN] (fallback)
-    mk: 147, // Интимен театар Битола [MK]
-    bg: 146, // Интимен театър Битоља [BG]
-    sr: 148  // Интимни театар Битоља [SR]
+    en: 170, // Народен театър "Иван Вазов" [BG] (fallback)
+    mk: 183, // Интимен театар Битола [MK]
+    bg: 182, // Интимен театър Битоља [BG]
+    sr: 184  // Интимни театар Битоља [SR]
   },
   'Drama Theatre "Krum Kyulyavkov"': {
-    en: 160, // "Ivan Vazov" National Theatre [EN] (fallback)
-    mk: 135, // Драмски театар "Крум Кјуљавков" [MK]
-    bg: 134, // Драматичен театър "Крум Кюлявков" [BG]
-    sr: 136  // Драмски театар "Крум Кјуљавков" [SR]
+    en: 170, // Народен театър "Иван Вазов" [BG] (fallback)
+    mk: 168, // Драмски театар Кјустендил [MK]
+    bg: 167, // Драматичен театър Кюстендил [BG]
+    sr: 169  // Драмски театар Кјустендил [SR]
   }
 };
 
@@ -152,13 +152,13 @@ function getCompanyNames(performance, language) {
 
 // Add venue mapping after theatreMap
 const venueMap = {
-  'Main Stage': 6,
-  'Chamber Stage': 7
+  'Main Stage': 8,
+  'Chamber Stage': 9
 };
 
 // Function to get venue ID from venue name
 function getVenueId(venueName) {
-  return venueMap[venueName] || 28; // Default to Main Stage if not found
+  return venueMap[venueName] || 8; // Default to Main Stage if not found
 }
 
 async function resetEventsFromPerformanceData() {
