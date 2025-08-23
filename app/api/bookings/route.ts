@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { isAdmin } from '@/lib/auth';
-
-const prisma = new PrismaClient();
 
 // Generate unique booking reference
 function generateBookingReference(): string {

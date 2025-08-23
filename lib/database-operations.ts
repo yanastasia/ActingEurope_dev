@@ -1315,7 +1315,7 @@ export const updateEvent = async (id: number, updatedFields: any): Promise<Event
        performanceLanguage: event.performance_language ? event.performance_language.split(',').map(lang => lang.trim()) : null,
        subtitleLanguage: event.subtitle_language ? event.subtitle_language.split(',').map(lang => lang.trim()) : null,
        genre: event.genre,
-       company: Array.isArray(event.company) ? event.company : (event.company ? event.company.split(',').map(comp => comp.trim()) : []),
+       company: Array.isArray(event.company) ? event.company : (event.company ? (event.company as string).split(',').map(comp => comp.trim()) : []),
        director: event.director,
        cast: event.cast,
        synopsis: event.synopsis,
