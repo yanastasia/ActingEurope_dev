@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { Suspense } from "react"
-import { AuthForm } from "@/components/auth/auth-form"
+import { SupabaseAuthForm } from "@/components/auth/supabase-auth-form"
 import { useLanguage } from "@/lib/language-context"
 
 export default function SignupPage() {
@@ -16,7 +16,7 @@ export default function SignupPage() {
       </div>
 
       <Suspense fallback={<div>{t('loading')}...</div>}>
-        <AuthForm type="signup" />
+        <SupabaseAuthForm type="signup" />
       </Suspense>
 
       <div className="mt-8 text-center text-sm text-muted-foreground">

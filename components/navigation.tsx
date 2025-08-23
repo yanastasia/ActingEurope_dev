@@ -16,7 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useToast } from "@/hooks/use-toast"
-import { isAuthenticated, isAdmin, clearAuthentication } from "@/lib/auth"
+import { useAuth } from "@/components/providers/supabase-auth-provider"
 import LanguageSwitcher from "@/components/language-switcher"
 import { useLanguage } from "@/lib/language-context"
 
@@ -25,9 +25,8 @@ export default function Navigation() {
   const router = useRouter()
   const { toast } = useToast()
   const { t } = useLanguage()
+  const { user, signOut, loading } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [userIsAdmin, setUserIsAdmin] = useState(false)
 
   // Define routes with translation keys
   const routes = [
@@ -39,41 +38,23 @@ export default function Navigation() {
     { href: "/contact", labelKey: "contact" },
   ]
 
-  // Check if user is logged in when component mounts
-  useEffect(() => {
-    const checkLoginStatus = () => {
-      setIsLoggedIn(isAuthenticated())
-      setUserIsAdmin(isAdmin())
+  // Check if user is admin based on user metadata
+  const userIsAdmin = user?.user_metadata?.role === 'admin' || user?.app_metadata?.role === 'admin'
+
+  const handleLogout = async () => {
+    try {
+      await signOut()
+      toast({
+        title: t("loggedOutSuccessfully"),
+        description: t("loggedOutSuccessfullyDesc"),
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to sign out. Please try again.",
+        variant: "destructive",
+      })
     }
-
-    checkLoginStatus()
-
-    // Set up event listeners for login/logout events
-    const handleLogin = () => {
-      checkLoginStatus()
-    }
-
-    const handleLogout = () => {
-      setIsLoggedIn(false)
-      setUserIsAdmin(false)
-    }
-
-    window.addEventListener("user-logged-in", handleLogin)
-    window.addEventListener("user-logged-out", handleLogout)
-
-    return () => {
-      window.removeEventListener("user-logged-in", handleLogin)
-      window.removeEventListener("user-logged-out", handleLogout)
-    }
-  }, [pathname])
-
-  const handleLogout = () => {
-    clearAuthentication()
-    toast({
-      title: t("loggedOutSuccessfully"),
-      description: t("loggedOutSuccessfullyDesc"),
-    })
-    router.push("/")
   }
 
   const navigateToProfile = (tab?: string) => {
@@ -156,7 +137,7 @@ export default function Navigation() {
           <nav className="flex items-center gap-2">
             <LanguageSwitcher />
 
-            {isLoggedIn ? (
+            {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild data-dropdown-trigger="user-menu">
                   <Button variant="ghost" size="icon" className="ml-2">
