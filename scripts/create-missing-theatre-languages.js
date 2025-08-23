@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 // Theatre translations for different languages
 const theatreTranslations = {
   bg: {
-    'Drama Theatre "Krum Kyulyavkov"': 'Драматичен театър "Крум Кюлявков"',
+    'Drama Theatre Kyustendil': 'Драматичен театър Кюстендил',
     'Macedonian National Theatre': 'Македонски национален театър',
     'National Theatre in Niš': 'Национален театър в Ниш',
     'OSAIK "39 Monkeys"': 'ОСАИК "39 Маймуни"',
@@ -13,7 +13,7 @@ const theatreTranslations = {
     'Virtual Booking Theatre': 'Виртуален театър за резервации'
   },
   mk: {
-    'Drama Theatre "Krum Kyulyavkov"': 'Драмски театар "Крум Кјуљавков"',
+    'Drama Theatre Kyustendil': 'Драмски театар Кјустендил',
     'Macedonian National Theatre': 'Македонски национален театар',
     'National Theatre in Niš': 'Национален театар во Ниш',
     'OSAIK "39 Monkeys"': 'ОСАИК "39 Мајмуни"',
@@ -21,7 +21,7 @@ const theatreTranslations = {
     'Virtual Booking Theatre': 'Виртуелен театар за резервации'
   },
   sr: {
-    'Drama Theatre "Krum Kyulyavkov"': 'Драмски театар "Крум Кјуљавков"',
+    'Drama Theatre Kyustendil': 'Драмски театар Кјустендил',
     'Macedonian National Theatre': 'Македонски национални театар',
     'National Theatre in Niš': 'Народно позориште у Нишу',
     'OSAIK "39 Monkeys"': 'ОСАИК "39 Мајмуна"',
@@ -32,7 +32,7 @@ const theatreTranslations = {
 
 const descriptionTranslations = {
   bg: {
-    'Drama Theatre "Krum Kyulyavkov"': 'Известен регионален театър, познат със своите иновативни постановки и ангажимент към българското драматично изкуство.',
+    'Drama Theatre Kyustendil': 'Известен регионален театър, познат със своите иновативни постановки и ангажимент към българското драматично изкуство.',
     'Macedonian National Theatre': 'Водещият национален театър на Македония, представящ класически и съвременни произведения.',
     'National Theatre in Niš': 'Престижен театър в Сърбия, известен със своите драматични постановки.',
     'OSAIK "39 Monkeys"': 'Съвременна театрална трупа, специализираща се в експериментални представления.',
@@ -40,7 +40,7 @@ const descriptionTranslations = {
     'Virtual Booking Theatre': 'Виртуален театър за демонстрация на системата за резервации.'
   },
   mk: {
-    'Drama Theatre "Krum Kyulyavkov"': 'Познат регионален театар, познат по своите иновативни постановки и посветеност на драмското искуство.',
+    'Drama Theatre Kyustendil': 'Познат регионален театар, познат по своите иновативни постановки и посветеност на драмското искуство.',
     'Macedonian National Theatre': 'Водечкиот национален театар на Македонија, претставувајќи класични и современи дела.',
     'National Theatre in Niš': 'Престижен театар во Србија, познат по своите драмски постановки.',
     'OSAIK "39 Monkeys"': 'Современа театарска трупа, специјализирана за експериментални претстави.',
@@ -48,7 +48,7 @@ const descriptionTranslations = {
     'Virtual Booking Theatre': 'Виртуелен театар за демонстрација на системот за резервации.'
   },
   sr: {
-    'Drama Theatre "Krum Kyulyavkov"': 'Познати регионални театар, познат по својим иновативним поставкама и посвећености драмској уметности.',
+    'Drama Theatre Kyustendil': 'Познати регионални театар, познат по својим иновативним поставкама и посвећености драмској уметности.',
     'Macedonian National Theatre': 'Водећи национални театар Македоније, представљајући класична и савремена дела.',
     'National Theatre in Niš': 'Престижни театар у Србији, познат по својим драмским поставкама.',
     'OSAIK "39 Monkeys"': 'Савремена позоришна трупа, специјализована за експерименталне представе.',

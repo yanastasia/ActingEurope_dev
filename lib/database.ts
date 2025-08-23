@@ -117,13 +117,13 @@ export const users = Users;
 export const Theatres: Theatre[] = [
   {
     id: 1,
-    name: 'Drama Theatre "Krum Kyulyavkov"',
+    name: 'Drama Theatre Kyustendil',
     city: "Kyustendil",
     country: "Bulgaria",
     description:
       "A prominent regional theatre known for its innovative productions and commitment to Bulgarian dramatic arts.",
     history:
-      "Founded in the mid-20th century, the theatre has been a cultural cornerstone of Kyustendil, presenting both classical and contemporary works while nurturing local talent. The theatre was named after Krum Kyulyavkov, a celebrated Bulgarian actor and director who significantly contributed to the development of Bulgarian theatre. Over the decades, it has maintained its reputation for artistic excellence and community engagement.",
+      "Founded in the mid-20th century, the theatre has been a cultural cornerstone of Kyustendil, presenting both classical and contemporary works while nurturing local talent. Over the decades, it has maintained its reputation for artistic excellence and community engagement.",
     foundedYear: 1952,
     images: [
       {

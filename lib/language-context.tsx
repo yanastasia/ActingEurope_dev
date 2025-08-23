@@ -239,6 +239,39 @@ const translations = {
     macedonian: "Macedonian",
     serbian: "Serbian",
 
+    // Cities
+    kyustendil: "Kyustendil",
+    sofia: "Sofia",
+    skopje: "Skopje",
+    nis: "Niš",
+    bitola: "Bitola",
+
+    // Countries
+    bulgaria: "Bulgaria",
+    northMacedonia: "North Macedonia",
+    serbia: "Serbia",
+
+    // Theatre Tags
+    regionalTheatre: "Regional Theatre",
+    bulgarianDrama: "Bulgarian Drama",
+    contemporaryWorks: "Contemporary Works",
+    communityTheatre: "Community Theatre",
+    nationalTheatre: "National Theatre",
+    classicalDrama: "Classical Drama",
+    bulgarianHeritage: "Bulgarian Heritage",
+    historicVenue: "Historic Venue",
+    macedonianCulture: "Macedonian Culture",
+    internationalCollaborations: "International Collaborations",
+    culturalIdentity: "Cultural Identity",
+    serbianTheatre: "Serbian Theatre",
+    contemporaryPlays: "Contemporary Plays",
+    independentTheatre: "Independent Theatre",
+    experimental: "Experimental",
+    contemporary: "Contemporary",
+    bulgarianTheatre: "Bulgarian Theatre",
+    intimateTheatre: "Intimate Theatre",
+    localProductions: "Local Productions",
+
     // News Article Page
     backToNews: "Back to News",
     articleNotFound: "Article Not Found",
@@ -498,6 +531,39 @@ const translations = {
     bulgarian: "Български",
     macedonian: "Македонски",
     serbian: "Сръбски",
+
+    // Cities
+    kyustendil: "Кюстендил",
+    sofia: "София",
+    skopje: "Скопие",
+    nis: "Ниш",
+    bitola: "Битоля",
+
+    // Countries
+    bulgaria: "България",
+    northMacedonia: "Северна Македония",
+    serbia: "Сърбия",
+
+    // Theatre Tags
+    regionalTheatre: "Регионален театър",
+    bulgarianDrama: "Българска драма",
+    contemporaryWorks: "Съвременни произведения",
+    communityTheatre: "Общностен театър",
+    nationalTheatre: "Национален театър",
+    classicalDrama: "Класическа драма",
+    bulgarianHeritage: "Българско наследство",
+    historicVenue: "Историческо място",
+    macedonianCulture: "Македонска култура",
+    internationalCollaborations: "Международни сътрудничества",
+    culturalIdentity: "Културна идентичност",
+    serbianTheatre: "Сръбски театър",
+    contemporaryPlays: "Съвременни пиеси",
+    independentTheatre: "Независим театър",
+    experimental: "Експериментален",
+    contemporary: "Съвременен",
+    bulgarianTheatre: "Български театър",
+    intimateTheatre: "Интимен театър",
+    localProductions: "Местни продукции",
 
     // News Article Page
     backToNews: "Назад към новините",
@@ -806,6 +872,39 @@ const translations = {
     macedonian: "Македонски",
     serbian: "Српски",
 
+    // Cities
+    kyustendil: "Ќустендил",
+    sofia: "Софија",
+    skopje: "Скопје",
+    nis: "Ниш",
+    bitola: "Битола",
+
+    // Countries
+    bulgaria: "Бугарија",
+    northMacedonia: "Северна Македонија",
+    serbia: "Србија",
+
+    // Theatre Tags
+    regionalTheatre: "Регионален театар",
+    bulgarianDrama: "Бугарска драма",
+    contemporaryWorks: "Современи дела",
+    communityTheatre: "Заедничкиот театар",
+    nationalTheatre: "Национален театар",
+    classicalDrama: "Класична драма",
+    bulgarianHeritage: "Бугарско наследство",
+    historicVenue: "Историско место",
+    macedonianCulture: "Македонска култура",
+    internationalCollaborations: "Меѓународни соработки",
+    culturalIdentity: "Културен идентитет",
+    serbianTheatre: "Српски театар",
+    contemporaryPlays: "Современи пиеси",
+    independentTheatre: "Независен театар",
+    experimental: "Експериментален",
+    contemporary: "Современ",
+    bulgarianTheatre: "Бугарски театар",
+    intimateTheatre: "Интимен театар",
+    localProductions: "Локални продукции",
+
     // News Article Page
     backToNews: "Назад кон вестите",
     articleNotFound: "Статијата не е пронајдена",
@@ -1111,6 +1210,39 @@ const translations = {
     bulgarian: "Бугарски",
     macedonian: "Македонски",
     serbian: "Српски",
+
+    // Cities
+    kyustendil: "Ћустендил",
+    sofia: "Софија",
+    skopje: "Скопље",
+    nis: "Ниш",
+    bitola: "Битоља",
+
+    // Countries
+    bulgaria: "Бугарска",
+    northMacedonia: "Северна Македонија",
+    serbia: "Србија",
+
+    // Theatre Tags
+    regionalTheatre: "Регионални театар",
+    bulgarianDrama: "Бугарска драма",
+    contemporaryWorks: "Савремена дела",
+    communityTheatre: "Заједнички театар",
+    nationalTheatre: "Национални театар",
+    classicalDrama: "Класична драма",
+    bulgarianHeritage: "Бугарско наслеђе",
+    historicVenue: "Историјско место",
+    macedonianCulture: "Македонска култура",
+    internationalCollaborations: "Међународне сарадње",
+    culturalIdentity: "Културни идентитет",
+    serbianTheatre: "Српски театар",
+    contemporaryPlays: "Савремене представе",
+    independentTheatre: "Независни театар",
+    experimental: "Експериментални",
+    contemporary: "Савремени",
+    bulgarianTheatre: "Бугарски театар",
+    intimateTheatre: "Интимни театар",
+    localProductions: "Локалне продукције",
 
     // News Article Page
     backToNews: "Назад на вести",

@@ -673,9 +673,9 @@ export interface TheatreImage {
 const theatreTranslations = {
   en: {
     161: {
-      name: 'Drama Theatre "Krum Kyulyavkov"',
+      name: 'Drama Theatre Kyustendil',
       description: 'A prominent regional theatre known for its innovative productions and commitment to Bulgarian dramatic arts.',
-      history: 'Founded in the mid-20th century, the theatre has been a cultural cornerstone of Kyustendil, presenting both classical and contemporary works while nurturing local talent. The theatre was named after Krum Kyulyavkov, a celebrated Bulgarian actor and director who significantly contributed to the development of Bulgarian theatre.',
+      history: 'Founded in the mid-20th century, the theatre has been a cultural cornerstone of Kyustendil, presenting both classical and contemporary works while nurturing local talent. The theatre has maintained its reputation for artistic excellence and community engagement.',
       tags: ['Regional Theatre', 'Bulgarian Drama', 'Contemporary Works', 'Community Theatre']
     },
     162: {

@@ -128,7 +128,7 @@ export const performances: Performance[] = [
     {
     id: "5",
     title: "Artists in waiting",
-    company: ['Drama Theatre "Krum Kyulyavkov"'],
+    company: ['Drama Theatre Kyustendil'],
     director: "Presiyan Kuzov",
     cast: [
       "Yordan Danchev", 

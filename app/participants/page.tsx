@@ -8,6 +8,7 @@ import { MapPin, Calendar, ExternalLink, ChevronLeft, ChevronRight } from 'lucid
 import Image from 'next/image'
 import Link from 'next/link'
 import { useLanguage } from '@/lib/language-context'
+import { getTranslatedLocation, getTranslatedTag } from '@/lib/location-utils'
 
 interface Theatre {
   id: number
@@ -98,7 +99,7 @@ export default function ParticipantsPage() {
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="mb-12 text-center">
-        <h1 className="mb-4 text-4xl font-bold text-secondary-blue">{t('participants')}</h1>
+        <h1 className="mb-4 text-4xl font-bold text-secondary-blue">{t('participatingTheatres')}</h1>
         <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
           {t('participantsDescription')}
         </p>
@@ -119,7 +120,7 @@ export default function ParticipantsPage() {
                 <div className="flex items-center gap-1 text-sm">
                   <MapPin className="h-4 w-4" />
                   <span>
-                    {theatre.city}, {theatre.country}
+                    {getTranslatedLocation(theatre.city, theatre.country, t)}
                   </span>
                 </div>
               </div>
@@ -129,7 +130,7 @@ export default function ParticipantsPage() {
               <CardTitle className="line-clamp-2 text-xl text-secondary-blue">{theatre.name}</CardTitle>
               <CardDescription className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
-                {t('founded')} {theatre.founded_year}
+                {t('foundedIn')} {theatre.founded_year}
               </CardDescription>
             </CardHeader>
 
@@ -139,7 +140,7 @@ export default function ParticipantsPage() {
               <div className="mb-4 flex flex-wrap gap-1">
                 {theatre.tags.slice(0, 3).map((tag, index) => (
                   <Badge key={index} variant="outline" className="text-xs">
-                    {tag.tag_name}
+                    {getTranslatedTag(tag.tag_name, t)}
                   </Badge>
                 ))}
                 {theatre.tags.length > 3 && (
@@ -232,11 +233,11 @@ export default function ParticipantsPage() {
                 <div className="flex items-center gap-4 mb-6 text-muted-foreground">
                   <div className="flex items-center gap-2">
                     <MapPin className="h-4 w-4" />
-                    <span>{selectedTheatre.city}, {selectedTheatre.country}</span>
+                    <span>{getTranslatedLocation(selectedTheatre.city, selectedTheatre.country, t)}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
-                    <span>{t('founded')} {selectedTheatre.founded_year}</span>
+                    <span>{t('foundedIn')} {selectedTheatre.founded_year}</span>
                   </div>
                 </div>
                 
@@ -259,7 +260,7 @@ export default function ParticipantsPage() {
                   <div className="flex flex-wrap gap-2">
                     {selectedTheatre.tags.map((tag, index) => (
                       <Badge key={index} variant="secondary">
-                        {tag.tag_name}
+                        {getTranslatedTag(tag.tag_name, t)}
                       </Badge>
                     ))}
                   </div>

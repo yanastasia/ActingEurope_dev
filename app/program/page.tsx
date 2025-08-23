@@ -77,7 +77,7 @@ export default function ProgramPage() {
         date: event.date,
         time: event.time,
         venue: event.venue,
-        company: event.company,
+        company: event.theatreName || event.company,
         description: event.synopsis,
         imageUrl: event.imageUrl,
         posterUrl: event.posterUrl,

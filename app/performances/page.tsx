@@ -16,6 +16,7 @@ interface Performance {
   id: string
   title: string
   company: string[]
+  theatreName?: string
   director: string
   date: string
   time: string
@@ -64,6 +65,7 @@ export default function PerformancesPage() {
     if (searchTerm) {
       filtered = filtered.filter(performance => 
         performance.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (performance.theatreName && performance.theatreName.toLowerCase().includes(searchTerm.toLowerCase())) ||
         performance.company.some(comp => comp.toLowerCase().includes(searchTerm.toLowerCase()))
       )
     }
@@ -170,9 +172,9 @@ export default function PerformancesPage() {
                   </Badge>
                 </div>
                 <CardDescription>
-                  {Array.isArray(performance.company) 
+                  {performance.theatreName || (Array.isArray(performance.company) 
                     ? performance.company.join(' & ') 
-                    : performance.company}
+                    : performance.company)}
                 </CardDescription>
               </CardHeader>
               <CardContent>
