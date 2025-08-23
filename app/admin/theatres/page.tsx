@@ -80,17 +80,56 @@ const AdminTheatresPage = () => {
   const [imagePreview, setImagePreview] = useState<string>('');
   const [isUploading, setIsUploading] = useState(false);
   const [newTag, setNewTag] = useState('');
+  const [translationGroups, setTranslationGroups] = useState<{ [key: string]: Theatre[] }>({});
+  const [theatresWithoutGroups, setTheatresWithoutGroups] = useState<Theatre[]>([]);
   const router = useRouter();
   const { toast } = useToast();
   const { t } = useLanguage();
 
   useEffect(() => {
-    if (!isAdmin()) {
-      router.push('/'); // Redirect if not admin
-    } else {
-      setUserIsAdmin(true);
-      fetchTheatres();
-    }
+    const checkAuthAndFetch = async () => {
+      // First check localStorage for quick response
+      const localAdmin = isAdmin();
+      
+      if (!localAdmin) {
+        router.push('/auth/login');
+        return;
+      }
+      
+      // Then verify with server to ensure session is still valid
+      try {
+        const userRole = localStorage.getItem('actingEurope_userRole');
+        const response = await fetch('/api/auth/check', {
+          headers: {
+            'Authorization': `Bearer ${userRole}`
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.isAdmin) {
+            setUserIsAdmin(true);
+            fetchTheatres();
+          } else {
+            // Clear invalid auth and redirect
+            localStorage.removeItem('actingEurope_auth');
+            localStorage.removeItem('actingEurope_userRole');
+            localStorage.removeItem('actingEurope_userEmail');
+            router.push('/auth/login');
+          }
+        } else {
+          // Server auth check failed, redirect to login
+          router.push('/auth/login');
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        // On network error, trust localStorage for now
+        setUserIsAdmin(true);
+        fetchTheatres();
+      }
+    };
+    
+    checkAuthAndFetch();
   }, [router]);
 
   const fetchTheatres = async () => {
@@ -292,6 +331,220 @@ const AdminTheatresPage = () => {
       tags: prev.tags.filter(tag => tag !== tagToRemove)
     }));
   };
+
+  // Group theatres by translation group
+  useEffect(() => {
+    const groups: { [key: string]: Theatre[] } = {};
+    const withoutGroups: Theatre[] = [];
+
+    theatres.forEach(theatre => {
+      if (theatre.translation_group) {
+        if (!groups[theatre.translation_group]) {
+          groups[theatre.translation_group] = [];
+        }
+        groups[theatre.translation_group].push(theatre);
+      } else {
+        withoutGroups.push(theatre);
+      }
+    });
+
+    setTranslationGroups(groups);
+    setTheatresWithoutGroups(withoutGroups);
+  }, [theatres]);
+
+  // Connect orphaned theatres to existing translation groups
+  async function connectOrphanedTheatres() {
+    try {
+      let connectionsFound = 0;
+      
+      // Get all theatres with translation groups to match against
+      const groupedTheatres = Object.values(translationGroups).flat();
+      
+      for (const orphanedTheatre of theatresWithoutGroups) {
+        // Try to find a matching theatre in existing translation groups
+        const potentialMatch = groupedTheatres.find(groupedTheatre => 
+          groupedTheatre.name.toLowerCase().includes(orphanedTheatre.name.toLowerCase()) ||
+          orphanedTheatre.name.toLowerCase().includes(groupedTheatre.name.toLowerCase()) ||
+          (groupedTheatre.city === orphanedTheatre.city && 
+           groupedTheatre.country === orphanedTheatre.country &&
+           groupedTheatre.content_language !== orphanedTheatre.content_language)
+        );
+        
+        if (potentialMatch && potentialMatch.translation_group) {
+          // Connect the orphaned theatre to this translation group
+          const theatreData = {
+            ...orphanedTheatre,
+            translation_group: potentialMatch.translation_group
+          };
+
+          const response = await fetch(`/api/theatres/${orphanedTheatre.id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('actingEurope_token')}`,
+            },
+            body: JSON.stringify(theatreData),
+          });
+
+          if (response.ok) {
+            connectionsFound++;
+          }
+        }
+      }
+      
+      if (connectionsFound > 0) {
+        toast({
+          title: 'Success',
+          description: `Connected ${connectionsFound} orphaned theatres to translation groups`,
+        });
+        fetchTheatres();
+      } else {
+        toast({
+          title: 'Info',
+          description: 'No matching theatres found to connect',
+        });
+      }
+    } catch (error) {
+      console.error('Error connecting orphaned theatres:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to connect orphaned theatres',
+        variant: 'destructive',
+      });
+    }
+  }
+
+  // Create language copy of a theatre
+  async function createLanguageCopy(originalTheatre: Theatre, targetLanguage: string) {
+    try {
+      let translationGroup: string | null = originalTheatre.translation_group || null;
+      
+      if (!translationGroup) {
+        // Create a new translation group for this theatre
+        translationGroup = `theatre_${originalTheatre.id}_${Date.now()}`;
+        
+        // Update the original theatre with the new translation group
+        const updateResponse = await fetch(`/api/theatres/${originalTheatre.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('actingEurope_token')}`,
+          },
+          body: JSON.stringify({
+            ...originalTheatre,
+            translation_group: translationGroup
+          }),
+        });
+        
+        if (!updateResponse.ok) {
+          throw new Error('Failed to assign translation group');
+        }
+      }
+
+      // Check if a copy already exists for this language in the translation group
+      const existingCopy = theatres.find(theatre => 
+        theatre.translation_group === translationGroup && 
+        theatre.content_language === targetLanguage
+      );
+
+      if (existingCopy) {
+        toast({
+          title: 'Info',
+          description: `${targetLanguage.toUpperCase()} language copy already exists`,
+        });
+        return;
+      }
+
+      // Check if there's an orphaned theatre that could be connected instead
+      const orphanedMatch = theatresWithoutGroups.find(theatre =>
+        theatre.content_language === targetLanguage &&
+        (theatre.name.toLowerCase().includes(originalTheatre.name.toLowerCase()) ||
+         originalTheatre.name.toLowerCase().includes(theatre.name.toLowerCase()) ||
+         (theatre.city === originalTheatre.city && theatre.country === originalTheatre.country))
+      );
+
+      if (orphanedMatch) {
+        // Connect the orphaned theatre to this translation group
+        const response = await fetch(`/api/theatres/${orphanedMatch.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('actingEurope_token')}`,
+          },
+          body: JSON.stringify({
+            ...orphanedMatch,
+            translation_group: translationGroup
+          }),
+        });
+
+        if (response.ok) {
+          toast({
+            title: 'Success',
+            description: `Connected existing ${targetLanguage.toUpperCase()} theatre to translation group`,
+          });
+          fetchTheatres();
+        }
+        return;
+      }
+
+      // Create a new theatre copy
+      const newTheatreData = {
+        name: originalTheatre.name, // Should be translated in real implementation
+        city: originalTheatre.city,
+        country: originalTheatre.country,
+        description: originalTheatre.description, // Should be translated
+        history: originalTheatre.history, // Should be translated
+        website: originalTheatre.website,
+        founded_year: originalTheatre.founded_year,
+        content_language: targetLanguage,
+        translation_group: translationGroup
+      };
+
+      const response = await fetch('/api/theatres', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('actingEurope_token')}`,
+        },
+        body: JSON.stringify(newTheatreData),
+      });
+
+      if (response.ok) {
+        toast({
+          title: 'Success',
+          description: `Created ${targetLanguage.toUpperCase()} language copy`,
+        });
+        fetchTheatres();
+      } else {
+        throw new Error('Failed to create language copy');
+      }
+    } catch (error) {
+      console.error('Error creating language copy:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to create language copy',
+        variant: 'destructive',
+      });
+    }
+  }
+
+  // Get language badge component
+  function getLanguageBadge(language: string) {
+    const langConfig = {
+      en: { label: 'EN', color: 'bg-blue-100 text-blue-800' },
+      bg: { label: 'BG', color: 'bg-green-100 text-green-800' },
+      mk: { label: 'MK', color: 'bg-yellow-100 text-yellow-800' },
+      sr: { label: 'SR', color: 'bg-purple-100 text-purple-800' }
+    };
+    
+    const config = langConfig[language as keyof typeof langConfig] || { label: language.toUpperCase(), color: 'bg-gray-100 text-gray-800' };
+    
+    return (
+      <Badge className={`${config.color} text-xs font-semibold`}>
+        {config.label}
+      </Badge>
+    );
+  }
 
   if (!userIsAdmin) {
     return (
@@ -512,119 +765,157 @@ const AdminTheatresPage = () => {
         </CardContent>
       </Card>
 
-      {/* Theatres List */}
+      {/* Translation Groups Display */}
       <div className="space-y-4">
-        <h2 className="text-2xl font-bold">Existing Theatres</h2>
-        {theatres.length === 0 ? (
+        <h2 className="text-2xl font-bold">Translation Groups</h2>
+        {Object.keys(translationGroups).length === 0 && theatresWithoutGroups.length === 0 ? (
           <Card>
             <CardContent className="p-6">
               <p className="text-center text-gray-500">No theatres found. Create your first theatre above.</p>
             </CardContent>
           </Card>
         ) : (
-          Object.entries(
-            theatres.reduce((groups: Record<string, Theatre[]>, theatre) => {
-              const key = theatre.translation_group || `single_${theatre.id}`;
-              if (!groups[key]) groups[key] = [];
-              groups[key].push(theatre);
-              return groups;
-            }, {})
-          ).map(([groupKey, groupTheatres]) => {
-            const sortedTheatres = groupTheatres.sort((a, b) => {
-              const langOrder = ['en', 'bg', 'mk', 'sr'];
-              return langOrder.indexOf(a.content_language) - langOrder.indexOf(b.content_language);
-            });
-            const mainTheatre = sortedTheatres[0]; // Use first theatre as main display
-            
-            return (
-              <Card key={groupKey} className="border-l-4 border-l-green-500">
-                <CardHeader>
-                  <div className="flex justify-between items-start">
+          <div className="grid gap-6">
+            {Object.entries(translationGroups).map(([groupId, groupTheatres]) => {
+              const languages = ['en', 'bg', 'mk', 'sr'];
+              const theatresByLang = languages.reduce((acc, lang) => {
+                acc[lang] = groupTheatres.find(theatre => theatre.content_language === lang) || null;
+                return acc;
+              }, {} as { [key: string]: Theatre | null });
+              
+              const primaryTheatre = groupTheatres[0];
+              
+              return (
+                <Card key={groupId} className="p-6">
+                  <div className="flex justify-between items-start mb-4">
                     <div>
-                      <CardTitle className="flex items-center gap-2">
-                        <span>{mainTheatre.name}</span>
-                        <div className="flex flex-wrap gap-1">
-                          {sortedTheatres.map(theatre => {
-                            const langNames = { en: 'EN', bg: 'BG', mk: 'MK', sr: 'SR' };
-                            return (
-                              <span 
-                                key={theatre.id}
-                                className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium"
-                              >
-                                {langNames[theatre.content_language as keyof typeof langNames] || theatre.content_language.toUpperCase()}
-                              </span>
-                            );
-                          })}
-                        </div>
-                      </CardTitle>
-                      <CardDescription>
-                        {mainTheatre.city}, {mainTheatre.country}
-                        {mainTheatre.founded_year && ` • Founded ${mainTheatre.founded_year}`}
-                        {mainTheatre._count && ` • ${mainTheatre._count.events} events`}
-                        {` • ${sortedTheatres.length} language${sortedTheatres.length > 1 ? 's' : ''}`}
-                      </CardDescription>
+                      <h3 className="text-xl font-semibold">{primaryTheatre.name}</h3>
+                      <p className="text-gray-600">
+                        {primaryTheatre.city}, {primaryTheatre.country}
+                        {primaryTheatre.founded_year && ` • Founded ${primaryTheatre.founded_year}`}
+                      </p>
+                      {primaryTheatre.website && (
+                        <p className="text-sm text-blue-600 mt-1">
+                          <a href={primaryTheatre.website} target="_blank" rel="noopener noreferrer">
+                            {primaryTheatre.website}
+                          </a>
+                        </p>
+                      )}
                     </div>
                   </div>
-                </CardHeader>
-                <CardContent>
-                  {mainTheatre.description && (
-                    <p className="text-gray-600 mb-2">{mainTheatre.description}</p>
-                  )}
-                  {mainTheatre.website && (
-                    <p className="text-sm text-blue-600 mb-2">
-                      <a href={mainTheatre.website} target="_blank" rel="noopener noreferrer">
-                        {mainTheatre.website}
-                      </a>
-                    </p>
-                  )}
-                  {mainTheatre.tags && mainTheatre.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mb-4">
-                      {mainTheatre.tags.map((tag) => (
-                        <Badge key={tag.id} variant="secondary" className="text-xs">
-                          {tag.tag_name}
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
                   
-                  {/* Show individual language versions for editing */}
-                  <div className="mt-4 space-y-2">
-                    <h4 className="text-sm font-medium text-gray-700">Language Versions:</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      {sortedTheatres.map(theatre => {
-                        const langNames = { en: 'English', bg: 'Bulgarian', mk: 'Macedonian', sr: 'Serbian' };
-                        return (
-                          <div key={theatre.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                            <span className="text-sm">
-                              <strong>{langNames[theatre.content_language as keyof typeof langNames] || theatre.content_language}:</strong> {theatre.name}
-                            </span>
-                            <div className="flex gap-1">
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                onClick={() => handleEditClick(theatre)}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {languages.map(lang => {
+                      const theatre = theatresByLang[lang];
+                      return (
+                        <div key={lang} className="border rounded-lg p-4">
+                          <div className="flex items-center justify-between mb-2">
+                            {getLanguageBadge(lang)}
+                          </div>
+                          {theatre ? (
+                            <div>
+                              <p className="font-medium text-sm">{theatre.name}</p>
+                              {theatre.description && (
+                                <p className="text-xs text-gray-500 mt-1 line-clamp-2">{theatre.description}</p>
+                              )}
+                              {theatre._count?.events && (
+                                <p className="text-xs text-gray-600 mt-1">{theatre._count.events} events</p>
+                              )}
+                              <div className="flex gap-1 mt-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleEditClick(theatre)}
+                                  className="flex-1"
+                                >
+                                  <Edit className="h-3 w-3" />
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleDeleteTheatre(theatre.id)}
+                                  className="flex-1"
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div>
+                              <p className="text-gray-400 text-sm">No {lang.toUpperCase()} version</p>
                               <Button
-                                variant="destructive"
+                                variant="outline"
                                 size="sm"
-                                onClick={() => handleDeleteTheatre(theatre.id)}
+                                className="mt-2 w-full"
+                                onClick={() => createLanguageCopy(primaryTheatre, lang)}
                               >
-                                <Trash2 className="h-4 w-4" />
+                                Create {lang.toUpperCase()}
                               </Button>
                             </div>
-                          </div>
-                        );
-                      })}
-                    </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
-                </CardContent>
-              </Card>
-            );
-          })
+                </Card>
+              );
+            })}
+          </div>
         )}
       </div>
+
+      {/* Theatres without translation groups */}
+      {theatresWithoutGroups.length > 0 && (
+        <div className="mt-8">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-bold">Individual Theatres</h2>
+            <Button
+              onClick={connectOrphanedTheatres}
+              variant="outline"
+              className="ml-4"
+            >
+              Connect Orphaned Theatres
+            </Button>
+          </div>
+          <div className="grid gap-4">
+            {theatresWithoutGroups.map((theatre) => (
+              <Card key={theatre.id} className="p-4">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-semibold">{theatre.name}</h3>
+                    <p className="text-gray-600 text-sm">
+                      {theatre.city}, {theatre.country}
+                      {theatre.founded_year && ` • Founded ${theatre.founded_year}`}
+                    </p>
+                    <div className="flex items-center gap-2 mt-2">
+                      {getLanguageBadge(theatre.content_language)}
+                      {theatre._count?.events && (
+                        <Badge variant="outline">{theatre._count.events} events</Badge>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEditClick(theatre)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDeleteTheatre(theatre.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

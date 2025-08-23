@@ -42,7 +42,7 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
   try {
     const { id, title, content, imageUrl, date, category, contentLanguage, translationGroup } = await request.json();
-    if (!id || !title || !content || !imageUrl || !date || !category || !contentLanguage) {
+    if (!id || !title || !content || imageUrl === undefined || !date || !category || !contentLanguage) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
     const updatedArticle = await updateNewsArticle(id, { 

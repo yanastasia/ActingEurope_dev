@@ -10391,6 +10391,8 @@ export namespace Prisma {
     language: string | null
     content_language: string | null
     translation_group: string | null
+    performance_language: string | null
+    subtitle_language: string | null
     genre: string | null
     director: string | null
     synopsis: string | null
@@ -10416,6 +10418,8 @@ export namespace Prisma {
     language: string | null
     content_language: string | null
     translation_group: string | null
+    performance_language: string | null
+    subtitle_language: string | null
     genre: string | null
     director: string | null
     synopsis: string | null
@@ -10441,6 +10445,8 @@ export namespace Prisma {
     language: number
     content_language: number
     translation_group: number
+    performance_language: number
+    subtitle_language: number
     genre: number
     company: number
     director: number
@@ -10484,6 +10490,8 @@ export namespace Prisma {
     language?: true
     content_language?: true
     translation_group?: true
+    performance_language?: true
+    subtitle_language?: true
     genre?: true
     director?: true
     synopsis?: true
@@ -10509,6 +10517,8 @@ export namespace Prisma {
     language?: true
     content_language?: true
     translation_group?: true
+    performance_language?: true
+    subtitle_language?: true
     genre?: true
     director?: true
     synopsis?: true
@@ -10534,6 +10544,8 @@ export namespace Prisma {
     language?: true
     content_language?: true
     translation_group?: true
+    performance_language?: true
+    subtitle_language?: true
     genre?: true
     company?: true
     director?: true
@@ -10648,6 +10660,8 @@ export namespace Prisma {
     language: string | null
     content_language: string
     translation_group: string | null
+    performance_language: string | null
+    subtitle_language: string | null
     genre: string | null
     company: string[]
     director: string | null
@@ -10694,6 +10708,8 @@ export namespace Prisma {
     language?: boolean
     content_language?: boolean
     translation_group?: boolean
+    performance_language?: boolean
+    subtitle_language?: boolean
     genre?: boolean
     company?: boolean
     director?: boolean
@@ -10725,6 +10741,8 @@ export namespace Prisma {
     language?: boolean
     content_language?: boolean
     translation_group?: boolean
+    performance_language?: boolean
+    subtitle_language?: boolean
     genre?: boolean
     company?: boolean
     director?: boolean
@@ -10754,6 +10772,8 @@ export namespace Prisma {
     language?: boolean
     content_language?: boolean
     translation_group?: boolean
+    performance_language?: boolean
+    subtitle_language?: boolean
     genre?: boolean
     company?: boolean
     director?: boolean
@@ -10783,6 +10803,8 @@ export namespace Prisma {
     language?: boolean
     content_language?: boolean
     translation_group?: boolean
+    performance_language?: boolean
+    subtitle_language?: boolean
     genre?: boolean
     company?: boolean
     director?: boolean
@@ -10795,7 +10817,7 @@ export namespace Prisma {
     updated_at?: boolean
   }
 
-  export type EventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "theatre_id" | "venue_id" | "event_type" | "event_date" | "event_time" | "description" | "price" | "image_url" | "poster_url" | "language" | "content_language" | "translation_group" | "genre" | "company" | "director" | "cast" | "synopsis" | "subtitles" | "duration" | "is_featured" | "created_at" | "updated_at", ExtArgs["result"]["event"]>
+  export type EventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "theatre_id" | "venue_id" | "event_type" | "event_date" | "event_time" | "description" | "price" | "image_url" | "poster_url" | "language" | "content_language" | "translation_group" | "performance_language" | "subtitle_language" | "genre" | "company" | "director" | "cast" | "synopsis" | "subtitles" | "duration" | "is_featured" | "created_at" | "updated_at", ExtArgs["result"]["event"]>
   export type EventInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     theatre?: boolean | TheatreDefaultArgs<ExtArgs>
     venue?: boolean | Event$venueArgs<ExtArgs>
@@ -10833,6 +10855,8 @@ export namespace Prisma {
       language: string | null
       content_language: string
       translation_group: string | null
+      performance_language: string | null
+      subtitle_language: string | null
       genre: string | null
       company: string[]
       director: string | null
@@ -11283,6 +11307,8 @@ export namespace Prisma {
     readonly language: FieldRef<"Event", 'String'>
     readonly content_language: FieldRef<"Event", 'String'>
     readonly translation_group: FieldRef<"Event", 'String'>
+    readonly performance_language: FieldRef<"Event", 'String'>
+    readonly subtitle_language: FieldRef<"Event", 'String'>
     readonly genre: FieldRef<"Event", 'String'>
     readonly company: FieldRef<"Event", 'String[]'>
     readonly director: FieldRef<"Event", 'String'>
@@ -17536,6 +17562,8 @@ export namespace Prisma {
     language: 'language',
     content_language: 'content_language',
     translation_group: 'translation_group',
+    performance_language: 'performance_language',
+    subtitle_language: 'subtitle_language',
     genre: 'genre',
     company: 'company',
     director: 'director',
@@ -18305,6 +18333,8 @@ export namespace Prisma {
     language?: StringNullableFilter<"Event"> | string | null
     content_language?: StringFilter<"Event"> | string
     translation_group?: StringNullableFilter<"Event"> | string | null
+    performance_language?: StringNullableFilter<"Event"> | string | null
+    subtitle_language?: StringNullableFilter<"Event"> | string | null
     genre?: StringNullableFilter<"Event"> | string | null
     company?: StringNullableListFilter<"Event">
     director?: StringNullableFilter<"Event"> | string | null
@@ -18335,6 +18365,8 @@ export namespace Prisma {
     language?: SortOrderInput | SortOrder
     content_language?: SortOrder
     translation_group?: SortOrderInput | SortOrder
+    performance_language?: SortOrderInput | SortOrder
+    subtitle_language?: SortOrderInput | SortOrder
     genre?: SortOrderInput | SortOrder
     company?: SortOrder
     director?: SortOrderInput | SortOrder
@@ -18368,6 +18400,8 @@ export namespace Prisma {
     language?: StringNullableFilter<"Event"> | string | null
     content_language?: StringFilter<"Event"> | string
     translation_group?: StringNullableFilter<"Event"> | string | null
+    performance_language?: StringNullableFilter<"Event"> | string | null
+    subtitle_language?: StringNullableFilter<"Event"> | string | null
     genre?: StringNullableFilter<"Event"> | string | null
     company?: StringNullableListFilter<"Event">
     director?: StringNullableFilter<"Event"> | string | null
@@ -18398,6 +18432,8 @@ export namespace Prisma {
     language?: SortOrderInput | SortOrder
     content_language?: SortOrder
     translation_group?: SortOrderInput | SortOrder
+    performance_language?: SortOrderInput | SortOrder
+    subtitle_language?: SortOrderInput | SortOrder
     genre?: SortOrderInput | SortOrder
     company?: SortOrder
     director?: SortOrderInput | SortOrder
@@ -18433,6 +18469,8 @@ export namespace Prisma {
     language?: StringNullableWithAggregatesFilter<"Event"> | string | null
     content_language?: StringWithAggregatesFilter<"Event"> | string
     translation_group?: StringNullableWithAggregatesFilter<"Event"> | string | null
+    performance_language?: StringNullableWithAggregatesFilter<"Event"> | string | null
+    subtitle_language?: StringNullableWithAggregatesFilter<"Event"> | string | null
     genre?: StringNullableWithAggregatesFilter<"Event"> | string | null
     company?: StringNullableListFilter<"Event">
     director?: StringNullableWithAggregatesFilter<"Event"> | string | null
@@ -19393,6 +19431,8 @@ export namespace Prisma {
     language?: string | null
     content_language?: string
     translation_group?: string | null
+    performance_language?: string | null
+    subtitle_language?: string | null
     genre?: string | null
     company?: EventCreatecompanyInput | string[]
     director?: string | null
@@ -19423,6 +19463,8 @@ export namespace Prisma {
     language?: string | null
     content_language?: string
     translation_group?: string | null
+    performance_language?: string | null
+    subtitle_language?: string | null
     genre?: string | null
     company?: EventCreatecompanyInput | string[]
     director?: string | null
@@ -19448,6 +19490,8 @@ export namespace Prisma {
     language?: NullableStringFieldUpdateOperationsInput | string | null
     content_language?: StringFieldUpdateOperationsInput | string
     translation_group?: NullableStringFieldUpdateOperationsInput | string | null
+    performance_language?: NullableStringFieldUpdateOperationsInput | string | null
+    subtitle_language?: NullableStringFieldUpdateOperationsInput | string | null
     genre?: NullableStringFieldUpdateOperationsInput | string | null
     company?: EventUpdatecompanyInput | string[]
     director?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19478,6 +19522,8 @@ export namespace Prisma {
     language?: NullableStringFieldUpdateOperationsInput | string | null
     content_language?: StringFieldUpdateOperationsInput | string
     translation_group?: NullableStringFieldUpdateOperationsInput | string | null
+    performance_language?: NullableStringFieldUpdateOperationsInput | string | null
+    subtitle_language?: NullableStringFieldUpdateOperationsInput | string | null
     genre?: NullableStringFieldUpdateOperationsInput | string | null
     company?: EventUpdatecompanyInput | string[]
     director?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19506,6 +19552,8 @@ export namespace Prisma {
     language?: string | null
     content_language?: string
     translation_group?: string | null
+    performance_language?: string | null
+    subtitle_language?: string | null
     genre?: string | null
     company?: EventCreatecompanyInput | string[]
     director?: string | null
@@ -19530,6 +19578,8 @@ export namespace Prisma {
     language?: NullableStringFieldUpdateOperationsInput | string | null
     content_language?: StringFieldUpdateOperationsInput | string
     translation_group?: NullableStringFieldUpdateOperationsInput | string | null
+    performance_language?: NullableStringFieldUpdateOperationsInput | string | null
+    subtitle_language?: NullableStringFieldUpdateOperationsInput | string | null
     genre?: NullableStringFieldUpdateOperationsInput | string | null
     company?: EventUpdatecompanyInput | string[]
     director?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19557,6 +19607,8 @@ export namespace Prisma {
     language?: NullableStringFieldUpdateOperationsInput | string | null
     content_language?: StringFieldUpdateOperationsInput | string
     translation_group?: NullableStringFieldUpdateOperationsInput | string | null
+    performance_language?: NullableStringFieldUpdateOperationsInput | string | null
+    subtitle_language?: NullableStringFieldUpdateOperationsInput | string | null
     genre?: NullableStringFieldUpdateOperationsInput | string | null
     company?: EventUpdatecompanyInput | string[]
     director?: NullableStringFieldUpdateOperationsInput | string | null
@@ -20620,6 +20672,8 @@ export namespace Prisma {
     language?: SortOrder
     content_language?: SortOrder
     translation_group?: SortOrder
+    performance_language?: SortOrder
+    subtitle_language?: SortOrder
     genre?: SortOrder
     company?: SortOrder
     director?: SortOrder
@@ -20654,6 +20708,8 @@ export namespace Prisma {
     language?: SortOrder
     content_language?: SortOrder
     translation_group?: SortOrder
+    performance_language?: SortOrder
+    subtitle_language?: SortOrder
     genre?: SortOrder
     director?: SortOrder
     synopsis?: SortOrder
@@ -20679,6 +20735,8 @@ export namespace Prisma {
     language?: SortOrder
     content_language?: SortOrder
     translation_group?: SortOrder
+    performance_language?: SortOrder
+    subtitle_language?: SortOrder
     genre?: SortOrder
     director?: SortOrder
     synopsis?: SortOrder
@@ -22068,6 +22126,8 @@ export namespace Prisma {
     language?: string | null
     content_language?: string
     translation_group?: string | null
+    performance_language?: string | null
+    subtitle_language?: string | null
     genre?: string | null
     company?: EventCreatecompanyInput | string[]
     director?: string | null
@@ -22096,6 +22156,8 @@ export namespace Prisma {
     language?: string | null
     content_language?: string
     translation_group?: string | null
+    performance_language?: string | null
+    subtitle_language?: string | null
     genre?: string | null
     company?: EventCreatecompanyInput | string[]
     director?: string | null
@@ -22207,6 +22269,8 @@ export namespace Prisma {
     language?: StringNullableFilter<"Event"> | string | null
     content_language?: StringFilter<"Event"> | string
     translation_group?: StringNullableFilter<"Event"> | string | null
+    performance_language?: StringNullableFilter<"Event"> | string | null
+    subtitle_language?: StringNullableFilter<"Event"> | string | null
     genre?: StringNullableFilter<"Event"> | string | null
     company?: StringNullableListFilter<"Event">
     director?: StringNullableFilter<"Event"> | string | null
@@ -22420,6 +22484,8 @@ export namespace Prisma {
     language?: string | null
     content_language?: string
     translation_group?: string | null
+    performance_language?: string | null
+    subtitle_language?: string | null
     genre?: string | null
     company?: EventCreatecompanyInput | string[]
     director?: string | null
@@ -22448,6 +22514,8 @@ export namespace Prisma {
     language?: string | null
     content_language?: string
     translation_group?: string | null
+    performance_language?: string | null
+    subtitle_language?: string | null
     genre?: string | null
     company?: EventCreatecompanyInput | string[]
     director?: string | null
@@ -22962,6 +23030,8 @@ export namespace Prisma {
     language?: string | null
     content_language?: string
     translation_group?: string | null
+    performance_language?: string | null
+    subtitle_language?: string | null
     genre?: string | null
     company?: EventCreatecompanyInput | string[]
     director?: string | null
@@ -22991,6 +23061,8 @@ export namespace Prisma {
     language?: string | null
     content_language?: string
     translation_group?: string | null
+    performance_language?: string | null
+    subtitle_language?: string | null
     genre?: string | null
     company?: EventCreatecompanyInput | string[]
     director?: string | null
@@ -23090,6 +23162,8 @@ export namespace Prisma {
     language?: NullableStringFieldUpdateOperationsInput | string | null
     content_language?: StringFieldUpdateOperationsInput | string
     translation_group?: NullableStringFieldUpdateOperationsInput | string | null
+    performance_language?: NullableStringFieldUpdateOperationsInput | string | null
+    subtitle_language?: NullableStringFieldUpdateOperationsInput | string | null
     genre?: NullableStringFieldUpdateOperationsInput | string | null
     company?: EventUpdatecompanyInput | string[]
     director?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23119,6 +23193,8 @@ export namespace Prisma {
     language?: NullableStringFieldUpdateOperationsInput | string | null
     content_language?: StringFieldUpdateOperationsInput | string
     translation_group?: NullableStringFieldUpdateOperationsInput | string | null
+    performance_language?: NullableStringFieldUpdateOperationsInput | string | null
+    subtitle_language?: NullableStringFieldUpdateOperationsInput | string | null
     genre?: NullableStringFieldUpdateOperationsInput | string | null
     company?: EventUpdatecompanyInput | string[]
     director?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23328,6 +23404,8 @@ export namespace Prisma {
     language?: string | null
     content_language?: string
     translation_group?: string | null
+    performance_language?: string | null
+    subtitle_language?: string | null
     genre?: string | null
     company?: EventCreatecompanyInput | string[]
     director?: string | null
@@ -23392,6 +23470,8 @@ export namespace Prisma {
     language?: NullableStringFieldUpdateOperationsInput | string | null
     content_language?: StringFieldUpdateOperationsInput | string
     translation_group?: NullableStringFieldUpdateOperationsInput | string | null
+    performance_language?: NullableStringFieldUpdateOperationsInput | string | null
+    subtitle_language?: NullableStringFieldUpdateOperationsInput | string | null
     genre?: NullableStringFieldUpdateOperationsInput | string | null
     company?: EventUpdatecompanyInput | string[]
     director?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23420,6 +23500,8 @@ export namespace Prisma {
     language?: NullableStringFieldUpdateOperationsInput | string | null
     content_language?: StringFieldUpdateOperationsInput | string
     translation_group?: NullableStringFieldUpdateOperationsInput | string | null
+    performance_language?: NullableStringFieldUpdateOperationsInput | string | null
+    subtitle_language?: NullableStringFieldUpdateOperationsInput | string | null
     genre?: NullableStringFieldUpdateOperationsInput | string | null
     company?: EventUpdatecompanyInput | string[]
     director?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23447,6 +23529,8 @@ export namespace Prisma {
     language?: NullableStringFieldUpdateOperationsInput | string | null
     content_language?: StringFieldUpdateOperationsInput | string
     translation_group?: NullableStringFieldUpdateOperationsInput | string | null
+    performance_language?: NullableStringFieldUpdateOperationsInput | string | null
+    subtitle_language?: NullableStringFieldUpdateOperationsInput | string | null
     genre?: NullableStringFieldUpdateOperationsInput | string | null
     company?: EventUpdatecompanyInput | string[]
     director?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23480,6 +23564,8 @@ export namespace Prisma {
     language?: string | null
     content_language?: string
     translation_group?: string | null
+    performance_language?: string | null
+    subtitle_language?: string | null
     genre?: string | null
     company?: EventCreatecompanyInput | string[]
     director?: string | null
@@ -23526,6 +23612,8 @@ export namespace Prisma {
     language?: NullableStringFieldUpdateOperationsInput | string | null
     content_language?: StringFieldUpdateOperationsInput | string
     translation_group?: NullableStringFieldUpdateOperationsInput | string | null
+    performance_language?: NullableStringFieldUpdateOperationsInput | string | null
+    subtitle_language?: NullableStringFieldUpdateOperationsInput | string | null
     genre?: NullableStringFieldUpdateOperationsInput | string | null
     company?: EventUpdatecompanyInput | string[]
     director?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23554,6 +23642,8 @@ export namespace Prisma {
     language?: NullableStringFieldUpdateOperationsInput | string | null
     content_language?: StringFieldUpdateOperationsInput | string
     translation_group?: NullableStringFieldUpdateOperationsInput | string | null
+    performance_language?: NullableStringFieldUpdateOperationsInput | string | null
+    subtitle_language?: NullableStringFieldUpdateOperationsInput | string | null
     genre?: NullableStringFieldUpdateOperationsInput | string | null
     company?: EventUpdatecompanyInput | string[]
     director?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23581,6 +23671,8 @@ export namespace Prisma {
     language?: NullableStringFieldUpdateOperationsInput | string | null
     content_language?: StringFieldUpdateOperationsInput | string
     translation_group?: NullableStringFieldUpdateOperationsInput | string | null
+    performance_language?: NullableStringFieldUpdateOperationsInput | string | null
+    subtitle_language?: NullableStringFieldUpdateOperationsInput | string | null
     genre?: NullableStringFieldUpdateOperationsInput | string | null
     company?: EventUpdatecompanyInput | string[]
     director?: NullableStringFieldUpdateOperationsInput | string | null

@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
-import { useLanguage } from "@/lib/language-context"
+import { useLanguage, translations } from "@/lib/language-context"
 // Removed static import - now using API
 
 // Define Event interface locally
@@ -24,11 +24,24 @@ interface Event {
   posterUrl: string
   isFeatured: boolean
   tags: string[]
+  translationGroup?: string
+  originalId: number
+  theatreName?: string
+  theatreCity?: string
+  theatreCountry?: string
+  synopsis?: string
+  director?: string
+  cast?: string[]
+  genre?: string
+  language?: string
+  duration?: string
+  price?: string
+  contentLanguage?: string
 }
 import Link from "next/link"
 
 export default function ProgramPage() {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const [selectedDate, setSelectedDate] = useState<string>("All Dates")
   const [selectedVenue, setSelectedVenue] = useState("All Venues")
   const [selectedType, setSelectedType] = useState("All Types")
@@ -37,44 +50,58 @@ export default function ProgramPage() {
   const [venues, setVenues] = useState<string[]>(["All Venues"])
   const [types, setTypes] = useState<string[]>(["All Types"])
 
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const response = await fetch('/api/events')
-        if (!response.ok) {
-          throw new Error('Failed to fetch events')
+
+  // Function to generate booking URL
+  const getBookingUrl = (event: Event) => {
+    return `/ticket-reservation`
+  }
+
+  const fetchEvents = async () => {
+    try {
+      const response = await fetch(`/api/events?language=${language}&t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
         }
-        const eventsData = await response.json()
-        
-        const mappedPerformances: Event[] = eventsData.map((event: any) => ({
-          id: `performance-${event.id}`,
-          title: event.title,
-          eventType: event.eventType as "performance" | "workshop" | "discussion",
-          date: event.date,
-          time: event.time,
-          venue: event.venue,
-          company: event.company,
-          description: event.synopsis,
-          imageUrl: event.imageUrl,
-          posterUrl: event.posterUrl,
-          isFeatured: event.isFeatured,
-          tags: [event.genre, event.language, event.duration].filter(Boolean) as string[],
-        }))
-
-        setEvents(mappedPerformances)
-        const uniqueDates = ["All Dates", ...new Set(mappedPerformances.map(e => e.date))]
-        console.log('Available dates for dropdown:', uniqueDates)
-        setDates(uniqueDates)
-        setVenues(["All Venues", ...new Set(mappedPerformances.map(e => e.venue))])
-        setTypes(["All Types", ...new Set(mappedPerformances.map(e => e.eventType))])
-      } catch (error) {
-        console.error('Error fetching events:', error)
-        setEvents([])
+      })
+      if (!response.ok) {
+        throw new Error('Failed to fetch events')
       }
-    }
+      const eventsData = await response.json()
+      
+      const mappedPerformances: Event[] = eventsData.map((event: any) => ({
+        id: `performance-${event.id}`,
+        title: event.title,
+        eventType: event.eventType as "performance" | "workshop" | "discussion",
+        date: event.date,
+        time: event.time,
+        venue: event.venue,
+        company: event.company,
+        description: event.synopsis,
+        imageUrl: event.imageUrl,
+        posterUrl: event.posterUrl,
+        isFeatured: event.isFeatured,
+        tags: [event.genre, event.language, event.duration].filter(Boolean) as string[],
+        translationGroup: event.translationGroup,
+        originalId: event.id
+      }))
 
+      setEvents(mappedPerformances)
+      const uniqueDates = ["All Dates", ...new Set(mappedPerformances.map(e => e.date))]
+      console.log('Available dates for dropdown:', uniqueDates)
+      setDates(uniqueDates)
+      setVenues(["All Venues", ...new Set(mappedPerformances.map(e => e.venue))])
+      setTypes(["All Types", ...new Set(mappedPerformances.map(e => e.eventType))])
+    } catch (error) {
+      console.error('Error fetching events:', error)
+      setEvents([])
+    }
+  }
+
+  useEffect(() => {
     fetchEvents()
-  }, [])
+  }, [language])
 
   const filteredEvents = events.filter((event) => {
     return (
@@ -161,18 +188,21 @@ export default function ProgramPage() {
             </SelectContent>
           </Select>
 
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => {
-              setSelectedDate("All Dates")
-              setSelectedVenue("All Venues")
-              setSelectedType("All Types")
-            }}
-            className="bg-secondary-blue hover:bg-secondary-blue/90 text-white border-secondary-blue px-3 py-2 text-sm"
-          >
-            Reset
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => {
+                setSelectedDate("All Dates")
+                setSelectedVenue("All Venues")
+                setSelectedType("All Types")
+              }}
+              className="bg-secondary-blue hover:bg-secondary-blue/90 text-white border-secondary-blue px-3 py-2 text-sm"
+            >
+              Reset
+            </Button>
+
+          </div>
         </div>
       </div>
 
@@ -209,7 +239,7 @@ export default function ProgramPage() {
                           <p className="font-semibold text-secondary-blue">{event.time}</p>
                           <div className="flex items-center text-sm text-muted-foreground">
                             <MapPin className="mr-1 h-4 w-4" />
-                            {event.venue}
+                            {translations[language][event.venue as keyof typeof translations[typeof language]] || event.venue}
                           </div>
                           <Badge className={`${getBadgeColor(event.eventType)}`}>
                             {t(event.eventType)}
@@ -220,16 +250,16 @@ export default function ProgramPage() {
                             <img
                               src={event.posterUrl as string}
                               alt={`${event.title} poster`}
-                              className="mb-2 h-20 w-12 sm:h-24 sm:w-16 md:h-28 md:w-20 lg:h-32 lg:w-24 rounded-md object-cover"
+                              className="mb-2 h-16 w-10 sm:h-20 sm:w-12 md:h-24 md:w-16 lg:h-28 lg:w-20 rounded-md object-cover flex-shrink-0"
                             />
                           ) : (event.imageUrl && event.imageUrl.trim() !== "") ? (
                             <img
                               src={event.imageUrl}
                               alt={`${event.title} poster`}
-                              className="mb-2 h-20 w-12 sm:h-24 sm:w-16 md:h-28 md:w-20 lg:h-32 lg:w-24 rounded-md object-cover"
+                              className="mb-2 h-16 w-10 sm:h-20 sm:w-12 md:h-24 md:w-16 lg:h-28 lg:w-20 rounded-md object-cover flex-shrink-0"
                             />
                           ) : (
-                            <div className="mb-2 h-20 w-12 sm:h-24 sm:w-16 md:h-28 md:w-20 lg:h-32 lg:w-24 bg-gray-200 rounded-md flex items-center justify-center text-muted-foreground text-xs">
+                            <div className="mb-2 h-16 w-10 sm:h-20 sm:w-12 md:h-24 md:w-16 lg:h-28 lg:w-20 bg-gray-200 rounded-md flex items-center justify-center text-muted-foreground text-xs flex-shrink-0">
                               No image
                             </div>
                           )}
@@ -244,7 +274,7 @@ export default function ProgramPage() {
                               </p>
                             )}
                             <div className="flex flex-wrap gap-2">
-                            <Link href={`/tickets?event=${event.id}`} passHref>
+                            <Link href={getBookingUrl(event)} passHref>
                               <Button size="sm">{t("bookTicket")}</Button>
                             </Link>
                             <Link href={`/performances/${event.id}`} passHref>
@@ -403,11 +433,14 @@ export default function ProgramPage() {
                                   <h5 className="font-semibold text-lg mb-1">{event.title}</h5>
                                   <p className="text-sm text-muted-foreground mb-2">
                                     <MapPin className="inline h-3 w-3 mr-1" />
-                                    {event.venue}
+                                    {translations[language][event.venue as keyof typeof translations[typeof language]] || event.venue}
                                   </p>
-                                  <p className="text-sm mb-3">{Array.isArray(event.company) ? event.company.join(", ") : event.company}</p>
+                                  <p className="text-sm mb-3">
+                                    <span className="font-medium">{translations[language].theatreName}: </span>
+                                    {Array.isArray(event.company) ? event.company.join(' & ') : event.company}
+                                  </p>
                                   <div className="flex gap-2">
-                                    <Link href={`/tickets?event=${event.id}`}>
+                                    <Link href={getBookingUrl(event)}>
                                       <Button size="sm" className="bg-primary-gold hover:bg-primary-gold/90">
                                         Book Ticket
                                       </Button>

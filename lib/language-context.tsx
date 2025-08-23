@@ -70,6 +70,7 @@ const translations = {
     // Participants/Theatres
     participantsDescription: "Discover the talented theatres participating in Acting Europe 2025",
     participatingTheatres: "Participating Theatres",
+    theatreName: "Theatre Name",
     theatreHistory: "Theatre History",
     gallery: "Gallery",
     founded: "Founded",
@@ -146,6 +147,10 @@ const translations = {
     date: "Date",
     time: "Time",
     venue: "Venue",
+    duration: "Duration",
+    director: "Director",
+    cast: "Cast",
+    synopsis: "Synopsis",
     price: "Price",
     total: "Total",
     back: "Back",
@@ -190,6 +195,29 @@ const translations = {
     downloadTicket: "Download Ticket",
     noPerformancesYet: "No performances available yet",
     noPerformancesYetDesc: "Please check back later or contact the administrator for more information.",
+    ticketsNotReleased: "Tickets are yet to be released",
+    ticketsNotReleasedDesc: "Seat selection is temporarily disabled. Please check back later.",
+    
+    // Ticket Reservation Page
+    ticketReservationTitle: "Ticket Reservations",
+    ticketReservationSubtitle: "Tickets will be available soon",
+    ticketAvailabilityTitle: "Tickets Coming Soon",
+    ticketAvailabilityMessage: "Ticket sales for Acting Europe 2025 will open at a later date. We're working hard to finalize all the details to bring you the best possible experience.",
+    stayUpdatedTitle: "Stay Updated with Acting Europe",
+    registerForUpdatesMessage: "Register for an account to stay updated with all Acting Europe news, events, and be the first to know when tickets become available!",
+    registerNow: "Register Now",
+    exploreWhileWaiting: "While you wait, explore what Acting Europe has to offer:",
+    thankYou: "Thank You!",
+    emailSubmittedMessage: "We've added your email to our notification list. You'll be among the first to know when tickets become available!",
+    backToHome: "Back to Home",
+    
+    // Performance page specific
+    bookYourTickets: "Book Your Tickets",
+    subtitles: "Subtitles:",
+    suitableForAges: "Suitable for ages 12+",
+    addToCalendar: "Add to Calendar",
+    needAssistance: "Need assistance?",
+    contactBoxOffice: "Contact our box office at:",
 
     // Workshops
     workshops: "Workshops",
@@ -257,9 +285,12 @@ const translations = {
     allTypes: "All Types",
     listView: "List View",
     calendarView: "Calendar View",
-    addToCalendar: "Add to Calendar",
     noEventsYet: "No events have been added yet. Please check back later.",
     noEventsMatchFilter: "No events match your filter criteria. Please try different filters.",
+
+    // Venue translations
+    "Main Stage": "Main Stage",
+    "Chamber Stage": "Chamber Stage",
 
     // Event types
     performance: "Performance",
@@ -342,6 +373,7 @@ const translations = {
     // Participants/Theatres
     participantsDescription: "Открийте талантливите театри, участващи в Актинг Европа 2025",
     participatingTheatres: "Участващи театри",
+    theatreName: "Име на театъра",
     theatreHistory: "История на театъра",
     gallery: "Галерия",
     founded: "Основан",
@@ -375,6 +407,10 @@ const translations = {
     date: "Дата",
     time: "Час",
     venue: "Място",
+    duration: "Продължителност",
+    director: "Режисьор",
+    cast: "Актьорски състав",
+    synopsis: "Синопсис",
     price: "Цена",
     total: "Общо",
     back: "Назад",
@@ -419,6 +455,29 @@ const translations = {
     downloadTicket: "Изтегли билет",
     noPerformancesYet: "Все още няма налични представления",
     noPerformancesYetDesc: "Моля, проверете по-късно или се свържете с администратора за повече информация.",
+    ticketsNotReleased: "Билетите все още не са пуснати",
+    ticketsNotReleasedDesc: "Избирането на места е временно деактивирано. Моля, проверете по-късно.",
+    
+    // Ticket Reservation Page
+    ticketReservationTitle: "Резервации за билети",
+    ticketReservationSubtitle: "Билетите ще бъдат налични скоро",
+    ticketAvailabilityTitle: "Билетите предстоят скоро",
+    ticketAvailabilityMessage: "Продажбата на билети за Актинг Европа 2025 ще започне по-късно. Работим усилено, за да финализираме всички детайли и да ви предоставим най-доброто възможно преживяване.",
+    stayUpdatedTitle: "Останете в крак с Актинг Европа",
+    registerForUpdatesMessage: "Регистрирайте се за акаунт, за да останете в крак с всички новини, събития на Актинг Европа и да бъдете първите, които ще научат кога билетите стават налични!",
+    registerNow: "Регистрирайте се сега",
+    exploreWhileWaiting: "Докато чакате, разгледайте какво предлага Актинг Европа:",
+    thankYou: "Благодарим ви!",
+    emailSubmittedMessage: "Добавихме вашия имейл в нашия списък за уведомления. Ще бъдете сред първите, които ще научат кога билетите стават налични!",
+    backToHome: "Обратно към началото",
+    
+    // Performance page specific
+    bookYourTickets: "Резервирайте билетите си",
+    subtitles: "Субтитри:",
+    suitableForAges: "Подходящо за възраст 12+",
+    addToCalendar: "Добави в календара",
+    needAssistance: "Нуждаете се от помощ?",
+    contactBoxOffice: "Свържете се с нашата каса на:",
 
     // Workshops
     workshops: "Работилници",
@@ -487,9 +546,12 @@ const translations = {
     allTypes: "Всички типове",
     listView: "Списъчен изглед",
     calendarView: "Календарен изглед",
-    addToCalendar: "Добави в календар",
     noEventsYet: "Все още няма добавени събития. Моля, проверете по-късно.",
     noEventsMatchFilter: "Няма събития, отговарящи на критериите за филтриране. Моля, опитайте с различни филтри.",
+
+    // Venue translations
+    "Main Stage": "Главна Сцена",
+    "Chamber Stage": "Камерна Сцена",
 
     // Event types
     performance: "Представление",
@@ -561,6 +623,9 @@ const translations = {
     failedToSendVerificationEmail: "Неуспешно изпращане на имейл за потвърждение. Моля, опитайте отново.",
     somethingWentWrong: "Нещо се обърка",
     error: "Грешка",
+
+    // Registration
+    signupDisclaimer: "Регистрирайки се, вие се съгласявате да получавате промоционални имейли от Актинг Европа.",
   },
   mk: {
     // Navigation
@@ -614,6 +679,7 @@ const translations = {
     // Participants/Theatres
     participantsDescription: "Откријте ги талентираните театри што учествуваат во Актинг Европа 2025",
     participatingTheatres: "Учеснички театри",
+    theatreName: "Име на театарот",
     theatreHistory: "Историја на театарот",
     gallery: "Галерија",
     founded: "Основан",
@@ -647,6 +713,10 @@ const translations = {
     date: "Датум",
     time: "Време",
     venue: "Место",
+    duration: "Времетраење",
+    director: "Режисер",
+    cast: "Актерски состав",
+    synopsis: "Синопсис",
     price: "Цена",
     total: "Вкупно",
     back: "Назад",
@@ -692,6 +762,29 @@ const translations = {
     downloadTicket: "Преземи билет",
     noPerformancesYet: "Сè уште нема достапни претстави",
     noPerformancesYetDesc: "Ве молиме проверете подоцна или контактирајте го администраторот за повеќе информации.",
+    ticketsNotReleased: "Билетите сè уште не се пуштени",
+    ticketsNotReleasedDesc: "Изборот на седишта е привремено деактивиран. Ве молиме проверете подоцна.",
+    
+    // Ticket Reservation Page
+    ticketReservationTitle: "Резервации за билети",
+    ticketReservationSubtitle: "Билетите ќе бидат достапни наскоро",
+    ticketAvailabilityTitle: "Билетите доаѓаат наскоро",
+    ticketAvailabilityMessage: "Продажбата на билети за Актинг Европа 2025 ќе започне подоцна. Работиме напорно за да ги финализираме сите детали и да ви обезбедиме најдобро можно искуство.",
+    stayUpdatedTitle: "Останете во тек со Актинг Европа",
+    registerForUpdatesMessage: "Регистрирајте се за да останете во тек со сите вести, настани на Актинг Европа и да бидете први кои ќе дознаат кога билетите стануваат достапни!",
+    registerNow: "Регистрирајте се сега",
+    exploreWhileWaiting: "Додека чекате, истражете што нуди Актинг Европа:",
+    thankYou: "Ви благодариме!",
+    emailSubmittedMessage: "Го додадовме вашиот е-маил во нашата листа за известувања. Ќе бидете меѓу првите кои ќе дознаат кога билетите стануваат достапни!",
+    backToHome: "Назад кон почетната",
+    
+    // Performance page specific
+    bookYourTickets: "Резервирајте ги вашите билети",
+    subtitles: "Титлови:",
+    suitableForAges: "Погодно за возраст 12+",
+    addToCalendar: "Додај во календар",
+    needAssistance: "Ви треба помош?",
+    contactBoxOffice: "Контактирајте ја нашата каса на:",
 
     // Workshops
     workshops: "Работилници",
@@ -760,9 +853,12 @@ const translations = {
     allTypes: "Сите типови",
     listView: "Преглед на листа",
     calendarView: "Календарски преглед",
-    addToCalendar: "Додади во календар",
     noEventsYet: "Сѐ уште нема додадени настани. Проверете подоцна.",
     noEventsMatchFilter: "Нема настани што одговараат на вашите критериуми за филтрирање. Пробајте различни филтри.",
+
+    // Venue translations
+    "Main Stage": "Главна Сцена",
+    "Chamber Stage": "Камерна Сцена",
 
     // Event types
     performance: "Претстава",
@@ -833,6 +929,9 @@ const translations = {
     failedToSendVerificationEmail: "Неуспешно испраќање на е-маил за потврда. Ве молиме обидете се повторно.",
     somethingWentWrong: "Нешто тргна наопаку",
     error: "Грешка",
+
+    // Registration
+    signupDisclaimer: "Со регистрирањето, се согласувате да примате промотивни е-маили од Актинг Европа.",
   },
   sr: {
     // Navigation
@@ -886,6 +985,7 @@ const translations = {
     // Participants/Theatres
     participantsDescription: "Откријте талентована позоришта која учествују у Актинг Европа 2025",
     participatingTheatres: "Позоришта учесници",
+    theatreName: "Име позоришта",
     theatreHistory: "Историја позоришта",
     gallery: "Галерија",
     founded: "Основано",
@@ -919,6 +1019,10 @@ const translations = {
     date: "Датум",
     time: "Време",
     venue: "Место",
+    duration: "Трајање",
+    director: "Режисер",
+    cast: "Глумачка постава",
+    synopsis: "Синопсис",
     price: "Цена",
     total: "Укупно",
     back: "Назад",
@@ -964,6 +1068,29 @@ const translations = {
     downloadTicket: "Преузми карту",
     noPerformancesYet: "Још увек нема доступних представа",
     noPerformancesYetDesc: "Молимо проверите касније или контактирајте администратора за више информација.",
+    ticketsNotReleased: "Карте још увек нису пуштене",
+    ticketsNotReleasedDesc: "Избор седишта је привремено деактивиран. Молимо проверите касније.",
+    
+    // Ticket Reservation Page
+    ticketReservationTitle: "Резервације карата",
+    ticketReservationSubtitle: "Карте ће бити доступне ускоро",
+    ticketAvailabilityTitle: "Карте ускоро",
+    ticketAvailabilityMessage: "Продаја карата за Актинг Европа 2025 ће почети касније. Напорно радимо да финализујемо све детаље и пружимо вам најбоље могуће искуство.",
+    stayUpdatedTitle: "Останите у току са Актинг Европом",
+    registerForUpdatesMessage: "Региструјте се за налог да останете у току са свим вестима, догађајима Актинг Европе и будите први који ће сазнати када карте постану доступне!",
+    registerNow: "Региструјте се сада",
+    exploreWhileWaiting: "Док чекате, истражите шта Актинг Европа нуди:",
+    thankYou: "Хвала вам!",
+    emailSubmittedMessage: "Додали смо ваш имејл у нашу листу за обавештења. Бићете међу првима који ће сазнати када карте постану доступне!",
+    backToHome: "Назад на почетну",
+    
+    // Performance page specific
+    bookYourTickets: "Резервишите ваше карте",
+    subtitles: "Титлови:",
+    suitableForAges: "Погодно за узраст 12+",
+    addToCalendar: "Додај у календар",
+    needAssistance: "Треба вам помоћ?",
+    contactBoxOffice: "Контактирајте нашу касу на:",
 
     // Workshops
     workshops: "Радионице",
@@ -1031,10 +1158,13 @@ const translations = {
     allTypes: "Сви типови",
     listView: "Преглед листе",
     calendarView: "Календарски преглед",
-    addToCalendar: "Додај у календар",
     noEventsYet: "Још увек нема додатих догађаја. Молимо проверите касније.",
     noEventsMatchFilter:
       "Нема догађаја који одговарају вашим критеријумима филтрирања. Покушајте са другачијим филтрима.",
+
+    // Venue translations
+    "Main Stage": "Главна Сцена",
+    "Chamber Stage": "Камерна Сцена",
 
     // Event types
     performance: "Представа",
@@ -1106,6 +1236,9 @@ const translations = {
     failedToSendVerificationEmail: "Неуспешно слање е-маила за потврду. Молимо покушајте поново.",
     somethingWentWrong: "Нешто је пошло по зло",
     error: "Грешка",
+
+    // Registration
+    signupDisclaimer: "Регистровањем се слажете да примате промотивне имејлове од Актинг Европе.",
   },
 }
 
@@ -1134,6 +1267,9 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   return <LanguageContext.Provider value={{ language, setLanguage, t }}>{children}</LanguageContext.Provider>
 }
+
+// Export translations object
+export { translations }
 
 // Custom hook to use the language context
 export function useLanguage() {

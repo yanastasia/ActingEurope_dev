@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useLanguage } from "@/lib/language-context"
+import { useLanguage, translations } from "@/lib/language-context"
 import { Calendar, Clock, MapPin, Search } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
@@ -29,7 +29,7 @@ interface Performance {
 
 export default function PerformancesPage() {
   const router = useRouter()
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const [performances, setPerformances] = useState<Performance[]>([])
   const [filteredPerformances, setFilteredPerformances] = useState<Performance[]>([])
   const [searchTerm, setSearchTerm] = useState("")
@@ -41,7 +41,7 @@ export default function PerformancesPage() {
     // Fetch performances from API
     const fetchPerformances = async () => {
       try {
-        const response = await fetch('/api/events')
+        const response = await fetch(`/api/events?language=${language}`)
         if (response.ok) {
           const data = await response.json()
           setPerformances(data)
@@ -55,7 +55,7 @@ export default function PerformancesPage() {
     }
 
     fetchPerformances()
-  }, [])
+  }, [language])
 
   useEffect(() => {
     // Filter performances based on search and filters
@@ -187,7 +187,7 @@ export default function PerformancesPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <MapPin className="h-4 w-4" />
-                    {performance.venue}
+                    {translations[language][performance.venue as keyof typeof translations[typeof language]] || performance.venue}
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -197,7 +197,7 @@ export default function PerformancesPage() {
                     </Link>
                   </Button>
                   <Button variant="outline" asChild>
-                    <Link href={`/tickets?performance=${performance.id}`}>
+                    <Link href="/ticket-reservation">
                       Book Tickets
                     </Link>
                   </Button>

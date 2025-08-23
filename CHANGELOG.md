@@ -6,6 +6,18 @@ All notable changes to the Acting Europe project will be documented in this file
 
 ### Added
 
+#### Ticket Reservation Improvements
+- **Simplified Reservation Form**: Removed email field requirement from ticket reservation
+  - Streamlined user experience with fewer required fields
+  - Updated reservation form validation
+  - Maintained data integrity while reducing user friction
+
+#### Content Updates
+- **Hero Slide Translations**: Updated hero slide content with improved translations
+  - Enhanced multilingual content for better user engagement
+  - Consistent messaging across all supported languages
+  - Updated translation files for hero section
+
 #### Multilingual Content Management
 - **Theatre Management with Translation Groups**: Implemented automatic multilingual theatre creation
   - New theatres are automatically created in all supported languages (English, Bulgarian, Macedonian, Serbian)

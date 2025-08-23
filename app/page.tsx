@@ -12,7 +12,7 @@ import { useLanguage } from "@/lib/language-context"
 // Removed static import - now using API
 
 export default function Home() {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const [featuredPerformance, setFeaturedPerformance] = useState<any | null>(null)
   const [featuredPerformances, setFeaturedPerformances] = useState<any[]>([])
   const [allSlides, setAllSlides] = useState<any[]>([])
@@ -41,7 +41,7 @@ export default function Home() {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await fetch('/api/events')
+        const response = await fetch(`/api/events?language=${language}`)
         if (!response.ok) {
           throw new Error('Failed to fetch events')
         }
@@ -71,10 +71,10 @@ export default function Home() {
         const heroSlide = {
           id: "hero",
           type: "hero",
-          title: t("Acting Europe"),
-          subtitle: t("Theatre Without Borders"),
-          description: t("An international festival celebrating cultural exchange and artistic collaboration."),
-          date: t("September 18-21, 2025 • Kyustendil, Bulgaria")
+          title: t("heroTitle"),
+          subtitle: t("heroSubtitle"),
+          description: t("heroDescription"),
+          date: t("heroDate")
         };
 
         // Combine hero slide with performance slides
@@ -95,16 +95,16 @@ export default function Home() {
         setAllSlides([{
           id: "hero",
           type: "hero",
-          title: t("Acting Europe"),
-          subtitle: t("Theatre Without Borders"),
-          description: t("An international festival celebrating cultural exchange and artistic collaboration"),
-          date: t("September 18-21, 2025 • Kyustendil, Bulgaria")
+          title: t("heroTitle"),
+          subtitle: t("heroSubtitle"),
+          description: t("heroDescription"),
+          date: t("heroDate")
         }])
       }
     }
 
     fetchEvents()
-  }, [t])
+  }, [t, language])
 
   return (
     <div className="flex flex-col">
@@ -200,7 +200,7 @@ export default function Home() {
                                   className="bg-secondary-blue border-2 border-white text-white hover:bg-secondary-blue/90 font-semibold px-8 py-3 transform transition-transform hover:scale-105"
                                   asChild
                                 >
-                                  <Link href="/tickets">{t("bookTickets")}</Link>
+                                  <Link href="/ticket-reservation">{t("bookTickets")}</Link>
                                 </Button>
                               </div>
                             </div>
@@ -288,7 +288,7 @@ export default function Home() {
           <div className="grid gap-6 md:grid-cols-3">
             <QuickLinkCard title={t("latestNews")} href="/news" icon={Newspaper} description={t("latestNewsDesc")} />
             <QuickLinkCard title={t("program")} href="/program" icon={Calendar} description={t("programDesc")} />
-            <QuickLinkCard title={t("bookTickets")} href="/tickets" icon={Ticket} description={t("bookTicketsDesc")} />
+            <QuickLinkCard title={t("bookTickets")} href="/ticket-reservation" icon={Ticket} description={t("bookTicketsDesc")} />
           </div>
         </div>
       </section>

@@ -51,11 +51,29 @@ export default function AdminAboutPage() {
 
   const fetchAboutPages = async () => {
     try {
-      const response = await fetch('/api/about');
-      if (response.ok) {
-        const data = await response.json();
-        setAboutPages(Array.isArray(data) ? data : [data].filter(Boolean));
+      // Fetch about pages for all languages
+      const languages = ['en', 'bg', 'mk', 'sr'];
+      const allPages: AboutPage[] = [];
+      
+      for (const lang of languages) {
+        const response = await fetch(`/api/about?language=${lang}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data) {
+            allPages.push({
+              id: data.id,
+              title: data.title,
+              content: data.content,
+              contentLanguage: data.content_language,
+              translationGroup: data.translation_group,
+              createdAt: new Date(data.created_at),
+              updatedAt: new Date(data.updated_at)
+            });
+          }
+        }
       }
+      
+      setAboutPages(allPages);
     } catch (error) {
       console.error('Error fetching about pages:', error);
     }

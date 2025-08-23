@@ -136,6 +136,8 @@ model Event {
   language       String?    @db.VarChar(50)
   content_language String   @default("en") @db.VarChar(5)
   translation_group String? @db.VarChar(100)
+  performance_language String? @db.VarChar(50)
+  subtitle_language String? @db.VarChar(50)
   genre          String?    @db.VarChar(100)
   company        String[]   @default([])
   director       String?    @db.VarChar(255)

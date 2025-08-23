@@ -199,6 +199,52 @@ ContactPage {
 - Language switching maintains content consistency
 - Admin can edit content in any supported language
 
+## Recent Translation and UI Improvements
+
+### Ticket Reservation Form Simplification
+
+**Implementation Date**: Latest development session
+
+**Changes Made**:
+1. **Removed Email Field**: Simplified ticket reservation form by removing email requirement
+   - Updated `app/ticket-reservation/page.tsx` to remove email input and related state
+   - Replaced email submission with registration prompt
+   - Added link to `/signup` page for user registration
+   - Updated translation keys in `lib/language-context.tsx`
+
+**Translation Key Updates**:
+- Replaced `emailNotificationTitle`, `emailNotificationMessage`, `submitEmail` keys
+- Added new keys: `stayUpdatedTitle`, `registerForUpdatesMessage`, `registerNow`
+- Updated all supported languages (English, Bulgarian, Macedonian, Serbian)
+
+**Files Modified**:
+- `app/ticket-reservation/page.tsx`: Removed email form, added registration prompt
+- `lib/language-context.tsx`: Updated translation keys for all languages
+
+### Hero Slide Translation Improvements
+
+**Implementation Date**: Latest development session
+
+**Changes Made**:
+1. **Fixed Hardcoded Text**: Replaced hardcoded English text in hero slide with proper translation keys
+   - Updated `app/page.tsx` to use correct translation keys
+   - Changed from hardcoded strings like "Acting Europe" to `t("heroTitle")`
+   - Ensured consistent multilingual support for hero content
+
+**Translation Keys Used**:
+- `heroTitle`: "Acting Europe"
+- `heroSubtitle`: "Theatre Without Borders"
+- `heroDescription`: Hero section description
+- `heroDate`: Event date information
+
+**Files Modified**:
+- `app/page.tsx`: Updated hero slide to use proper translation keys
+
+**Benefits**:
+- Consistent multilingual experience across all languages
+- Proper translation system integration
+- Eliminates hardcoded English text in multilingual application
+
 ## Migration Notes
 
 No database migration is required as:
@@ -206,3 +252,4 @@ No database migration is required as:
 - The existing data structure supports the new functionality
 - All changes are backward compatible
 - New tables (AboutPage, ContactPage) are created automatically by Prisma
+- Recent UI changes only affect frontend components and translation files

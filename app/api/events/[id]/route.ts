@@ -1,12 +1,17 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { performances } from '@/lib/performance-data'
+import { getEventTranslationGroup, updateEvent, deleteEventWithTranslations, getTheatreByIdAndLanguage } from '@/lib/database-operations'
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
   try {
-    const { id } = params
+    const { id } = resolvedParams
+    const { searchParams } = new URL(request.url)
+    const requestedLanguage = searchParams.get('language') || 'en'
     
-    const event = await prisma.event.findUnique({
+    // First, try to find the event by ID
+    let event = await prisma.event.findUnique({
       where: {
         id: parseInt(id),
       },
@@ -19,6 +24,29 @@ export async function GET(request: Request, { params }: { params: { id: string }
     if (!event) {
       return NextResponse.json({ error: 'Event not found' }, { status: 404 })
     }
+
+    // If the event's content language doesn't match the requested language,
+    // try to find the translation in the requested language
+    if (event.content_language !== requestedLanguage && event.translation_group) {
+      const translatedEvent = await prisma.event.findFirst({
+        where: {
+          translation_group: event.translation_group,
+          content_language: requestedLanguage,
+        },
+        include: {
+          theatre: true,
+          venue: true,
+        },
+      })
+      
+      // Use the translated event if found, otherwise keep the original
+      if (translatedEvent) {
+        event = translatedEvent
+      }
+    }
+
+    // Get theatre name in the requested language instead of event's content language
+    const theatre = await getTheatreByIdAndLanguage(event.theatre_id, requestedLanguage);
 
     // Transform the data to match the expected format
     const transformedEvent = {
@@ -47,9 +75,14 @@ export async function GET(request: Request, { params }: { params: { id: string }
       price: event.price ? `€${event.price}` : 'Free',
       eventType: event.event_type,
       isFeatured: event.is_featured,
-      theatreName: event.theatre.name,
-      theatreCity: event.theatre.city,
-      theatreCountry: event.theatre.country,
+      theatreName: theatre?.name || event.theatre.name,
+      theatreCity: theatre?.city || event.theatre.city,
+      theatreCountry: theatre?.country || event.theatre.country,
+      contentLanguage: event.content_language,
+      translationGroup: event.translation_group,
+      theatreId: event.theatre_id,
+      venueId: event.venue_id,
+      subtitles: event.subtitles
     }
 
     return NextResponse.json(transformedEvent)
@@ -62,17 +95,17 @@ export async function GET(request: Request, { params }: { params: { id: string }
          error.message.includes('database connections opened') ||
          error.name === 'PrismaClientInitializationError')) {
       
-      console.log('Database unavailable, searching fallback performance data for event ID:', params.id)
+      console.log('Database unavailable, searching fallback performance data for event ID:', resolvedParams.id)
       
       // Find the specific performance by ID
-      const performance = performances.find(p => p.id === params.id)
+      const performance = performances.find(p => p.id === resolvedParams.id)
       
       if (performance) {
         // Transform performance data to match expected event format
         const fallbackEvent = {
           id: performance.id,
           title: performance.title,
-          company: Array.isArray(performance.company) ? performance.company[0] : performance.company,
+          company: performance.company,
           date: performance.date,
           time: performance.time,
           venue: performance.venue,
@@ -102,74 +135,132 @@ export async function GET(request: Request, { params }: { params: { id: string }
   }
 }
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
+  console.log('🎯 PUT request received for event ID:', resolvedParams.id);
   try {
-    const { id } = params
+    const eventId = parseInt(resolvedParams.id)
+    
+    if (isNaN(eventId)) {
+      return NextResponse.json({ error: 'Invalid event ID' }, { status: 400 })
+    }
+
     const body = await request.json()
     const {
       title,
+      description,
       eventType,
       date,
       time,
-      venue,
-      company,
-      description,
-      imageUrl,
-      isFeatured,
+      eventDate,
+      eventTime,
+      theatreId,
+      venueId,
       price,
-      tags
+      imageUrl,
+      posterUrl,
+      language,
+      genre,
+      company,
+      director,
+      cast,
+      synopsis,
+      subtitles,
+      duration,
+      isFeatured,
+      performanceLanguage,
+      subtitleLanguage
     } = body
 
-    // Parse date and time (date comes in YYYY-MM-DD format from HTML date input)
-    const eventDate = new Date(date)
-    const [hours, minutes] = time.split(':')
-    const eventTime = new Date()
-    eventTime.setHours(parseInt(hours), parseInt(minutes), 0, 0)
-
-    // Find venue by name
-    const venueRecord = await prisma.venue.findFirst({
-      where: { name: venue }
-    })
-
-    if (!venueRecord) {
-      return NextResponse.json({ error: 'Venue not found' }, { status: 400 })
+    // Handle both formats: admin page sends eventDate/eventTime, API might send date/time
+    let finalEventDate: Date | undefined
+    let finalEventTime: Date | undefined
+    
+    if (eventDate) {
+      finalEventDate = new Date(eventDate)
+    } else if (date) {
+      finalEventDate = new Date(date)
+    }
+    
+    if (eventTime) {
+      if (typeof eventTime === 'string' && eventTime.match(/^\d{1,2}:\d{2}$/)) {
+        // Handle time format like "19:30"
+        const [hours, minutes] = eventTime.split(':')
+        finalEventTime = new Date()
+        finalEventTime.setHours(parseInt(hours), parseInt(minutes), 0, 0)
+      } else {
+        // Handle full date string
+        finalEventTime = new Date(eventTime)
+      }
+    } else if (time) {
+      const [hours, minutes] = time.split(':')
+      finalEventTime = new Date()
+      finalEventTime.setHours(parseInt(hours), parseInt(minutes), 0, 0)
     }
 
-    // Update the event
-    const event = await prisma.event.update({
-      where: { id: parseInt(id) },
-      data: {
-        title,
-        event_type: eventType,
-        event_date: eventDate,
-        event_time: eventTime,
-        venue_id: venueRecord.id,
-        company: Array.isArray(company) ? company : [company],
-        description,
-        image_url: imageUrl,
-        is_featured: isFeatured,
-        price: parseFloat(price) || 0,
-        genre: tags?.join(', ') || 'Drama'
-      }
-    })
+    // Handle theatreId - admin page sends array, but database expects single value
+    let finalTheatreId: number | undefined
+    if (Array.isArray(theatreId) && theatreId.length > 0) {
+      finalTheatreId = theatreId[0] // Take first theatre for now
+    } else if (typeof theatreId === 'number') {
+      finalTheatreId = theatreId
+    } else if (typeof theatreId === 'string') {
+      finalTheatreId = parseInt(theatreId)
+    }
 
-    return NextResponse.json({ success: true, id: event.id })
+    // Handle venue - use provided venueId directly
+    let finalVenueId: number | undefined = venueId ? parseInt(venueId) : undefined
+
+    console.log('🚀 About to call updateEvent with eventId:', eventId)
+    console.log('🔍 updateEvent function type:', typeof updateEvent);
+    console.log('📝 updateEvent function:', updateEvent.toString().substring(0, 200));
+    const updatedEvent = await updateEvent(eventId, {
+      title,
+      description,
+      eventType,
+      eventDate: finalEventDate,
+      eventTime: finalEventTime,
+      theatreId: finalTheatreId,
+      venueId: finalVenueId,
+      price: price ? parseFloat(price) : undefined,
+      imageUrl,
+      posterUrl,
+      language,
+      genre,
+      company: Array.isArray(company) ? company : (company ? [company] : undefined),
+      director,
+      cast: Array.isArray(cast) ? cast : (cast ? [cast] : undefined),
+      synopsis,
+      subtitles,
+      duration,
+      isFeatured,
+      performanceLanguage: Array.isArray(performanceLanguage) ? performanceLanguage : (performanceLanguage ? [performanceLanguage] : undefined),
+      subtitleLanguage: Array.isArray(subtitleLanguage) ? subtitleLanguage : (subtitleLanguage ? [subtitleLanguage] : undefined)
+    })
+    console.log('updateEvent call completed, result:', updatedEvent)
+
+    console.log('Updated event from database:', updatedEvent)
+    const response = { success: true, event: updatedEvent }
+    console.log('API response being sent:', response)
+    return NextResponse.json(response)
   } catch (error) {
     console.error('Error updating event:', error)
     return NextResponse.json({ error: 'Failed to update event' }, { status: 500 })
   }
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params
+    const resolvedParams = await params;
+    const eventId = parseInt(resolvedParams.id)
+    
+    if (isNaN(eventId)) {
+      return NextResponse.json({ error: 'Invalid event ID' }, { status: 400 })
+    }
 
-    // Delete the event
-    await prisma.event.delete({
-      where: { id: parseInt(id) }
-    })
+    await deleteEventWithTranslations(eventId)
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true, message: 'Event and all translations deleted successfully' })
   } catch (error) {
     console.error('Error deleting event:', error)
     return NextResponse.json({ error: 'Failed to delete event' }, { status: 500 })

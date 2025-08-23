@@ -172,7 +172,7 @@ export default async function TheatrePage({ params }: { params: Promise<{ id: st
                   <Link href="/program">View Festival Program</Link>
                 </Button>
                 <Button variant="outline" className="w-full" asChild>
-                  <Link href="/tickets">Book Tickets</Link>
+                  <Link href="/ticket-reservation">Book Tickets</Link>
                 </Button>
               </div>
             </CardContent>

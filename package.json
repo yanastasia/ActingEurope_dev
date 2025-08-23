@@ -46,6 +46,7 @@
     "@radix-ui/react-toggle-group": "latest",
     "@radix-ui/react-tooltip": "latest",
     "@react-email/render": "latest",
+    "@types/uuid": "^10.0.0",
     "autoprefixer": "^10.4.20",
     "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.1",
@@ -58,6 +59,7 @@
     "lucide-react": "^0.454.0",
     "next": "15.2.4",
     "next-themes": "latest",
+    "node-fetch": "^3.3.2",
     "nodemailer": "latest",
     "pdfkit": "latest",
     "react": "^19",
@@ -69,6 +71,7 @@
     "sonner": "latest",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
+    "uuid": "^11.1.0",
     "vaul": "latest",
     "zod": "^3.24.1"
   },

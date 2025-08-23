@@ -13,7 +13,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { Calendar, Ticket, FileText, AlertTriangle, ShieldCheck, Pencil, Trash2, MapPin, Info, Phone, Building } from "lucide-react"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Calendar, Ticket, FileText, AlertTriangle, ShieldCheck, Trash2, MapPin, Info, Phone, Building, Edit } from "lucide-react"
 import { isAdmin } from "@/lib/auth"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/lib/language-context"
@@ -25,14 +26,18 @@ interface Event {
   date: string
   time: string
   venue: string
+  theatreId?: number[]
   company: string[]
   description: string
+  synopsis?: string
   imageUrl: string
   isFeatured: boolean
   price: string
   tags: string[]
   contentLanguage: string
   translationGroup?: string
+  performanceLanguage?: string[]
+  subtitleLanguage?: string[]
 }
 
 
@@ -70,6 +75,7 @@ interface EventFormState {
   date: string;
   time: string;
   venue: string;
+  theatreId: number[];
   company: string[];
   description: string;
   imageUrl: string;
@@ -78,6 +84,16 @@ interface EventFormState {
   tags: string[];
   contentLanguage: string;
   translationGroup?: string;
+  performanceLanguage: string[];
+  subtitleLanguage: string[];
+}
+
+interface Theatre {
+  id: number;
+  name: string;
+  city: string;
+  country: string;
+  description: string;
 }
 
 interface VenueFormState {
@@ -95,24 +111,32 @@ export default function AdminPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [authorized, setAuthorized] = useState(false)
   const [adminEmail, setAdminEmail] = useState("")
-  const [events, setEvents] = useState<Event[]>([])
+  const [events, setEvents] = useState<Event[]>([])  
+  const [filteredEvents, setFilteredEvents] = useState<Event[]>([])  
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('all')  
+  const [translationGroups, setTranslationGroups] = useState<{[key: string]: Event[]}>({})
   const [venues, setVenues] = useState<Venue[]>([])
+  const [theatres, setTheatres] = useState<Theatre[]>([])
   const [editingEvent, setEditingEvent] = useState<Event | null>(null)
   const [editingVenue, setEditingVenue] = useState<Venue | null>(null)
+  const [showEventForm, setShowEventForm] = useState(false)
   const [formData, setFormData] = useState<EventFormState>({
     title: "",
     eventType: "performance",
     date: "",
     time: "",
     venue: "",
+    theatreId: [],
     company: [],
     description: "",
     imageUrl: "/placeholder.svg?height=400&width=600",
     isFeatured: false,
-    price: "20.00",
+    price: "0",
     tags: [],
     contentLanguage: "en",
     translationGroup: undefined,
+    performanceLanguage: [],
+    subtitleLanguage: [],
   })
   const [venueFormData, setVenueFormData] = useState<VenueFormState>({
     name: "",
@@ -123,6 +147,33 @@ export default function AdminPage() {
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Language options
+  const languageOptions = [
+    { code: 'en', name: 'English' },
+    { code: 'bg', name: 'Bulgarian' },
+    { code: 'mk', name: 'Macedonian' },
+    { code: 'sr', name: 'Serbian' }
+  ]
+
+  // Helper function for handling multi-select changes
+  const handleMultiSelectChange = (field: keyof EventFormState, value: string, checked: boolean) => {
+    setFormData(prev => {
+      const currentArray = prev[field] as string[] | number[]
+      if (checked) {
+        return {
+          ...prev,
+          [field]: [...currentArray, field === 'theatreId' ? parseInt(value) : value]
+        }
+      } else {
+        return {
+          ...prev,
+          [field]: currentArray.filter(item => item.toString() !== value)
+        }
+      }
+    })
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -139,12 +190,40 @@ export default function AdminPage() {
           const venuesData = await venuesResponse.json()
           setVenues(venuesData || [])
         }
+        
+        // Load theatres from API
+        const theatresResponse = await fetch('/api/theatres?admin=true')
+        if (theatresResponse.ok) {
+          const theatresData = await theatresResponse.json()
+          setTheatres(theatresData || [])
+        }
       } catch (error) {
         console.error('Error fetching data:', error)
       }
     };
     fetchData();
   }, []);
+
+  // Filter events by language and group translation groups
+  useEffect(() => {
+    let filtered = events
+    if (selectedLanguage !== 'all') {
+      filtered = events.filter(event => event.contentLanguage === selectedLanguage)
+    }
+    setFilteredEvents(filtered)
+
+    // Group events by translation group
+    const groups: {[key: string]: Event[]} = {}
+    events.forEach(event => {
+      if (event.translationGroup) {
+        if (!groups[event.translationGroup]) {
+          groups[event.translationGroup] = []
+        }
+        groups[event.translationGroup].push(event)
+      }
+    })
+    setTranslationGroups(groups)
+  }, [events, selectedLanguage])
 
   useEffect(() => {
     // Check if user is admin
@@ -166,11 +245,11 @@ export default function AdminPage() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target
-    if (editingEvent) {
-      setEditingEvent({ ...editingEvent, [id]: value })
-    } else {
-      setFormData((prev) => ({ ...prev, [id]: value }))
-    }
+    setFormData((prev) => ({ ...prev, [id]: value }))
+  }
+
+  const handleFieldChange = (field: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
   const handleVenueInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -191,19 +270,11 @@ export default function AdminPage() {
 
 
   const handleSelectChange = (name: string, value: string) => {
-    if (editingEvent) {
-      setEditingEvent({ ...editingEvent, [name]: value })
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }))
-    }
+    setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
   const handleFeaturedToggle = (checked: boolean) => {
-    if (editingEvent) {
-      setEditingEvent({ ...editingEvent, isFeatured: checked })
-    } else {
-      setFormData((prev) => ({ ...prev, isFeatured: checked }))
-    }
+    setFormData((prev) => ({ ...prev, isFeatured: checked }))
   }
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -223,11 +294,7 @@ export default function AdminPage() {
         const data = await response.json();
         const imageUrl = data.url;
         
-        if (editingEvent) {
-          setEditingEvent({ ...editingEvent, imageUrl });
-        } else {
-          setFormData((prev) => ({ ...prev, imageUrl }));
-        }
+        setFormData((prev) => ({ ...prev, imageUrl }));
         
         toast({
           title: "Success",
@@ -259,11 +326,7 @@ export default function AdminPage() {
       .map((tag) => tag.trim())
       .filter((tag) => tag !== "")
 
-    if (editingEvent) {
-      setEditingEvent({ ...editingEvent, tags: tagsArray })
-    } else {
-      setFormData((prev) => ({ ...prev, tags: tagsArray }))
-    }
+    setFormData((prev) => ({ ...prev, tags: tagsArray }))
   }
 
   const handleAddEvent = async (e: React.FormEvent) => {
@@ -281,10 +344,33 @@ export default function AdminPage() {
       return
     }
 
+    // Validate theatre selection
+    if (formData.theatreId.length === 0) {
+      toast({
+        title: "Missing theatre",
+        description: "Please select at least one theatre/company",
+        variant: "destructive",
+      })
+      setIsSubmitting(false)
+      return
+    }
+
+    // Validate performance language selection
+    if (formData.performanceLanguage.length === 0) {
+      toast({
+        title: "Missing performance language",
+        description: "Please select at least one performance language",
+        variant: "destructive",
+      })
+      setIsSubmitting(false)
+      return
+    }
+
     // Create new event
     const newEvent: Event = {
       id: `event-${Date.now()}`,
       ...formData,
+      theatreId: formData.theatreId,
     }
 
     // Add to database via API
@@ -331,13 +417,16 @@ export default function AdminPage() {
       date: "",
       time: "",
       venue: "",
+      theatreId: [],
       company: [],
       description: "",
       imageUrl: "/placeholder.svg?height=400&width=600",
       isFeatured: false,
       price: "Free",
       tags: [] as string[],
-      contentLanguage: "en"
+      contentLanguage: "en",
+      performanceLanguage: [],
+      subtitleLanguage: []
     })
 
     setIsSubmitting(false)
@@ -381,8 +470,8 @@ export default function AdminPage() {
         id: 'section-1',
         sectionName: 'Main',
         sectionType: 'regular' as const,
-        rows: [{ 
-          rowNumber: 1, 
+        rows: [{
+          rowNumber: 1,
           seats: Array.from({ length: 10 }, (_, i) => ({ seatNumber: i + 1, isAccessible: false }))
         }],
       }]
@@ -448,6 +537,267 @@ export default function AdminPage() {
     setIsSubmitting(false)
   }
 
+  const handleEditEvent = (id: string) => {
+    const eventToEdit = events.find((event) => event.id === id)
+    if (eventToEdit) {
+      setEditingEvent(eventToEdit)
+      
+      // Convert DD-MM-YYYY back to YYYY-MM-DD for input field
+      let formattedDate = '';
+      if (eventToEdit.date) {
+        const dateParts = eventToEdit.date.split('-');
+        if (dateParts.length === 3) {
+          formattedDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`; // Convert DD-MM-YYYY to YYYY-MM-DD
+        }
+      }
+      
+      setFormData({
+        title: eventToEdit.title || '',
+        eventType: eventToEdit.eventType || 'performance',
+        date: formattedDate,
+        time: eventToEdit.time || '',
+        venue: eventToEdit.venue || '',
+        theatreId: [], // Will be populated based on company names
+        company: Array.isArray(eventToEdit.company) ? eventToEdit.company : [],
+        description: eventToEdit.synopsis || eventToEdit.description || '',
+        imageUrl: eventToEdit.imageUrl || '',
+        isFeatured: eventToEdit.isFeatured || false,
+        price: eventToEdit.price ? eventToEdit.price.replace('€', '').replace('Free', '0') : '0',
+        tags: Array.isArray(eventToEdit.tags) ? eventToEdit.tags : [],
+        contentLanguage: eventToEdit.contentLanguage || 'en',
+        translationGroup: eventToEdit.translationGroup || '',
+        performanceLanguage: Array.isArray(eventToEdit.performanceLanguage) ? eventToEdit.performanceLanguage : (eventToEdit.performanceLanguage ? [eventToEdit.performanceLanguage] : []),
+        subtitleLanguage: Array.isArray(eventToEdit.subtitleLanguage) ? eventToEdit.subtitleLanguage : (eventToEdit.subtitleLanguage ? [eventToEdit.subtitleLanguage] : [])
+      })
+      // Scroll to form after state update
+      setTimeout(() => {
+        document.getElementById('event-form')?.scrollIntoView({ behavior: 'smooth' })
+      }, 100)
+    }
+  }
+
+  const handleCreateEvent = async (e: React.FormEvent) => {
+     e.preventDefault()
+     setIsSubmitting(true)
+     
+     // Validate required fields
+     if (formData.theatreId.length === 0) {
+       toast({
+         title: "Missing information",
+         description: "Please select at least one theatre/company",
+         variant: "destructive",
+       })
+       setIsSubmitting(false)
+       return
+     }
+
+     // Validate performance language selection
+     if (formData.performanceLanguage.length === 0) {
+       toast({
+         title: "Missing performance language",
+         description: "Please select at least one performance language",
+         variant: "destructive",
+       })
+       setIsSubmitting(false)
+       return
+     }
+     
+     try {
+       const eventData = {
+         title: formData.title,
+         eventType: formData.eventType,
+         date: formData.date,
+         time: formData.time,
+         venue: formData.venue,
+         theatreId: formData.theatreId,
+         company: formData.company,
+         description: formData.description,
+         price: formData.price,
+         tags: formData.tags,
+         contentLanguage: formData.contentLanguage,
+         isFeatured: formData.isFeatured,
+         performanceLanguage: formData.performanceLanguage,
+         subtitleLanguage: formData.subtitleLanguage
+       }
+
+       const response = await fetch('/api/events', {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+         },
+         body: JSON.stringify(eventData),
+       })
+
+       if (response.ok) {
+         const newEvent = await response.json()
+         setEvents([...events, newEvent])
+         setEditingEvent(null)
+         setFormData({
+           title: '',
+           eventType: 'performance',
+           date: '',
+           time: '',
+           venue: '',
+           theatreId: [],
+           company: [],
+           description: '',
+           imageUrl: '',
+           isFeatured: false,
+           price: '',
+           tags: [],
+           contentLanguage: 'en',
+           translationGroup: '',
+           performanceLanguage: [],
+           subtitleLanguage: []
+         })
+         toast({
+           title: "Success",
+           description: "Event created successfully!",
+         })
+       } else {
+         toast({
+           title: "Error",
+           description: "Failed to create event",
+           variant: "destructive",
+         })
+       }
+     } catch (error) {
+       console.error('Error creating event:', error)
+       toast({
+         title: "Error",
+         description: "Error creating event",
+         variant: "destructive",
+       })
+     } finally {
+       setIsSubmitting(false)
+     }
+   }
+
+   const handleUpdateEvent = async (e: React.FormEvent) => {
+     e.preventDefault()
+     if (!editingEvent) return
+     
+     setIsSubmitting(true)
+     
+     try {
+       const eventData = {
+         title: formData.title,
+         eventType: formData.eventType,
+         eventDate: formData.date,
+         eventTime: formData.time,
+         venueId: formData.venue ? parseInt(formData.venue) : undefined,
+         theatreId: formData.theatreId && formData.theatreId.length > 0 ? formData.theatreId : undefined,
+         company: formData.company,
+         description: formData.description,
+         price: formData.price,
+         tags: formData.tags,
+         contentLanguage: formData.contentLanguage,
+         isFeatured: formData.isFeatured,
+         performanceLanguage: formData.performanceLanguage,
+         subtitleLanguage: formData.subtitleLanguage
+       }
+
+       const response = await fetch(`/api/events/${editingEvent.id}`, {
+         method: 'PUT',
+         headers: {
+           'Content-Type': 'application/json',
+         },
+         body: JSON.stringify(eventData),
+       })
+
+       if (response.ok) {
+         const responseData = await response.json()
+         console.log('Frontend received response:', responseData)
+         const updatedEventFromAPI = responseData.event || responseData
+         console.log('Extracted event data:', updatedEventFromAPI)
+         
+         // Check if the API response has the expected structure
+         if (!updatedEventFromAPI || !updatedEventFromAPI.id) {
+           console.error('Invalid API response:', responseData)
+           throw new Error('Invalid response from server')
+         }
+         
+         // Transform the API response to match the frontend Event interface
+         const transformedEvent = {
+           id: updatedEventFromAPI.id.toString(),
+           title: updatedEventFromAPI.title,
+           eventType: updatedEventFromAPI.eventType,
+           date: updatedEventFromAPI.eventDate ? 
+             new Date(updatedEventFromAPI.eventDate).toLocaleDateString('en-CA') : 
+             updatedEventFromAPI.date,
+           time: updatedEventFromAPI.eventTime ? 
+             new Date(updatedEventFromAPI.eventTime).toLocaleTimeString('en-GB', {
+               hour: '2-digit',
+               minute: '2-digit',
+               hour12: false
+             }) : 
+             updatedEventFromAPI.time,
+           venue: updatedEventFromAPI.venue || 'TBA',
+           company: Array.isArray(updatedEventFromAPI.company) ? updatedEventFromAPI.company : [updatedEventFromAPI.company || ''],
+           description: updatedEventFromAPI.description || updatedEventFromAPI.synopsis || '',
+           imageUrl: updatedEventFromAPI.imageUrl || '/placeholder.svg?height=400&width=600',
+           isFeatured: updatedEventFromAPI.isFeatured,
+           price: updatedEventFromAPI.price ? updatedEventFromAPI.price.toString() : '0',
+           tags: updatedEventFromAPI.tags || [],
+           contentLanguage: updatedEventFromAPI.contentLanguage,
+           translationGroup: updatedEventFromAPI.translationGroup,
+           performanceLanguage: updatedEventFromAPI.performanceLanguage,
+           subtitleLanguage: updatedEventFromAPI.subtitleLanguage
+         }
+         
+         setEvents(events.map(event => 
+           event.id === editingEvent.id ? transformedEvent : event
+         ))
+         
+         // Refresh the events list to ensure we have the latest data
+         const eventsResponse = await fetch('/api/events')
+         if (eventsResponse.ok) {
+           const eventsData = await eventsResponse.json()
+           setEvents(eventsData || [])
+         }
+         
+         setEditingEvent(null)
+         setFormData({
+           title: '',
+           eventType: 'performance',
+           date: '',
+           time: '',
+           venue: '',
+           theatreId: [],
+           company: [],
+           description: '',
+           imageUrl: '',
+           isFeatured: false,
+           price: '',
+           tags: [],
+           contentLanguage: 'en',
+           translationGroup: '',
+           performanceLanguage: [],
+           subtitleLanguage: []
+         })
+         toast({
+           title: "Success",
+           description: "Event updated successfully!",
+         })
+       } else {
+         toast({
+           title: "Error",
+           description: "Failed to update event",
+           variant: "destructive",
+         })
+       }
+     } catch (error) {
+       console.error('Error updating event:', error)
+       toast({
+         title: "Error",
+         description: "Error updating event",
+         variant: "destructive",
+       })
+     } finally {
+       setIsSubmitting(false)
+     }
+   }
+
   const handleEditVenue = (id: string) => {
     const venueToEdit = venues.find((venue) => venue.id === id)
     if (venueToEdit) {
@@ -479,87 +829,9 @@ export default function AdminPage() {
     }
   }
 
-  const handleSelectEventForEdit = (id: string) => {
-    const eventToEdit = events.find((event) => event.id === id)
-    if (!eventToEdit) {
-      toast({
-        title: "Error",
-        description: "Event not found for editing.",
-        variant: "destructive",
-      })
-      return
-    }
 
-    // Transform the data to match form expectations
-    const transformedEvent = {
-      ...eventToEdit,
-      // Convert DD-MM-YYYY to YYYY-MM-DD for HTML date input
-      date: eventToEdit.date ? eventToEdit.date.split('-').reverse().join('-') : '',
-      // Remove currency prefix from price (€25 -> 25, Free -> 0)
-      price: eventToEdit.price === 'Free' ? '0' : eventToEdit.price.replace(/[€$]/g, ''),
-      // Ensure description field is mapped correctly
-      description: eventToEdit.description || ''
-    }
 
-    setEditingEvent(transformedEvent)
-  }
 
-  const handleEditEvent = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!editingEvent) return
-
-    // Validate form
-    if (!editingEvent.title || !editingEvent.eventType || !editingEvent.date || !editingEvent.time || !editingEvent.venue) {
-      toast({
-        title: "Missing information",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      })
-      return
-    }
-
-    // Update events array
-    const updatedEvents = events.map((event) => (event.id === editingEvent.id ? editingEvent : event))
-
-    // Update event via API
-    try {
-      const response = await fetch(`/api/events/${editingEvent.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(editingEvent),
-      })
-      
-      if (response.ok) {
-        // Refresh events list
-        const eventsResponse = await fetch('/api/events')
-        if (eventsResponse.ok) {
-          const eventsData = await eventsResponse.json()
-          setEvents(eventsData || [])
-        }
-      } else {
-        throw new Error('Failed to update event')
-      }
-    } catch (error) {
-      console.error('Error updating event:', error)
-      toast({
-        title: "Error",
-        description: "Failed to update event. Please try again.",
-        variant: "destructive"
-      })
-      return
-    }
-
-    // Show success message
-    toast({
-      title: "Event updated successfully",
-      description: `"${editingEvent.title}" has been updated`,
-    })
-
-    // Reset editing state
-    setEditingEvent(null)
-  }
 
   const handleUpdateVenue = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -620,7 +892,6 @@ export default function AdminPage() {
   }
 
   const handleCancelEdit = () => {
-    setEditingEvent(null)
     setEditingVenue(null)
   }
 
@@ -655,6 +926,44 @@ export default function AdminPage() {
       title: "Event deleted",
       description: "The event has been removed from the program",
     })
+  }
+
+  const handleViewTranslationGroup = async (translationGroup: string) => {
+    try {
+      const response = await fetch(`/api/events/translation-group/${translationGroup}`)
+      if (response.ok) {
+        const groupEvents = await response.json()
+        // Show all language versions in a modal or expand view
+        toast({
+          title: "Translation Group",
+          description: `Found ${groupEvents.length} language versions of this event`,
+        })
+      }
+    } catch (error) {
+      console.error('Error fetching translation group:', error)
+    }
+  }
+
+  const getLanguageBadge = (language: string | undefined) => {
+    if (!language) {
+      return (
+        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+          N/A
+        </span>
+      )
+    }
+    const badges = {
+      'en': { label: 'EN', color: 'bg-blue-100 text-blue-800' },
+      'bg': { label: 'BG', color: 'bg-green-100 text-green-800' },
+      'mk': { label: 'MK', color: 'bg-purple-100 text-purple-800' },
+      'sr': { label: 'SR', color: 'bg-orange-100 text-orange-800' }
+    }
+    const badge = badges[language as keyof typeof badges] || { label: language.toUpperCase(), color: 'bg-gray-100 text-gray-800' }
+    return (
+      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${badge.color}`}>
+        {badge.label}
+      </span>
+    )
   }
 
   const handleDeleteVenue = async (id: string) => {
@@ -746,6 +1055,7 @@ export default function AdminPage() {
                </CardContent>
              </Card>
            </a>
+
            <a href="/admin/theatres" className="block">
              <Card className="hover:shadow-lg transition-shadow duration-200">
                <CardHeader>
@@ -796,330 +1106,104 @@ export default function AdminPage() {
         </TabsList>
 
         <TabsContent value="events" className="mt-6 space-y-6">
-          {editingEvent ? (
-            <Card>
-              <CardHeader>
-                <CardTitle>Edit Event</CardTitle>
-                <CardDescription>Update event information</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-            <form onSubmit={handleEditEvent} className="grid gap-4 py-4">
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="title">Event Title *</Label>
-                      <Input
-                        id="title"
-                        placeholder="Enter event title"
-                        value={editingEvent.title}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="type">Event Type *</Label>
-                      <Select value={editingEvent.eventType} onValueChange={(value) => handleSelectChange("eventType", value as "performance" | "workshop" | "discussion")}>
-                        <SelectTrigger id="type">
-                          <SelectValue placeholder="Select type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="performance">Performance</SelectItem>
-                          <SelectItem value="workshop">Workshop</SelectItem>
-                          <SelectItem value="discussion">Discussion</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="date">Date *</Label>
-                      <Input id="date" type="date" value={editingEvent.date} onChange={handleInputChange} required />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="time">Time *</Label>
-                      <Input id="time" type="time" value={editingEvent.time} onChange={handleInputChange} required />
-                    </div>
-                  </div>
-
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="venue">Venue *</Label>
-                      <Select value={editingEvent.venue} onValueChange={(value) => handleSelectChange("venue", value)}>
-                        <SelectTrigger id="venue">
-                          <SelectValue placeholder="Select venue" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {venues.map((venue) => (
-                            <SelectItem key={venue.id} value={venue.name}>
-                              {venue.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="company">Company/Presenter</Label>
-                      <Input
-                        id="company"
-                        placeholder="Enter companies separated by commas (max 2)"
-                        value={Array.isArray(editingEvent.company) ? editingEvent.company.join(', ') : editingEvent.company}
-                        onChange={(e) => {
-                          const companies = e.target.value.split(',').map(c => c.trim()).filter(c => c.length > 0).slice(0, 2)
-                          setEditingEvent({ ...editingEvent, company: companies })
-                        }}
-                      />
-                      <p className="text-sm text-muted-foreground">Enter up to 2 companies separated by commas</p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea
-                      id="description"
-                      placeholder="Enter event description"
-                      rows={4}
-                      value={editingEvent.description}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="image">Event Image</Label>
-                    <Input id="image" type="file" onChange={handleFileChange} />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="price">Ticket Price (€) *</Label>
-                    <Input
-                      id="price"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      placeholder="20.00"
-                      value={editingEvent.price}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="tags">Tags (comma separated)</Label>
-                    <Input
-                      id="tags"
-                      placeholder="drama, comedy, modern, classic"
-                      value={editingEvent ? editingEvent.tags?.join(", ") : formData.tags.join(", ")}
-                      onChange={handleTagsChange}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="contentLanguage">Content Language *</Label>
-                    <Select value={editingEvent.contentLanguage} onValueChange={(value) => setEditingEvent({ ...editingEvent, contentLanguage: value })}>
-                      <SelectTrigger id="contentLanguage">
-                        <SelectValue placeholder="Select language" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="en">English</SelectItem>
-                        <SelectItem value="mk">Macedonian</SelectItem>
-                        <SelectItem value="bg">Bulgarian</SelectItem>
-                        <SelectItem value="sr">Serbian</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <Switch id="featured" checked={editingEvent.isFeatured} onCheckedChange={handleFeaturedToggle} />
-                    <Label htmlFor="featured">Featured Event (displayed on homepage)</Label>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button type="submit">Update Event</Button>
-                    <Button type="button" variant="outline" onClick={handleCancelEdit}>
-                      Cancel
-                    </Button>
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
-          ) : (
-            <Card>
-              <CardHeader>
-                <CardTitle>Add New Event</CardTitle>
-                <CardDescription>Create a new performance, workshop, or discussion</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <form onSubmit={handleAddEvent} className="space-y-4">
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="title">Event Title *</Label>
-                      <Input
-                        id="title"
-                        placeholder="Enter event title"
-                        value={formData.title}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="type">Event Type *</Label>
-                      <Select value={formData.eventType} onValueChange={(value) => handleSelectChange("eventType", value as "performance" | "workshop" | "discussion")}>
-                        <SelectTrigger id="type">
-                          <SelectValue placeholder="Select type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="performance">Performance</SelectItem>
-                          <SelectItem value="workshop">Workshop</SelectItem>
-                          <SelectItem value="discussion">Discussion</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="date">Date *</Label>
-                      <Input id="date" type="date" value={formData.date} onChange={handleInputChange} required />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="time">Time *</Label>
-                      <Input id="time" type="time" value={formData.time} onChange={handleInputChange} required />
-                    </div>
-                  </div>
-
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="venue">Venue *</Label>
-                      <Select value={formData.venue} onValueChange={(value) => handleSelectChange("venue", value)}>
-                        <SelectTrigger id="venue">
-                          <SelectValue placeholder="Select venue" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {venues.map((venue) => (
-                            <SelectItem key={venue.id} value={venue.name}>
-                              {venue.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="company">Company/Presenter</Label>
-                      <Input
-                        id="company"
-                        placeholder="Enter companies separated by commas (max 2)"
-                        value={formData.company.join(', ')}
-                        onChange={(e) => {
-                          const companies = e.target.value.split(',').map(c => c.trim()).filter(c => c.length > 0).slice(0, 2)
-                          setFormData({ ...formData, company: companies })
-                        }}
-                      />
-                      <p className="text-sm text-muted-foreground">Enter up to 2 companies separated by commas</p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea
-                      id="description"
-                      placeholder="Enter event description"
-                      rows={4}
-                      value={formData.description}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="image">Event Image</Label>
-                    <Input id="image" type="file" onChange={handleFileChange} />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="price">Ticket Price (€) *</Label>
-                    <Input
-                      id="price"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      placeholder="20.00"
-                      value={formData.price}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="tags">Tags (comma separated)</Label>
-                    <Input
-                      id="tags"
-                      placeholder="drama, comedy, modern, classic"
-                      //value={editingEvent ? editingEvent.tags?.join(", ") : formData.tags.join(", ")}
-                      onChange={handleTagsChange}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="contentLanguage">Content Language *</Label>
-                    <Select value={formData.contentLanguage} onValueChange={(value) => handleSelectChange("contentLanguage", value)}>
-                      <SelectTrigger id="contentLanguage">
-                        <SelectValue placeholder="Select language" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="en">English</SelectItem>
-                        <SelectItem value="mk">Macedonian</SelectItem>
-                        <SelectItem value="bg">Bulgarian</SelectItem>
-                        <SelectItem value="sr">Serbian</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <Switch id="featured" checked={formData.isFeatured} onCheckedChange={handleFeaturedToggle} />
-                    <Label htmlFor="featured">Featured Event (displayed on homepage)</Label>
-                  </div>
-
-                  <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? "Adding Event..." : "Add Event"}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          )}
-
           <Card>
             <CardHeader>
-              <CardTitle>Manage Events</CardTitle>
-              <CardDescription>Edit or delete existing events</CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Manage Events</CardTitle>
+                  <CardDescription>Create, edit or delete events</CardDescription>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="languageFilter">Filter by Language:</Label>
+                    <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
+                      <SelectTrigger id="languageFilter" className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Languages</SelectItem>
+                        <SelectItem value="en">English</SelectItem>
+                        <SelectItem value="bg">Bulgarian</SelectItem>
+                        <SelectItem value="mk">Macedonian</SelectItem>
+                        <SelectItem value="sr">Serbian</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button onClick={() => {
+                    setEditingEvent({ id: 'new' } as Event)
+                    setFormData({
+                      title: '',
+                      eventType: 'performance',
+                      date: '',
+                      time: '',
+                      venue: '',
+                      theatreId: [],
+                      company: [],
+                      description: '',
+                      imageUrl: '',
+                      isFeatured: false,
+                      price: '',
+                      tags: [],
+                      contentLanguage: 'en',
+                      translationGroup: '',
+                      performanceLanguage: [],
+                      subtitleLanguage: []
+                    })
+                    // Scroll to form after state update
+                    setTimeout(() => {
+                      document.getElementById('event-form')?.scrollIntoView({ behavior: 'smooth' })
+                    }, 100)
+                  }}>
+                    Create New Event
+                  </Button>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
-              {events.length > 0 ? (
+              {filteredEvents.length > 0 ? (
                 <div className="rounded-md border">
-                  <div className="grid grid-cols-9 border-b bg-muted/50 p-3 font-medium">
+                  <div className="grid grid-cols-10 border-b bg-muted/50 p-3 font-medium">
                     <div className="col-span-2">Title</div>
                     <div>Type</div>
                     <div>Date</div>
                     <div>Venue</div>
                     <div>Price (BGN)</div>
-                    <div>Tags</div>
+                    <div>Language</div>
                     <div>Featured</div>
+                    <div>Translations</div>
                     <div>Actions</div>
                   </div>
-                  {events.map((event) => (
-                    <div key={event.id} className="grid grid-cols-9 border-b p-3">
+                  {filteredEvents.map((event, index) => (
+                    <div key={event.id || `event-${index}`} className="grid grid-cols-10 border-b p-3">
                       <div className="col-span-2 font-medium">{event.title}</div>
                       <div className="capitalize">{event.eventType}</div>
                       <div>{event.date}</div>
                       <div>{event.venue}</div>
                       <div>{event.price ? `${(Number.parseFloat(event.price) * 1.96).toFixed(2)} BGN` : "Free"}</div>
-                      <div className="truncate">{event.tags?.join(", ") || "None"}</div>
+                      <div>{getLanguageBadge(event.contentLanguage)}</div>
                       <div>{event.isFeatured ? "Yes" : "No"}</div>
+                      <div>
+                        {event.translationGroup && translationGroups[event.translationGroup] ? (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-6 px-2 text-xs"
+                            onClick={() => handleViewTranslationGroup(event.translationGroup!)}
+                          >
+                            {translationGroups[event.translationGroup].length} versions
+                          </Button>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">Single</span>
+                        )}
+                      </div>
                       <div className="flex gap-2">
                         <Button
                           variant="outline"
                           size="sm"
                           className="h-8 w-8 p-0"
-                          onClick={() => handleSelectEventForEdit(event.id)}
+                          onClick={() => handleEditEvent(event.id)}
                         >
-                          <Pencil className="h-4 w-4" />
+                          <Edit className="h-4 w-4" />
                           <span className="sr-only">Edit</span>
                         </Button>
                         <Button
@@ -1137,11 +1221,247 @@ export default function AdminPage() {
                 </div>
               ) : (
                 <p className="text-center text-muted-foreground">
-                  No events have been added yet. Use the form above to create events.
+                  {selectedLanguage === 'all' 
+                    ? "No events have been added yet."
+                    : `No events found for the selected language (${selectedLanguage.toUpperCase()}).`
+                  }
                 </p>
               )}
             </CardContent>
           </Card>
+
+          {editingEvent && (
+            <Card id="event-form">
+              <CardHeader>
+                <CardTitle>{editingEvent.id === 'new' ? 'Create New Event' : 'Edit Event'}</CardTitle>
+                <CardDescription>{editingEvent.id === 'new' ? 'Add a new event to the system' : 'Update event information'}</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <form onSubmit={editingEvent.id === 'new' ? handleCreateEvent : handleUpdateEvent} className="space-y-4">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                       <Label htmlFor="title">Event Title *</Label>
+                       <Input
+                         id="title"
+                         name="title"
+                         placeholder="Enter event title"
+                         value={formData.title}
+                         onChange={handleInputChange}
+                         required
+                       />
+                     </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-type">Event Type *</Label>
+                      <Select value={formData.eventType} onValueChange={(value) => handleSelectChange("eventType", value as "performance" | "workshop" | "discussion")}>
+                        <SelectTrigger id="edit-type">
+                          <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="performance">Performance</SelectItem>
+                          <SelectItem value="workshop">Workshop</SelectItem>
+                          <SelectItem value="discussion">Discussion</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                     <div className="space-y-2">
+                       <Label htmlFor="date">Date *</Label>
+                       <Input id="date" name="date" type="date" value={formData.date} onChange={handleInputChange} required />
+                     </div>
+                     <div className="space-y-2">
+                       <Label htmlFor="time">Time *</Label>
+                       <Input id="time" name="time" type="time" value={formData.time} onChange={handleInputChange} required />
+                     </div>
+                   </div>
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-venue">Venue *</Label>
+                      <Select value={formData.venue} onValueChange={(value) => handleSelectChange("venue", value)}>
+                        <SelectTrigger id="edit-venue">
+                          <SelectValue placeholder="Select venue" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {venues.map((venue) => (
+                            <SelectItem key={venue.id} value={venue.name}>
+                              {venue.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-theatre">Theatre/Company *</Label>
+                      <div className="border rounded-md p-3 max-h-40 overflow-y-auto">
+                        {theatres.map((theatre) => (
+                          <div key={theatre.id} className="flex items-center space-x-2 mb-2">
+                            <Checkbox
+                              id={`theatre-${theatre.id}`}
+                              checked={formData.theatreId.includes(theatre.id)}
+                              onCheckedChange={(checked) => {
+                                handleMultiSelectChange('theatreId', theatre.id.toString(), checked as boolean)
+                                // Update company names
+                                const currentCompanies = formData.company
+                                if (checked) {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    company: [...currentCompanies, theatre.name]
+                                  }))
+                                } else {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    company: currentCompanies.filter(name => name !== theatre.name)
+                                  }))
+                                }
+                              }}
+                            />
+                            <Label htmlFor={`theatre-${theatre.id}`} className="text-sm">
+                              {theatre.name} ({theatre.city}, {theatre.country})
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                      <p className="text-sm text-muted-foreground">Select one or more theatres/companies presenting this event</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                     <Label htmlFor="description">Description</Label>
+                     <Textarea
+                       id="description"
+                       name="description"
+                       placeholder="Enter event description"
+                       rows={4}
+                       value={formData.description}
+                       onChange={handleInputChange}
+                     />
+                   </div>
+
+                   <div className="space-y-2">
+                     <Label htmlFor="imageUrl">Event Image</Label>
+                     <Input id="imageUrl" name="imageUrl" type="file" onChange={handleFileChange} />
+                   </div>
+
+                   <div className="space-y-2">
+                     <Label htmlFor="price">Ticket Price (€) *</Label>
+                     <Input
+                       id="price"
+                       name="price"
+                       type="text"
+                       placeholder="20.00"
+                       value={formData.price}
+                       onChange={handleInputChange}
+                       required
+                     />
+                   </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-tags">Tags (comma separated)</Label>
+                    <Input
+                      id="edit-tags"
+                      placeholder="drama, comedy, modern, classic"
+                      value={formData.tags.join(", ")}
+                      onChange={handleTagsChange}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-contentLanguage">Content Language *</Label>
+                    <Select value={formData.contentLanguage} onValueChange={(value) => handleSelectChange("contentLanguage", value)}>
+                      <SelectTrigger id="edit-contentLanguage">
+                        <SelectValue placeholder="Select language" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="en">English</SelectItem>
+                        <SelectItem value="mk">Macedonian</SelectItem>
+                        <SelectItem value="bg">Bulgarian</SelectItem>
+                        <SelectItem value="sr">Serbian</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-performanceLanguage">Performance Language(s) *</Label>
+                    <div className="border rounded-md p-3">
+                      {languageOptions.map((lang) => (
+                        <div key={lang.code} className="flex items-center space-x-2 mb-2">
+                          <Checkbox
+                            id={`perf-lang-${lang.code}`}
+                            checked={formData.performanceLanguage.includes(lang.code)}
+                            onCheckedChange={(checked) => {
+                              handleMultiSelectChange('performanceLanguage', lang.code, checked as boolean)
+                            }}
+                          />
+                          <Label htmlFor={`perf-lang-${lang.code}`} className="text-sm">
+                            {lang.name}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-sm text-gray-500">Select the language(s) the performance will be in</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-subtitleLanguage">Subtitle Language(s)</Label>
+                    <div className="border rounded-md p-3">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <Checkbox
+                          id="subtitle-none"
+                          checked={formData.subtitleLanguage.includes('none')}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setFormData(prev => ({ ...prev, subtitleLanguage: ['none'] }))
+                            } else {
+                              setFormData(prev => ({ ...prev, subtitleLanguage: [] }))
+                            }
+                          }}
+                        />
+                        <Label htmlFor="subtitle-none" className="text-sm">
+                          No subtitles
+                        </Label>
+                      </div>
+                      {languageOptions.map((lang) => (
+                        <div key={lang.code} className="flex items-center space-x-2 mb-2">
+                          <Checkbox
+                            id={`sub-lang-${lang.code}`}
+                            checked={formData.subtitleLanguage.includes(lang.code) && !formData.subtitleLanguage.includes('none')}
+                            disabled={formData.subtitleLanguage.includes('none')}
+                            onCheckedChange={(checked) => {
+                              if (formData.subtitleLanguage.includes('none')) {
+                                setFormData(prev => ({ ...prev, subtitleLanguage: [lang.code] }))
+                              } else {
+                                handleMultiSelectChange('subtitleLanguage', lang.code, checked as boolean)
+                              }
+                            }}
+                          />
+                          <Label htmlFor={`sub-lang-${lang.code}`} className="text-sm">
+                            {lang.name}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-sm text-gray-500">Select subtitle languages or choose 'No subtitles'</p>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Switch id="edit-featured" checked={formData.isFeatured} onCheckedChange={handleFeaturedToggle} />
+                    <Label htmlFor="edit-featured">Featured Event (displayed on homepage)</Label>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Button type="submit" disabled={isSubmitting}>
+                      {isSubmitting ? "Updating Event..." : "Update Event"}
+                    </Button>
+                    <Button type="button" variant="outline" onClick={() => setEditingEvent(null)}>
+                      Cancel
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="venues" className="mt-6 space-y-6">

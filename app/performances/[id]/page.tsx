@@ -1,3 +1,6 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Image from "next/image"
 import Link from "next/link"
 import { Calendar, Clock, MapPin, Languages, Users, Subtitles } from "lucide-react"
@@ -11,34 +14,65 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-// Removed static import - now using API
+import { useLanguage, translations } from "@/lib/language-context"
 
-export default async function PerformancePage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  
-  // Extract original ID if it's prefixed
-  const originalId = id.startsWith('performance-') ? id.replace('performance-', '') : id
-  
-  // Fetch performance from database
-  let performance = null
-  try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/events/${originalId}`, {
-      cache: 'no-store'
-    })
-    if (response.ok) {
-      performance = await response.json()
+export default function PerformancePage({ params }: { params: Promise<{ id: string }> }) {
+  const { t, language } = useLanguage()
+  const [performance, setPerformance] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [id, setId] = useState<string>('')
+
+  useEffect(() => {
+    const getParams = async () => {
+      const resolvedParams = await params
+      setId(resolvedParams.id)
     }
-  } catch (error) {
-    console.error('Error fetching performance:', error)
+    getParams()
+  }, [params])
+
+  useEffect(() => {
+    if (!id) return
+    
+    const fetchPerformance = async () => {
+      setLoading(true)
+      // Extract original ID if it's prefixed
+      const originalId = id.startsWith('performance-') ? id.replace('performance-', '') : id
+      
+      try {
+        const response = await fetch(`/api/events/${originalId}?language=${language}`, {
+          cache: 'no-store'
+        })
+        if (response.ok) {
+          const data = await response.json()
+          setPerformance(data)
+        }
+      } catch (error) {
+        console.error('Error fetching performance:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchPerformance()
+  }, [id, language])
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-12">
+        <div className="text-center">
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    )
   }
 
   if (!performance) {
     return (
       <div className="container mx-auto px-4 py-12">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-secondary-blue mb-4">Performance Not Found</h1>
-          <p className="text-muted-foreground mb-6">The performance you're looking for doesn't exist.</p>
-          <Link href="/program" className="text-primary-gold hover:underline">← Back to Program</Link>
+          <h1 className="text-2xl font-bold text-secondary-blue mb-4">{t('performanceNotFound') || 'Performance Not Found'}</h1>
+          <p className="text-muted-foreground mb-6">{t('performanceNotFoundDesc') || "The performance you're looking for doesn't exist."}</p>
+          <Link href="/program" className="text-primary-gold hover:underline">← {t('backToProgram') || 'Back to Program'}</Link>
         </div>
       </div>
     )
@@ -98,18 +132,20 @@ export default async function PerformancePage({ params }: { params: Promise<{ id
             <div className="flex items-center gap-2">
               <MapPin className="h-5 w-5 text-primary-gold" />
               <div>
-                <div className="font-medium">{performance.venue}</div>
+                <div className="font-medium">{translations[language][performance.venue as keyof typeof translations[typeof language]] || performance.venue}</div>
               </div>
             </div>
           </div>
 
-          <h2 className="mb-4 text-2xl font-semibold text-secondary-blue">Synopsis</h2>
+          <h2 className="mb-4 text-2xl font-semibold text-secondary-blue">{translations[language].synopsis}</h2>
           <div className="mb-8 space-y-4">
-            {performance.synopsis.split("\n\n").map((paragraph: string, index: number) => (
+            {performance.synopsis ? performance.synopsis.split("\n\n").map((paragraph: string, index: number) => (
               <p key={index} className="text-muted-foreground">
                 {paragraph}
               </p>
-            ))}
+            )) : (
+              <p className="text-muted-foreground">No synopsis available.</p>
+            )}
           </div>
 
           {(performance.director !== "TBA" || performance.cast.length > 0) && (
@@ -118,13 +154,13 @@ export default async function PerformancePage({ params }: { params: Promise<{ id
               <div className="mb-8 space-y-2">
                 {performance.director !== "TBA" && (
                   <div className="flex">
-                    <span className="w-24 font-medium">Director:</span>
+                    <span className="w-24 font-medium">{translations[language].director}:</span>
                     <span className="text-muted-foreground">{performance.director}</span>
                   </div>
                 )}
                 {performance.cast.length > 0 && (
                   <div className="flex flex-col">
-                    <span className="mb-2 w-24 font-medium">Cast:</span>
+                    <span className="mb-2 w-24 font-medium">{translations[language].cast}:</span>
                     <ul className="ml-6 list-disc space-y-1">
                       {performance.cast.map((actor: string, index: number) => (
                         <li key={index} className="text-muted-foreground">
@@ -142,24 +178,24 @@ export default async function PerformancePage({ params }: { params: Promise<{ id
         {/* Sidebar */}
         <div>
           <div className="sticky top-20 space-y-6 rounded-lg border p-6">
-            <h2 className="text-xl font-semibold text-secondary-blue">Book Your Tickets</h2>
+            <h2 className="text-xl font-semibold text-secondary-blue">{translations[language].bookYourTickets}</h2>
             <Separator />
 
             <div className="space-y-4">
               <div className="flex justify-between">
-                <span className="font-medium">Date:</span>
+                <span className="font-medium">{translations[language].date}:</span>
                 <span>{performance.date}</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-medium">Time:</span>
+                <span className="font-medium">{translations[language].time}:</span>
                 <span>{performance.time}</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-medium">Venue:</span>
-                <span>{performance.venue}</span>
+                <span className="font-medium">{translations[language].venue}:</span>
+                <span>{translations[language][performance.venue as keyof typeof translations[typeof language]] || performance.venue}</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-medium">Duration:</span>
+                <span className="font-medium">{translations[language].duration}:</span>
                 <span>{performance.duration}</span>
               </div>
             </div>
@@ -174,12 +210,12 @@ export default async function PerformancePage({ params }: { params: Promise<{ id
               {performance.subtitles && (
                 <div className="flex items-center gap-2">
                   <Subtitles className="h-5 w-5 text-primary-gold" />
-                  <span className="text-sm">Subtitles: {performance.subtitles}</span>
+                  <span className="text-sm">{translations[language].subtitles} {performance.subtitles}</span>
                 </div>
               )}
               <div className="flex items-center gap-2">
                 <Users className="h-5 w-5 text-primary-gold" />
-                <span className="text-sm">Suitable for ages 12+</span>
+                <span className="text-sm">{translations[language].suitableForAges}</span>
               </div>
             </div>
 
@@ -187,16 +223,16 @@ export default async function PerformancePage({ params }: { params: Promise<{ id
 
             <div className="space-y-4">
               <Button className="w-full" size="lg" asChild>
-                <Link href={`/tickets?performance=${performance.id}`}>Book Ticket</Link>
+                <Link href="/ticket-reservation">{translations[language].bookTicket}</Link>
               </Button>
               <Button variant="outline" className="w-full" size="lg">
-                Add to Calendar
+                {translations[language].addToCalendar}
               </Button>
             </div>
 
             <div className="mt-6 rounded-lg bg-muted/30 p-4 text-center text-sm">
-              <p className="font-medium">Need assistance?</p>
-              <p className="text-muted-foreground">Contact our box office at:</p>
+              <p className="font-medium">{translations[language].needAssistance}</p>
+              <p className="text-muted-foreground">{translations[language].contactBoxOffice}</p>
               <p className="text-primary-gold">tickets@actingeurope.com</p>
             </div>
           </div>

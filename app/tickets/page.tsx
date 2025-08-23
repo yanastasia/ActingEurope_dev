@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { Calendar } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -31,9 +32,12 @@ interface Event {
   isFeatured: boolean
   price: number
   tags: string[]
+  performanceLanguage?: string
+  subtitleLanguage?: string
 }
 
 export default function TicketsPage() {
+  const router = useRouter()
   const { toast } = useToast()
   const { t } = useLanguage()
   const [selectedPerformance, setSelectedPerformance] = useState<string | null>(null)
@@ -111,8 +115,7 @@ export default function TicketsPage() {
   }
 
   const handlePerformanceSelect = (id: string) => {
-    setSelectedPerformance(id)
-    setStep(2)
+    router.push('/ticket-reservation')
   }
 
   const handleSeatsSelected = (seats: string[]) => {
@@ -166,38 +169,16 @@ export default function TicketsPage() {
       setBookingReference(result.bookingReference || "")
 
       // Save booking to database
-      const booking = {
-        id: Date.now(),
-        userId: 1, // Assuming a default user ID for now, replace with actual user ID
-        eventId: selectedPerformanceData.id as number, // Use the ID of the selected performance as eventId
-        performanceId: selectedPerformance,
-        seats: selectedSeats.map((seatName, index) => ({
-          id: index + 1,
+      // Prepare booking data for the new API format
+      const dbBookingData = {
+        userId: 1, // TODO: Replace with actual authenticated user ID
+        eventId: selectedPerformanceData.id as number,
+        selectedSeats: selectedSeats.map((seatName, index) => ({
+          id: index + 1, // TODO: Use actual seat IDs from venue/seat selection
           rowNumber: seatName.charCodeAt(0) - 64,
           seatNumber: parseInt(seatName.substring(1)),
-          isAvailable: false,
         })),
-        customer: `${formData.firstName} ${formData.lastName}`,
-        email: formData.email,
-        date: new Date().toISOString(),
-        bookingReference: result.bookingReference || "",
         totalAmount: selectedSeats.length * selectedPerformanceData.rawPrice,
-        bookingStatus: "confirmed" as const,
-        event: {
-          id: selectedPerformanceData.id as number,
-          title: selectedPerformanceData.title,
-          eventType: "performance",
-          date: selectedPerformanceData.date,
-          time: selectedPerformanceData.time,
-          venue: selectedPerformanceData.venue,
-          company: selectedPerformanceData.company ? (Array.isArray(selectedPerformanceData.company) ? selectedPerformanceData.company : [selectedPerformanceData.company]) : ["Acting Europe Festival"],
-          description: "", // Placeholder: Add actual description
-          imageUrl: selectedPerformanceData.imageUrl || "/placeholder.svg?height=200&width=300",
-          isFeatured: false,
-          price: selectedPerformanceData.rawPrice,
-          tags: [],
-        } as Event,
-        bookingDate: new Date().toISOString(),
       }
 
       // Save booking via API
@@ -206,12 +187,18 @@ export default function TicketsPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(booking),
+        body: JSON.stringify(dbBookingData),
       })
 
       if (!response.ok) {
-        throw new Error('Failed to save booking')
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to save booking')
       }
+
+      // Get booking response data
+      const responseData = await response.json()
+      const bookingReference = responseData.booking?.booking_reference || ''
+      setBookingReference(bookingReference)
 
       // Show confirmation
       setStep(4)
@@ -330,7 +317,7 @@ export default function TicketsPage() {
                                     </span>
                                   </div>
                                   <div>
-                                    <span className="font-medium">{t("venue")}:</span> {performance.venue}
+                                    <span className="font-medium">{t("venue")}:</span> {t(performance.venue) || performance.venue}
                                   </div>
                                   <div>
                                     <span className="font-medium">{t("price")}:</span> {performance.price}
@@ -356,7 +343,13 @@ export default function TicketsPage() {
             {step === 2 && selectedPerformanceData && (
               <div>
                 <h3 className="mb-4 text-lg font-semibold text-secondary-blue">{t("selectSeats")}</h3>
-              <SeatSelection venueId={selectedPerformanceData.venueId} onSeatsSelected={handleSeatsSelected} />
+                <div className="rounded-lg border border-dashed p-8 text-center">
+                  <h3 className="mb-2 text-lg font-medium">{t("ticketsNotReleased")}</h3>
+                  <p className="mb-4 text-muted-foreground">{t("ticketsNotReleasedDesc")}</p>
+                  <Button onClick={() => setStep(1)} variant="outline">
+                    {t("backToPerformances") || "Back to Performances"}
+                  </Button>
+                </div>
               </div>
             )}
 

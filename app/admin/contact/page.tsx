@@ -51,11 +51,20 @@ export default function AdminContactPage() {
 
   const fetchContactPages = async () => {
     try {
-      const response = await fetch('/api/contact');
-      if (response.ok) {
-        const data = await response.json();
-        setContactPages(Array.isArray(data) ? data : [data].filter(Boolean));
+      const allContactPages: ContactPage[] = [];
+      const languages = ['en', 'bg', 'mk', 'sr'];
+      
+      for (const lang of languages) {
+        const response = await fetch(`/api/contact?language=${lang}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data) {
+            allContactPages.push(data);
+          }
+        }
       }
+      
+      setContactPages(allContactPages);
     } catch (error) {
       console.error('Error fetching contact pages:', error);
     }

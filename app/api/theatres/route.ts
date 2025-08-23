@@ -17,26 +17,49 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const language = searchParams.get('language') || 'en';
+    const admin = searchParams.get('admin') === 'true';
     
-    const theatres = await prisma.theatre.findMany({
-      where: {
-        content_language: language
-      },
-      include: {
-        images: true,
-        tags: true,
-        _count: {
-          select: {
-            events: true
+    if (admin) {
+      // For admin interface, return all theatres with language info
+      const theatres = await prisma.theatre.findMany({
+        include: {
+          images: true,
+          tags: true,
+          _count: {
+            select: {
+              events: true
+            }
           }
-        }
-      },
-      orderBy: {
-        name: 'asc'
-      }
-    });
+        },
+        orderBy: [
+          { name: 'asc' },
+          { content_language: 'asc' }
+        ]
+      });
 
-    return NextResponse.json(theatres);
+      return NextResponse.json(theatres);
+    } else {
+      // For public interface, return only theatres for specific language
+      const theatres = await prisma.theatre.findMany({
+        where: {
+          content_language: language
+        },
+        include: {
+          images: true,
+          tags: true,
+          _count: {
+            select: {
+              events: true
+            }
+          }
+        },
+        orderBy: {
+          name: 'asc'
+        }
+      });
+
+      return NextResponse.json(theatres);
+    }
   } catch (error) {
     console.error('Error fetching theatres:', error);
     return NextResponse.json(
@@ -80,20 +103,61 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create theatre with translations in all languages
-    const theatres = await createTheatreWithTranslations(
-      name,
-      city,
-      country,
-      description,
-      history,
-      website,
-      founded_year ? parseInt(founded_year) : undefined,
-      images,
-      tags
-    );
+    // Check if this is a single language creation (from admin interface)
+    if (content_language && translation_group) {
+      // Create single theatre for specific language
+      const theatre = await prisma.theatre.create({
+        data: {
+          name,
+          city,
+          country,
+          description,
+          history,
+          website,
+          founded_year: founded_year ? parseInt(founded_year) : undefined,
+          content_language,
+          translation_group,
+          images: {
+            create: images.map((img: any) => ({
+              image_url: img.image_url,
+              caption: img.caption,
+              is_primary: img.is_primary || false
+            }))
+          },
+          tags: {
+            create: tags.map((tag: any) => ({
+              tag_name: tag.tag_name
+            }))
+          }
+        },
+        include: {
+          images: true,
+          tags: true,
+          _count: {
+            select: {
+              events: true
+            }
+          }
+        }
+      });
 
-    return NextResponse.json(theatres, { status: 201 });
+      return NextResponse.json(theatre, { status: 201 });
+    } else {
+      // Create theatre with translations in all languages (legacy behavior)
+      const theatres = await createTheatreWithTranslations(
+        name,
+        city,
+        country,
+        description,
+        history,
+        website,
+        founded_year ? parseInt(founded_year) : undefined,
+        images,
+        tags
+      );
+
+      return NextResponse.json(theatres, { status: 201 });
+    }
   } catch (error) {
     console.error('Error creating theatre:', error);
     return NextResponse.json(
