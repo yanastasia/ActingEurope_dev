@@ -3490,6 +3490,7 @@ export namespace Prisma {
     history: number
     website: number
     founded_year: number
+    photos: number
     content_language: number
     translation_group: number
     created_at: number
@@ -3547,6 +3548,7 @@ export namespace Prisma {
     history?: true
     website?: true
     founded_year?: true
+    photos?: true
     content_language?: true
     translation_group?: true
     created_at?: true
@@ -3649,6 +3651,7 @@ export namespace Prisma {
     history: string | null
     website: string | null
     founded_year: number | null
+    photos: string[]
     content_language: string
     translation_group: string | null
     created_at: Date
@@ -3683,6 +3686,7 @@ export namespace Prisma {
     history?: boolean
     website?: boolean
     founded_year?: boolean
+    photos?: boolean
     content_language?: boolean
     translation_group?: boolean
     created_at?: boolean
@@ -3702,6 +3706,7 @@ export namespace Prisma {
     history?: boolean
     website?: boolean
     founded_year?: boolean
+    photos?: boolean
     content_language?: boolean
     translation_group?: boolean
     created_at?: boolean
@@ -3717,6 +3722,7 @@ export namespace Prisma {
     history?: boolean
     website?: boolean
     founded_year?: boolean
+    photos?: boolean
     content_language?: boolean
     translation_group?: boolean
     created_at?: boolean
@@ -3732,13 +3738,14 @@ export namespace Prisma {
     history?: boolean
     website?: boolean
     founded_year?: boolean
+    photos?: boolean
     content_language?: boolean
     translation_group?: boolean
     created_at?: boolean
     updated_at?: boolean
   }
 
-  export type TheatreOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "city" | "country" | "description" | "history" | "website" | "founded_year" | "content_language" | "translation_group" | "created_at" | "updated_at", ExtArgs["result"]["theatre"]>
+  export type TheatreOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "city" | "country" | "description" | "history" | "website" | "founded_year" | "photos" | "content_language" | "translation_group" | "created_at" | "updated_at", ExtArgs["result"]["theatre"]>
   export type TheatreInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     images?: boolean | Theatre$imagesArgs<ExtArgs>
     tags?: boolean | Theatre$tagsArgs<ExtArgs>
@@ -3764,6 +3771,7 @@ export namespace Prisma {
       history: string | null
       website: string | null
       founded_year: number | null
+      photos: string[]
       content_language: string
       translation_group: string | null
       created_at: Date
@@ -4202,6 +4210,7 @@ export namespace Prisma {
     readonly history: FieldRef<"Theatre", 'String'>
     readonly website: FieldRef<"Theatre", 'String'>
     readonly founded_year: FieldRef<"Theatre", 'Int'>
+    readonly photos: FieldRef<"Theatre", 'String[]'>
     readonly content_language: FieldRef<"Theatre", 'String'>
     readonly translation_group: FieldRef<"Theatre", 'String'>
     readonly created_at: FieldRef<"Theatre", 'DateTime'>
@@ -17452,6 +17461,7 @@ export namespace Prisma {
     history: 'history',
     website: 'website',
     founded_year: 'founded_year',
+    photos: 'photos',
     content_language: 'content_language',
     translation_group: 'translation_group',
     created_at: 'created_at',
@@ -17882,6 +17892,7 @@ export namespace Prisma {
     history?: StringNullableFilter<"Theatre"> | string | null
     website?: StringNullableFilter<"Theatre"> | string | null
     founded_year?: IntNullableFilter<"Theatre"> | number | null
+    photos?: StringNullableListFilter<"Theatre">
     content_language?: StringFilter<"Theatre"> | string
     translation_group?: StringNullableFilter<"Theatre"> | string | null
     created_at?: DateTimeFilter<"Theatre"> | Date | string
@@ -17900,6 +17911,7 @@ export namespace Prisma {
     history?: SortOrderInput | SortOrder
     website?: SortOrderInput | SortOrder
     founded_year?: SortOrderInput | SortOrder
+    photos?: SortOrder
     content_language?: SortOrder
     translation_group?: SortOrderInput | SortOrder
     created_at?: SortOrder
@@ -17921,6 +17933,7 @@ export namespace Prisma {
     history?: StringNullableFilter<"Theatre"> | string | null
     website?: StringNullableFilter<"Theatre"> | string | null
     founded_year?: IntNullableFilter<"Theatre"> | number | null
+    photos?: StringNullableListFilter<"Theatre">
     content_language?: StringFilter<"Theatre"> | string
     translation_group?: StringNullableFilter<"Theatre"> | string | null
     created_at?: DateTimeFilter<"Theatre"> | Date | string
@@ -17939,6 +17952,7 @@ export namespace Prisma {
     history?: SortOrderInput | SortOrder
     website?: SortOrderInput | SortOrder
     founded_year?: SortOrderInput | SortOrder
+    photos?: SortOrder
     content_language?: SortOrder
     translation_group?: SortOrderInput | SortOrder
     created_at?: SortOrder
@@ -17962,6 +17976,7 @@ export namespace Prisma {
     history?: StringNullableWithAggregatesFilter<"Theatre"> | string | null
     website?: StringNullableWithAggregatesFilter<"Theatre"> | string | null
     founded_year?: IntNullableWithAggregatesFilter<"Theatre"> | number | null
+    photos?: StringNullableListFilter<"Theatre">
     content_language?: StringWithAggregatesFilter<"Theatre"> | string
     translation_group?: StringNullableWithAggregatesFilter<"Theatre"> | string | null
     created_at?: DateTimeWithAggregatesFilter<"Theatre"> | Date | string
@@ -18969,6 +18984,7 @@ export namespace Prisma {
     history?: string | null
     website?: string | null
     founded_year?: number | null
+    photos?: TheatreCreatephotosInput | string[]
     content_language?: string
     translation_group?: string | null
     created_at?: Date | string
@@ -18987,6 +19003,7 @@ export namespace Prisma {
     history?: string | null
     website?: string | null
     founded_year?: number | null
+    photos?: TheatreCreatephotosInput | string[]
     content_language?: string
     translation_group?: string | null
     created_at?: Date | string
@@ -19004,6 +19021,7 @@ export namespace Prisma {
     history?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     founded_year?: NullableIntFieldUpdateOperationsInput | number | null
+    photos?: TheatreUpdatephotosInput | string[]
     content_language?: StringFieldUpdateOperationsInput | string
     translation_group?: NullableStringFieldUpdateOperationsInput | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19022,6 +19040,7 @@ export namespace Prisma {
     history?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     founded_year?: NullableIntFieldUpdateOperationsInput | number | null
+    photos?: TheatreUpdatephotosInput | string[]
     content_language?: StringFieldUpdateOperationsInput | string
     translation_group?: NullableStringFieldUpdateOperationsInput | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19040,6 +19059,7 @@ export namespace Prisma {
     history?: string | null
     website?: string | null
     founded_year?: number | null
+    photos?: TheatreCreatephotosInput | string[]
     content_language?: string
     translation_group?: string | null
     created_at?: Date | string
@@ -19054,6 +19074,7 @@ export namespace Prisma {
     history?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     founded_year?: NullableIntFieldUpdateOperationsInput | number | null
+    photos?: TheatreUpdatephotosInput | string[]
     content_language?: StringFieldUpdateOperationsInput | string
     translation_group?: NullableStringFieldUpdateOperationsInput | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19069,6 +19090,7 @@ export namespace Prisma {
     history?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     founded_year?: NullableIntFieldUpdateOperationsInput | number | null
+    photos?: TheatreUpdatephotosInput | string[]
     content_language?: StringFieldUpdateOperationsInput | string
     translation_group?: NullableStringFieldUpdateOperationsInput | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20229,6 +20251,14 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
+  export type StringNullableListFilter<$PrismaModel = never> = {
+    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    has?: string | StringFieldRefInput<$PrismaModel> | null
+    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
+    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
+    isEmpty?: boolean
+  }
+
   export type TheatreImageListRelationFilter = {
     every?: TheatreImageWhereInput
     some?: TheatreImageWhereInput
@@ -20268,6 +20298,7 @@ export namespace Prisma {
     history?: SortOrder
     website?: SortOrder
     founded_year?: SortOrder
+    photos?: SortOrder
     content_language?: SortOrder
     translation_group?: SortOrder
     created_at?: SortOrder
@@ -20603,14 +20634,6 @@ export namespace Prisma {
     gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
-  }
-
-  export type StringNullableListFilter<$PrismaModel = never> = {
-    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    has?: string | StringFieldRefInput<$PrismaModel> | null
-    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
-    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
-    isEmpty?: boolean
   }
 
   export type VenueNullableScalarRelationFilter = {
@@ -21116,6 +21139,10 @@ export namespace Prisma {
     deleteMany?: BookingScalarWhereInput | BookingScalarWhereInput[]
   }
 
+  export type TheatreCreatephotosInput = {
+    set: string[]
+  }
+
   export type TheatreImageCreateNestedManyWithoutTheatreInput = {
     create?: XOR<TheatreImageCreateWithoutTheatreInput, TheatreImageUncheckedCreateWithoutTheatreInput> | TheatreImageCreateWithoutTheatreInput[] | TheatreImageUncheckedCreateWithoutTheatreInput[]
     connectOrCreate?: TheatreImageCreateOrConnectWithoutTheatreInput | TheatreImageCreateOrConnectWithoutTheatreInput[]
@@ -21164,6 +21191,11 @@ export namespace Prisma {
     decrement?: number
     multiply?: number
     divide?: number
+  }
+
+  export type TheatreUpdatephotosInput = {
+    set?: string[]
+    push?: string | string[]
   }
 
   export type TheatreImageUpdateManyWithoutTheatreNestedInput = {
@@ -22246,6 +22278,7 @@ export namespace Prisma {
     history?: string | null
     website?: string | null
     founded_year?: number | null
+    photos?: TheatreCreatephotosInput | string[]
     content_language?: string
     translation_group?: string | null
     created_at?: Date | string
@@ -22263,6 +22296,7 @@ export namespace Prisma {
     history?: string | null
     website?: string | null
     founded_year?: number | null
+    photos?: TheatreCreatephotosInput | string[]
     content_language?: string
     translation_group?: string | null
     created_at?: Date | string
@@ -22295,6 +22329,7 @@ export namespace Prisma {
     history?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     founded_year?: NullableIntFieldUpdateOperationsInput | number | null
+    photos?: TheatreUpdatephotosInput | string[]
     content_language?: StringFieldUpdateOperationsInput | string
     translation_group?: NullableStringFieldUpdateOperationsInput | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -22312,6 +22347,7 @@ export namespace Prisma {
     history?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     founded_year?: NullableIntFieldUpdateOperationsInput | number | null
+    photos?: TheatreUpdatephotosInput | string[]
     content_language?: StringFieldUpdateOperationsInput | string
     translation_group?: NullableStringFieldUpdateOperationsInput | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -22328,6 +22364,7 @@ export namespace Prisma {
     history?: string | null
     website?: string | null
     founded_year?: number | null
+    photos?: TheatreCreatephotosInput | string[]
     content_language?: string
     translation_group?: string | null
     created_at?: Date | string
@@ -22345,6 +22382,7 @@ export namespace Prisma {
     history?: string | null
     website?: string | null
     founded_year?: number | null
+    photos?: TheatreCreatephotosInput | string[]
     content_language?: string
     translation_group?: string | null
     created_at?: Date | string
@@ -22377,6 +22415,7 @@ export namespace Prisma {
     history?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     founded_year?: NullableIntFieldUpdateOperationsInput | number | null
+    photos?: TheatreUpdatephotosInput | string[]
     content_language?: StringFieldUpdateOperationsInput | string
     translation_group?: NullableStringFieldUpdateOperationsInput | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -22394,6 +22433,7 @@ export namespace Prisma {
     history?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     founded_year?: NullableIntFieldUpdateOperationsInput | number | null
+    photos?: TheatreUpdatephotosInput | string[]
     content_language?: StringFieldUpdateOperationsInput | string
     translation_group?: NullableStringFieldUpdateOperationsInput | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -22756,6 +22796,7 @@ export namespace Prisma {
     history?: string | null
     website?: string | null
     founded_year?: number | null
+    photos?: TheatreCreatephotosInput | string[]
     content_language?: string
     translation_group?: string | null
     created_at?: Date | string
@@ -22773,6 +22814,7 @@ export namespace Prisma {
     history?: string | null
     website?: string | null
     founded_year?: number | null
+    photos?: TheatreCreatephotosInput | string[]
     content_language?: string
     translation_group?: string | null
     created_at?: Date | string
@@ -22864,6 +22906,7 @@ export namespace Prisma {
     history?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     founded_year?: NullableIntFieldUpdateOperationsInput | number | null
+    photos?: TheatreUpdatephotosInput | string[]
     content_language?: StringFieldUpdateOperationsInput | string
     translation_group?: NullableStringFieldUpdateOperationsInput | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -22881,6 +22924,7 @@ export namespace Prisma {
     history?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     founded_year?: NullableIntFieldUpdateOperationsInput | number | null
+    photos?: TheatreUpdatephotosInput | string[]
     content_language?: StringFieldUpdateOperationsInput | string
     translation_group?: NullableStringFieldUpdateOperationsInput | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string

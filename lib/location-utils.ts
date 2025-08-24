@@ -10,7 +10,7 @@ export const getCityTranslationKey = (cityName: string): string => {
     'Bitola': 'bitola'
   };
   
-  return cityMap[cityName] || cityName.toLowerCase();
+  return cityMap[cityName] || cityName;
 };
 
 // Map country names to translation keys
@@ -21,7 +21,7 @@ export const getCountryTranslationKey = (countryName: string): string => {
     'Serbia': 'serbia'
   };
   
-  return countryMap[countryName] || countryName.toLowerCase().replace(/\s+/g, '');
+  return countryMap[countryName] || countryName;
 };
 
 // Get translated location string
@@ -36,7 +36,11 @@ export const getTranslatedLocation = (
   const translatedCity = t(cityKey);
   const translatedCountry = t(countryKey);
   
-  return `${translatedCity}, ${translatedCountry}`;
+  // If translation returns the same as the key (meaning no translation found), use original
+  const finalCity = translatedCity === cityKey ? city : translatedCity;
+  const finalCountry = translatedCountry === countryKey ? country : translatedCountry;
+  
+  return `${finalCity}, ${finalCountry}`;
 };
 
 // Map theatre tag names to translation keys
