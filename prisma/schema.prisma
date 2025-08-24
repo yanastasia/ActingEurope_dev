@@ -129,7 +129,7 @@ model Event {
   event_type     EventType
   event_date     DateTime   @db.Date
   event_time     DateTime   @db.Time(3)
-  description    String?
+  description    String?    @db.Text
   price          Decimal    @db.Decimal(10, 2)
   image_url      String?    @db.VarChar(500)
   poster_url     String?    @db.VarChar(500)
@@ -142,7 +142,6 @@ model Event {
   company        String[]   @default([])
   director       String?    @db.VarChar(255)
   cast           String[]   @default([])
-  synopsis       String?    @db.Text
   subtitles      String?    @db.VarChar(255)
   duration       String?    @db.VarChar(100)
   is_featured    Boolean    @default(false)

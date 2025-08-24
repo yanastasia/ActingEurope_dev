@@ -203,6 +203,7 @@ const translations = {
     duration: "Duration",
     director: "Director",
     cast: "Cast",
+    castAndCrew: "Cast & Crew",
     synopsis: "Synopsis",
     price: "Price",
     total: "Total",
@@ -325,6 +326,22 @@ const translations = {
     intimateTheatre: "Intimate Theatre",
     localProductions: "Local Productions",
 
+    // Genre Tags
+    drama: "Drama",
+    comedy: "Comedy",
+    monodrama: "Monodrama",
+
+    // Performance Languages
+    performanceLanguageEn: "English",
+    performanceLanguageBg: "Bulgarian",
+    performanceLanguageMk: "Macedonian",
+    performanceLanguageSr: "Serbian",
+    subtitlesEn: "English",
+    subtitlesBg: "Bulgaria",
+    subtitlesMk: "Macedonian",
+    subtitlesSr: "Serbian",
+    noSubtitles: "No Subtitles",
+
     // News Article Page
     backToNews: "Back to News",
     articleNotFound: "Article Not Found",
@@ -377,6 +394,14 @@ const translations = {
     // Venue translations
     "Main Stage": "Main Stage",
     "Chamber Stage": "Chamber Stage",
+
+    // Theatre name translations
+    "Drama Theatre Kyustendil": "Drama Theatre Kyustendil",
+    "\"Ivan Vazov\" National Theatre": "\"Ivan Vazov\" National Theatre",
+    "Macedonian National Theatre": "Macedonian National Theatre",
+    "National Theatre in Niš": "National Theatre in Niš",
+    "OSAIK \"39 Monkeys\"": "OSAIK \"39 Monkeys\"",
+    "Intimate Theatre Bitola": "Intimate Theatre Bitola",
 
     // Event types
     performance: "Performance",
@@ -495,6 +520,7 @@ const translations = {
     duration: "Продължителност",
     director: "Режисьор",
     cast: "Актьорски състав",
+    castAndCrew: "Актьорски състав и екип",
     synopsis: "Синопсис",
     price: "Цена",
     total: "Общо",
@@ -617,6 +643,22 @@ const translations = {
     intimateTheatre: "Интимен театър",
     localProductions: "Местни продукции",
 
+    // Genre Tags
+    drama: "Драма",
+    comedy: "Комедия",
+    monodrama: "Монодрама",
+
+    // Performance Languages
+    performanceLanguageEn: "Английски",
+    performanceLanguageBg: "Български",
+    performanceLanguageMk: "Македонски",
+    performanceLanguageSr: "Сръбски",
+    subtitlesEn: "Английски",
+    subtitlesBg: "Български",
+    subtitlesMk: "Македонски",
+    subtitlesSr: "Сръбски",
+    noSubtitles: "Без субтитри",
+
     // News Article Page
     backToNews: "Назад към новините",
     articleNotFound: "Статията не е намерена",
@@ -670,6 +712,14 @@ const translations = {
     // Venue translations
     "Main Stage": "Главна Сцена",
     "Chamber Stage": "Камерна Сцена",
+
+    // Theatre name translations
+    "Drama Theatre Kyustendil": "Драматичен театър Кюстендил",
+    "\"Ivan Vazov\" National Theatre": "Народен театър \"Иван Вазов\"",
+    "Macedonian National Theatre": "Македонски национален театър",
+    "National Theatre in Niš": "Народен театър в Ниш",
+    "OSAIK \"39 Monkeys\"": "ОСАИК \"39 Маймуни\"",
+    "Intimate Theatre Bitola": "Интимен театър Битоля",
 
     // Event types
     performance: "Представление",
@@ -888,6 +938,7 @@ const translations = {
     duration: "Времетраење",
     director: "Режисер",
     cast: "Актерски состав",
+    castAndCrew: "Актерски состав и екипа",
     synopsis: "Синопсис",
     price: "Цена",
     total: "Вкупно",
@@ -1011,6 +1062,22 @@ const translations = {
     intimateTheatre: "Интимен театар",
     localProductions: "Локални продукции",
 
+    // Genre Tags
+    drama: "Драма",
+    comedy: "Комедија",
+    monodrama: "Монодрама",
+
+    // Performance Languages
+    performanceLanguageEn: "Англиски",
+    performanceLanguageBg: "Бугарски",
+    performanceLanguageMk: "Македонски",
+    performanceLanguageSr: "Српски",
+    subtitlesEn: "Англиски",
+    subtitlesBg: "Бугарски",
+    subtitlesMk: "Македонски",
+    subtitlesSr: "Српски",
+    noSubtitles: "Без титлови",
+
     // News Article Page
     backToNews: "Назад кон вестите",
     articleNotFound: "Статијата не е пронајдена",
@@ -1064,6 +1131,14 @@ const translations = {
     // Venue translations
     "Main Stage": "Главна Сцена",
     "Chamber Stage": "Камерна Сцена",
+
+    // Theatre name translations
+    "Drama Theatre Kyustendil": "Драматски театар Ќустендил",
+    "\"Ivan Vazov\" National Theatre": "Народен театар \"Иван Вазов\"",
+    "Macedonian National Theatre": "Македонски народен театар",
+    "National Theatre in Niš": "Народен театар во Ниш",
+    "OSAIK \"39 Monkeys\"": "ОСАИК \"39 Мајмуни\"",
+    "Intimate Theatre Bitola": "Интимен театар Битола",
 
     // Event types
     performance: "Претстава",
@@ -1282,6 +1357,7 @@ const translations = {
     duration: "Трајање",
     director: "Режисер",
     cast: "Глумачка постава",
+    castAndCrew: "Глумачка постава и екипа",
     synopsis: "Синопсис",
     price: "Цена",
     total: "Укупно",
@@ -1405,6 +1481,22 @@ const translations = {
     intimateTheatre: "Интимни театар",
     localProductions: "Локалне продукције",
 
+    // Genre Tags
+    drama: "Драма",
+    comedy: "Комедија",
+    monodrama: "Монодрама",
+
+    // Performance Languages
+    performanceLanguageEn: "Енглески",
+    performanceLanguageBg: "Бугарски",
+    performanceLanguageMk: "Македонски",
+    performanceLanguageSr: "Српски",
+    subtitlesEn: "Енглески",
+    subtitlesBg: "Бугарски",
+    subtitlesMk: "Македонски",
+    subtitlesSr: "Српски",
+    noSubtitles: "Без титлова",
+
     // News Article Page
     backToNews: "Назад на вести",
     articleNotFound: "Чланак није пронађен",
@@ -1458,6 +1550,14 @@ const translations = {
     // Venue translations
     "Main Stage": "Главна Сцена",
     "Chamber Stage": "Камерна Сцена",
+
+    // Theatre name translations
+    "Drama Theatre Kyustendil": "Драмски театар Ћустендил",
+    "\"Ivan Vazov\" National Theatre": "Народно позориште \"Иван Вазов\"",
+    "Macedonian National Theatre": "Македонско народно позориште",
+    "National Theatre in Niš": "Народно позориште у Нишу",
+    "OSAIK \"39 Monkeys\"": "ОСАИК \"39 Мајмуна\"",
+    "Intimate Theatre Bitola": "Интимно позориште Битољ",
 
     // Event types
     performance: "Представа",

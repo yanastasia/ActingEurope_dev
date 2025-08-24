@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { useLanguage } from '@/lib/language-context'
+import { useLanguage, translations } from '@/lib/language-context'
 import { useToast } from '@/hooks/use-toast'
 
 interface VirtualPerformance {
@@ -256,7 +256,7 @@ export default function VirtualPerformancePage() {
                   <div className="text-sm">
                     <div>{virtualPerformance.venue?.name || 'Venue TBA'}</div>
                     <div className="text-muted-foreground">
-                      {virtualPerformance.theatre.name}, {virtualPerformance.theatre.city}
+                      {translations[language][virtualPerformance.theatre.name as keyof typeof translations[typeof language]] || virtualPerformance.theatre.name}, {virtualPerformance.theatre.city}
                     </div>
                   </div>
                 </div>

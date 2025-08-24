@@ -80,7 +80,6 @@ export async function GET(
       company: primaryEvent.company,
       director: primaryEvent.director,
       cast: primaryEvent.cast,
-      synopsis: primaryEvent.synopsis,
       subtitles: primaryEvent.subtitles,
       duration: primaryEvent.duration,
       isFeatured: primaryEvent.is_featured,

@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Reminder - Acting Europe</title>
+    <style>
+        /* Reset styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f8f9fa;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Header with Acting Europe branding */
+        .header {
+            background: linear-gradient(135deg, #021a4a 0%, #0d2a5c 100%);
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(255, 204, 0, 0.1) 0%, rgba(255, 255, 255, 0) 60%);
+            pointer-events: none;
+        }
+        
+        .header-title {
+            color: #ffffff;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header-subtitle {
+            color: #ffcc00;
+            font-size: 16px;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Main content */
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .reminder-message {
+            font-size: 24px;
+            font-weight: 600;
+            color: #021a4a;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .message-text {
+            font-size: 16px;
+            color: #555555;
+            margin-bottom: 30px;
+            text-align: center;
+            line-height: 1.7;
+        }
+        
+        /* Countdown section */
+        .countdown-section {
+            background: linear-gradient(135deg, #ffcc00 0%, #ffd700 100%);
+            color: #021a4a;
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .countdown-label {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        .countdown-time {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .countdown-subtitle {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        /* Performance details */
+        .performance-details {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 30px 0;
+            border-left: 4px solid #ffcc00;
+        }
+        
+        .performance-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #021a4a;
+            margin-bottom: 15px;
+        }
+        
+        .performance-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .info-item {
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .info-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666666;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 14px;
+            color: #333333;
+            font-weight: 500;
+        }
+        
+        /* Seat information */
+        .seats-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .seats-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #021a4a;
+            margin-bottom: 10px;
+        }
+        
+        .seats-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .seat-item {
+            background-color: #ffcc00;
+            color: #021a4a;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        /* CTA Buttons */
+        .cta-container {
+            text-align: center;
+            margin: 40px 0;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffcc00 0%, #ffd700 100%);
+            color: #021a4a;
+            text-decoration: none;
+            padding: 14px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(255, 204, 0, 0.3);
+        }
+        
+        .cta-button.secondary {
+            background: #ffffff;
+            border: 2px solid #021a4a;
+            color: #021a4a;
+            box-shadow: none;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 204, 0, 0.4);
+        }
+        
+        .cta-button.secondary:hover {
+            background-color: #f8f9fa;
+            box-shadow: 0 4px 12px rgba(2, 26, 74, 0.1);
+        }
+        
+        /* Preparation tips */
+        .preparation-tips {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #d4edda;
+            border-radius: 6px;
+            border-left: 4px solid #28a745;
+        }
+        
+        .tips-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #155724;
+            margin-bottom: 15px;
+        }
+        
+        .tips-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .tips-list li {
+            font-size: 14px;
+            color: #155724;
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .tips-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        /* Contact info */
+        .contact-info {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #fff3cd;
+            border-radius: 6px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .contact-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 8px;
+        }
+        
+        .contact-text {
+            font-size: 14px;
+            color: #856404;
+            line-height: 1.5;
+        }
+        
+        /* Footer */
+        .footer {
+            background-color: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .footer-text {
+            font-size: 14px;
+            color: #666666;
+            margin-bottom: 15px;
+        }
+        
+        .footer-links {
+            margin-bottom: 20px;
+        }
+        
+        .footer-link {
+            color: #021a4a;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 14px;
+        }
+        
+        .footer-link:hover {
+            color: #ffcc00;
+        }
+        
+        .copyright {
+            font-size: 12px;
+            color: #999999;
+        }
+        
+        /* Responsive design */
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                margin: 0;
+                border-radius: 0;
+            }
+            
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .content {
+                padding: 30px 20px;
+            }
+            
+            .header-title {
+                font-size: 24px;
+            }
+            
+            .reminder-message {
+                font-size: 20px;
+            }
+            
+            .countdown-time {
+                font-size: 24px;
+            }
+            
+            .cta-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .cta-button {
+                width: 100%;
+                max-width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="header-title">Acting Europe</h1>
+            <p class="header-subtitle">Theatre Without Borders</p>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="content">
+            <!-- English Content -->
+            <h2 class="reminder-message">🎭 Performance Reminder</h2>
+            
+            <p class="message-text">
+                Don't forget! Your theatre performance is coming up soon. 
+                We're excited to see you there!
+            </p>
+            
+            <div class="countdown-section">
+                <div class="countdown-label">Performance starts in</div>
+                <div class="countdown-time">{{ .TimeUntil }}</div>
+                <div class="countdown-subtitle">{{ .DateTime }}</div>
+            </div>
+            
+            <div class="performance-details">
+                <h3 class="performance-title">{{ .PerformanceTitle }}</h3>
+                
+                <div class="performance-info">
+                    <div class="info-item">
+                        <div class="info-label">Theatre</div>
+                        <div class="info-value">{{ .TheatreName }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Address</div>
+                        <div class="info-value">{{ .TheatreAddress }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Genre</div>
+                        <div class="info-value">{{ .Genre }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Language</div>
+                        <div class="info-value">{{ .Language }}</div>
+                    </div>
+                </div>
+                
+                <div class="seats-section">
+                    <div class="seats-title">Your Seats</div>
+                    <div class="seats-list">
+                        {{ range .Seats }}
+                        <span class="seat-item">{{ . }}</span>
+                        {{ end }}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="cta-container">
+                <a href="{{ .TicketURL }}" class="cta-button">
+                    View Tickets
+                </a>
+                <a href="{{ .DirectionsURL }}" class="cta-button secondary">
+                    Get Directions
+                </a>
+            </div>
+            
+            <div class="preparation-tips">
+                <div class="tips-title">🎯 Preparation Tips</div>
+                <ul class="tips-list">
+                    <li>Arrive 15-30 minutes before the performance starts</li>
+                    <li>Bring your digital ticket or printed copy</li>
+                    <li>Check the weather and dress appropriately</li>
+                    <li>Turn off your mobile phone during the performance</li>
+                    <li>Consider public transport or book parking in advance</li>
+                </ul>
+            </div>
+            
+            <div class="contact-info">
+                <div class="contact-title">📞 Need Help?</div>
+                <div class="contact-text">
+                    If you have any questions or need assistance, please contact the theatre directly or reach out to our support team.
+                </div>
+            </div>
+            
+            <!-- Bulgarian Content -->
+            <hr style="margin: 40px 0; border: none; border-top: 2px solid #e9ecef;">
+            
+            <h2 class="reminder-message">🎭 Напомняне за представление</h2>
+            
+            <p class="message-text">
+                Не забравяйте! Вашето театрално представление наближава.
+                Радваме се да ви видим там!
+            </p>
+            
+            <div class="countdown-section">
+                <div class="countdown-label">Представлението започва след</div>
+                <div class="countdown-time">{{ .TimeUntil }}</div>
+                <div class="countdown-subtitle">{{ .DateTime }}</div>
+            </div>
+            
+            <div class="performance-details">
+                <h3 class="performance-title">{{ .PerformanceTitle }}</h3>
+                
+                <div class="performance-info">
+                    <div class="info-item">
+                        <div class="info-label">Театър</div>
+                        <div class="info-value">{{ .TheatreName }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Адрес</div>
+                        <div class="info-value">{{ .TheatreAddress }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Жанр</div>
+                        <div class="info-value">{{ .Genre }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Език</div>
+                        <div class="info-value">{{ .Language }}</div>
+                    </div>
+                </div>
+                
+                <div class="seats-section">
+                    <div class="seats-title">Вашите места</div>
+                    <div class="seats-list">
+                        {{ range .Seats }}
+                        <span class="seat-item">{{ . }}</span>
+                        {{ end }}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="cta-container">
+                <a href="{{ .TicketURL }}" class="cta-button">
+                    Вижте билетите
+                </a>
+                <a href="{{ .DirectionsURL }}" class="cta-button secondary">
+                    Вземете указания
+                </a>
+            </div>
+            
+            <div class="preparation-tips">
+                <div class="tips-title">🎯 Съвети за подготовка</div>
+                <ul class="tips-list">
+                    <li>Пристигнете 15-30 минути преди началото на представлението</li>
+                    <li>Носете вашия цифров билет или разпечатано копие</li>
+                    <li>Проверете времето и се облечете подходящо</li>
+                    <li>Изключете мобилния си телефон по време на представлението</li>
+                    <li>Помислете за обществен транспорт или резервирайте паркинг предварително</li>
+                </ul>
+            </div>
+            
+            <div class="contact-info">
+                <div class="contact-title">📞 Нужда от помощ?</div>
+                <div class="contact-text">
+                    Ако имате въпроси или се нуждаете от помощ, моля свържете се директно с театъра или се обърнете към нашия екип за поддръжка.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p class="footer-text">
+                Thank you for choosing Acting Europe - where cultures meet through theatre!
+            </p>
+            
+            <div class="footer-links">
+                <a href="https://your-domain.com/about" class="footer-link">About Us</a>
+                <a href="https://your-domain.com/program" class="footer-link">Program</a>
+                <a href="https://your-domain.com/contact" class="footer-link">Contact</a>
+                <a href="https://your-domain.com/profile" class="footer-link">My Profile</a>
+            </div>
+            
+            <p class="copyright">
+                © 2025 Acting Europe. All rights reserved.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

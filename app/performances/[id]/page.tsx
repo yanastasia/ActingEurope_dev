@@ -16,6 +16,44 @@ import {
 } from "@/components/ui/breadcrumb"
 import { useLanguage, translations } from "@/lib/language-context"
 
+// Helper function to translate subtitle languages
+const translateSubtitleLanguages = (subtitles: string, language: string) => {
+  if (!subtitles) return '';
+  
+  const languageMap: { [key: string]: { [key: string]: string } } = {
+    en: {
+      'English': translations.en.subtitlesEn,
+      'Bulgarian': translations.en.subtitlesBg,
+      'Macedonian': translations.en.subtitlesMk,
+      'Serbian': translations.en.subtitlesSr
+    },
+    bg: {
+      'English': translations.bg.subtitlesEn,
+      'Bulgarian': translations.bg.subtitlesBg,
+      'Macedonian': translations.bg.subtitlesMk,
+      'Serbian': translations.bg.subtitlesSr
+    },
+    mk: {
+      'English': translations.mk.subtitlesEn,
+      'Bulgarian': translations.mk.subtitlesBg,
+      'Macedonian': translations.mk.subtitlesMk,
+      'Serbian': translations.mk.subtitlesSr
+    },
+    sr: {
+      'English': translations.sr.subtitlesEn,
+      'Bulgarian': translations.sr.subtitlesBg,
+      'Macedonian': translations.sr.subtitlesMk,
+      'Serbian': translations.sr.subtitlesSr
+    }
+  };
+  
+  // Split by comma and translate each language
+  return subtitles.split(',').map(lang => {
+    const trimmedLang = lang.trim();
+    return languageMap[language]?.[trimmedLang] || trimmedLang;
+  }).join(', ');
+};
+
 export default function PerformancePage({ params }: { params: Promise<{ id: string }> }) {
   const { t, language } = useLanguage()
   const [performance, setPerformance] = useState<any>(null)
@@ -111,7 +149,7 @@ export default function PerformancePage({ params }: { params: Promise<{ id: stri
 
           <h1 className="mb-2 text-3xl font-bold text-secondary-blue md:text-4xl">{performance.title}</h1>
           <p className="mb-4 text-xl text-muted-foreground">
-            {performance.theatreName || (Array.isArray(performance.company) ? performance.company.join(' & ') : performance.company)}
+            {translations[language][performance.theatreName as keyof typeof translations[typeof language]] || performance.theatreName || (Array.isArray(performance.company) ? performance.company.join(' & ') : performance.company)}
           </p>
 
           <div className="mb-6 flex flex-wrap gap-2">
@@ -139,18 +177,18 @@ export default function PerformancePage({ params }: { params: Promise<{ id: stri
 
           <h2 className="mb-4 text-2xl font-semibold text-secondary-blue">{translations[language].synopsis}</h2>
           <div className="mb-8 space-y-4">
-            {performance.synopsis ? performance.synopsis.split("\n\n").map((paragraph: string, index: number) => (
+            {performance.description ? performance.description.split("\n\n").map((paragraph: string, index: number) => (
               <p key={index} className="text-muted-foreground">
                 {paragraph}
               </p>
             )) : (
-              <p className="text-muted-foreground">No synopsis available.</p>
+              <p className="text-muted-foreground">No description available.</p>
             )}
           </div>
 
           {(performance.director !== "TBA" || performance.cast.length > 0) && (
             <>
-              <h2 className="mb-4 text-2xl font-semibold text-secondary-blue">Cast & Crew</h2>
+              <h2 className="mb-4 text-2xl font-semibold text-secondary-blue">{translations[language].castAndCrew}</h2>
               <div className="mb-8 space-y-2">
                 {performance.director !== "TBA" && (
                   <div className="flex">
@@ -210,7 +248,7 @@ export default function PerformancePage({ params }: { params: Promise<{ id: stri
               {performance.subtitles && (
                 <div className="flex items-center gap-2">
                   <Subtitles className="h-5 w-5 text-primary-gold" />
-                  <span className="text-sm">{translations[language].subtitles} {performance.subtitles}</span>
+                  <span className="text-sm">{translations[language].subtitles} {translateSubtitleLanguages(performance.subtitles, language)}</span>
                 </div>
               )}
               <div className="flex items-center gap-2">
@@ -224,9 +262,6 @@ export default function PerformancePage({ params }: { params: Promise<{ id: stri
             <div className="space-y-4">
               <Button className="w-full" size="lg" asChild>
                 <Link href="/ticket-reservation">{translations[language].bookTicket}</Link>
-              </Button>
-              <Button variant="outline" className="w-full" size="lg">
-                {translations[language].addToCalendar}
               </Button>
             </div>
 

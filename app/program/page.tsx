@@ -78,7 +78,7 @@ export default function ProgramPage() {
         time: event.time,
         venue: event.venue,
         company: event.theatreName || event.company,
-        description: event.synopsis,
+        description: event.description,
         imageUrl: event.imageUrl,
         posterUrl: event.posterUrl,
         isFeatured: event.isFeatured,
@@ -280,7 +280,6 @@ export default function ProgramPage() {
                             <Link href={`/performances/${event.id}`} passHref>
                               <Button size="sm" variant="outline">{t("details")}</Button>
                             </Link>
-                            <Button size="sm" variant="ghost">{t("addToCalendar")}</Button>
                           </div>
                         </div>
                       </div>

@@ -951,7 +951,7 @@ export interface Event {
   company: string[];
   director: string | null;
   cast: string[];
-  synopsis: string | null;
+
   subtitles: string | null;
   duration: string | null;
   isFeatured: boolean;
@@ -993,7 +993,7 @@ export const getEventsByLanguage = async (language: string = 'en'): Promise<Even
     company: event.company,
     director: event.director,
     cast: event.cast,
-    synopsis: event.synopsis,
+
     subtitles: event.subtitles,
     duration: event.duration,
     isFeatured: event.is_featured,
@@ -1035,7 +1035,7 @@ export const getAllEvents = async (): Promise<Event[]> => {
     company: event.company,
     director: event.director,
     cast: event.cast,
-    synopsis: event.synopsis,
+
     subtitles: event.subtitles,
     duration: event.duration,
     isFeatured: event.is_featured,
@@ -1064,7 +1064,7 @@ export const createEventWithTranslations = async (
   company: string[] = [],
   director?: string,
   cast: string[] = [],
-  synopsis?: string,
+
   subtitles?: string,
   duration?: string,
   isFeatured: boolean = false,
@@ -1080,17 +1080,12 @@ export const createEventWithTranslations = async (
   for (const lang of languages) {
     let localizedTitle = title;
     let localizedDescription = description;
-    let localizedSynopsis = synopsis;
-    
     // Add language indicators for non-English versions
     if (lang !== 'en') {
       const langSuffix = ` (${lang.toUpperCase()})`;
       localizedTitle = `${title}${langSuffix}`;
       if (localizedDescription) {
         localizedDescription = `${description}${langSuffix}`;
-      }
-      if (localizedSynopsis) {
-        localizedSynopsis = `${synopsis}${langSuffix}`;
       }
     }
     
@@ -1113,7 +1108,7 @@ export const createEventWithTranslations = async (
         company: company,
         director: director,
         cast: cast,
-        synopsis: localizedSynopsis,
+    
         subtitles: subtitles,
         duration: duration,
         is_featured: isFeatured,
@@ -1141,7 +1136,7 @@ export const createEventWithTranslations = async (
       company: event.company,
       director: event.director,
       cast: event.cast,
-      synopsis: event.synopsis,
+
       subtitles: event.subtitles,
       duration: event.duration,
       isFeatured: event.is_featured,
@@ -1196,7 +1191,7 @@ export const getEventTranslationGroup = async (eventId: number): Promise<Event[]
     company: event.company,
     director: event.director,
     cast: event.cast,
-    synopsis: event.synopsis,
+    
     subtitles: event.subtitles,
     duration: event.duration,
     isFeatured: event.is_featured,
@@ -1262,7 +1257,7 @@ export const updateEvent = async (id: number, updatedFields: any): Promise<Event
     if (updatedFields.company !== undefined) updateData.company = Array.isArray(updatedFields.company) ? updatedFields.company : [updatedFields.company];
     if (updatedFields.director !== undefined) updateData.director = updatedFields.director;
     if (updatedFields.cast !== undefined) updateData.cast = Array.isArray(updatedFields.cast) ? updatedFields.cast.join(',') : updatedFields.cast;
-    if (updatedFields.synopsis !== undefined) updateData.synopsis = updatedFields.synopsis;
+
     if (updatedFields.subtitles !== undefined) updateData.subtitles = updatedFields.subtitles;
      if (updatedFields.duration !== undefined) updateData.duration = updatedFields.duration;
      if (updatedFields.isFeatured !== undefined) updateData.is_featured = updatedFields.isFeatured;
@@ -1318,7 +1313,7 @@ export const updateEvent = async (id: number, updatedFields: any): Promise<Event
        company: Array.isArray(event.company) ? event.company : (event.company ? (event.company as string).split(',').map(comp => comp.trim()) : []),
        director: event.director,
        cast: event.cast,
-       synopsis: event.synopsis,
+
        subtitles: event.subtitles,
        duration: event.duration,
        isFeatured: event.is_featured,

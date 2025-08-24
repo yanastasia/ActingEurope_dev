@@ -10382,7 +10382,6 @@ export namespace Prisma {
     subtitle_language: string | null
     genre: string | null
     director: string | null
-    synopsis: string | null
     subtitles: string | null
     duration: string | null
     is_featured: boolean | null
@@ -10409,7 +10408,6 @@ export namespace Prisma {
     subtitle_language: string | null
     genre: string | null
     director: string | null
-    synopsis: string | null
     subtitles: string | null
     duration: string | null
     is_featured: boolean | null
@@ -10438,7 +10436,6 @@ export namespace Prisma {
     company: number
     director: number
     cast: number
-    synopsis: number
     subtitles: number
     duration: number
     is_featured: number
@@ -10481,7 +10478,6 @@ export namespace Prisma {
     subtitle_language?: true
     genre?: true
     director?: true
-    synopsis?: true
     subtitles?: true
     duration?: true
     is_featured?: true
@@ -10508,7 +10504,6 @@ export namespace Prisma {
     subtitle_language?: true
     genre?: true
     director?: true
-    synopsis?: true
     subtitles?: true
     duration?: true
     is_featured?: true
@@ -10537,7 +10532,6 @@ export namespace Prisma {
     company?: true
     director?: true
     cast?: true
-    synopsis?: true
     subtitles?: true
     duration?: true
     is_featured?: true
@@ -10653,7 +10647,6 @@ export namespace Prisma {
     company: string[]
     director: string | null
     cast: string[]
-    synopsis: string | null
     subtitles: string | null
     duration: string | null
     is_featured: boolean
@@ -10701,7 +10694,6 @@ export namespace Prisma {
     company?: boolean
     director?: boolean
     cast?: boolean
-    synopsis?: boolean
     subtitles?: boolean
     duration?: boolean
     is_featured?: boolean
@@ -10734,7 +10726,6 @@ export namespace Prisma {
     company?: boolean
     director?: boolean
     cast?: boolean
-    synopsis?: boolean
     subtitles?: boolean
     duration?: boolean
     is_featured?: boolean
@@ -10765,7 +10756,6 @@ export namespace Prisma {
     company?: boolean
     director?: boolean
     cast?: boolean
-    synopsis?: boolean
     subtitles?: boolean
     duration?: boolean
     is_featured?: boolean
@@ -10796,7 +10786,6 @@ export namespace Prisma {
     company?: boolean
     director?: boolean
     cast?: boolean
-    synopsis?: boolean
     subtitles?: boolean
     duration?: boolean
     is_featured?: boolean
@@ -10804,7 +10793,7 @@ export namespace Prisma {
     updated_at?: boolean
   }
 
-  export type EventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "theatre_id" | "venue_id" | "event_type" | "event_date" | "event_time" | "description" | "price" | "image_url" | "poster_url" | "language" | "content_language" | "translation_group" | "performance_language" | "subtitle_language" | "genre" | "company" | "director" | "cast" | "synopsis" | "subtitles" | "duration" | "is_featured" | "created_at" | "updated_at", ExtArgs["result"]["event"]>
+  export type EventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "theatre_id" | "venue_id" | "event_type" | "event_date" | "event_time" | "description" | "price" | "image_url" | "poster_url" | "language" | "content_language" | "translation_group" | "performance_language" | "subtitle_language" | "genre" | "company" | "director" | "cast" | "subtitles" | "duration" | "is_featured" | "created_at" | "updated_at", ExtArgs["result"]["event"]>
   export type EventInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     theatre?: boolean | TheatreDefaultArgs<ExtArgs>
     venue?: boolean | Event$venueArgs<ExtArgs>
@@ -10848,7 +10837,6 @@ export namespace Prisma {
       company: string[]
       director: string | null
       cast: string[]
-      synopsis: string | null
       subtitles: string | null
       duration: string | null
       is_featured: boolean
@@ -11300,7 +11288,6 @@ export namespace Prisma {
     readonly company: FieldRef<"Event", 'String[]'>
     readonly director: FieldRef<"Event", 'String'>
     readonly cast: FieldRef<"Event", 'String[]'>
-    readonly synopsis: FieldRef<"Event", 'String'>
     readonly subtitles: FieldRef<"Event", 'String'>
     readonly duration: FieldRef<"Event", 'String'>
     readonly is_featured: FieldRef<"Event", 'Boolean'>
@@ -17555,7 +17542,6 @@ export namespace Prisma {
     company: 'company',
     director: 'director',
     cast: 'cast',
-    synopsis: 'synopsis',
     subtitles: 'subtitles',
     duration: 'duration',
     is_featured: 'is_featured',
@@ -18326,7 +18312,6 @@ export namespace Prisma {
     company?: StringNullableListFilter<"Event">
     director?: StringNullableFilter<"Event"> | string | null
     cast?: StringNullableListFilter<"Event">
-    synopsis?: StringNullableFilter<"Event"> | string | null
     subtitles?: StringNullableFilter<"Event"> | string | null
     duration?: StringNullableFilter<"Event"> | string | null
     is_featured?: BoolFilter<"Event"> | boolean
@@ -18358,7 +18343,6 @@ export namespace Prisma {
     company?: SortOrder
     director?: SortOrderInput | SortOrder
     cast?: SortOrder
-    synopsis?: SortOrderInput | SortOrder
     subtitles?: SortOrderInput | SortOrder
     duration?: SortOrderInput | SortOrder
     is_featured?: SortOrder
@@ -18393,7 +18377,6 @@ export namespace Prisma {
     company?: StringNullableListFilter<"Event">
     director?: StringNullableFilter<"Event"> | string | null
     cast?: StringNullableListFilter<"Event">
-    synopsis?: StringNullableFilter<"Event"> | string | null
     subtitles?: StringNullableFilter<"Event"> | string | null
     duration?: StringNullableFilter<"Event"> | string | null
     is_featured?: BoolFilter<"Event"> | boolean
@@ -18425,7 +18408,6 @@ export namespace Prisma {
     company?: SortOrder
     director?: SortOrderInput | SortOrder
     cast?: SortOrder
-    synopsis?: SortOrderInput | SortOrder
     subtitles?: SortOrderInput | SortOrder
     duration?: SortOrderInput | SortOrder
     is_featured?: SortOrder
@@ -18462,7 +18444,6 @@ export namespace Prisma {
     company?: StringNullableListFilter<"Event">
     director?: StringNullableWithAggregatesFilter<"Event"> | string | null
     cast?: StringNullableListFilter<"Event">
-    synopsis?: StringNullableWithAggregatesFilter<"Event"> | string | null
     subtitles?: StringNullableWithAggregatesFilter<"Event"> | string | null
     duration?: StringNullableWithAggregatesFilter<"Event"> | string | null
     is_featured?: BoolWithAggregatesFilter<"Event"> | boolean
@@ -19424,7 +19405,6 @@ export namespace Prisma {
     company?: EventCreatecompanyInput | string[]
     director?: string | null
     cast?: EventCreatecastInput | string[]
-    synopsis?: string | null
     subtitles?: string | null
     duration?: string | null
     is_featured?: boolean
@@ -19456,7 +19436,6 @@ export namespace Prisma {
     company?: EventCreatecompanyInput | string[]
     director?: string | null
     cast?: EventCreatecastInput | string[]
-    synopsis?: string | null
     subtitles?: string | null
     duration?: string | null
     is_featured?: boolean
@@ -19483,7 +19462,6 @@ export namespace Prisma {
     company?: EventUpdatecompanyInput | string[]
     director?: NullableStringFieldUpdateOperationsInput | string | null
     cast?: EventUpdatecastInput | string[]
-    synopsis?: NullableStringFieldUpdateOperationsInput | string | null
     subtitles?: NullableStringFieldUpdateOperationsInput | string | null
     duration?: NullableStringFieldUpdateOperationsInput | string | null
     is_featured?: BoolFieldUpdateOperationsInput | boolean
@@ -19515,7 +19493,6 @@ export namespace Prisma {
     company?: EventUpdatecompanyInput | string[]
     director?: NullableStringFieldUpdateOperationsInput | string | null
     cast?: EventUpdatecastInput | string[]
-    synopsis?: NullableStringFieldUpdateOperationsInput | string | null
     subtitles?: NullableStringFieldUpdateOperationsInput | string | null
     duration?: NullableStringFieldUpdateOperationsInput | string | null
     is_featured?: BoolFieldUpdateOperationsInput | boolean
@@ -19545,7 +19522,6 @@ export namespace Prisma {
     company?: EventCreatecompanyInput | string[]
     director?: string | null
     cast?: EventCreatecastInput | string[]
-    synopsis?: string | null
     subtitles?: string | null
     duration?: string | null
     is_featured?: boolean
@@ -19571,7 +19547,6 @@ export namespace Prisma {
     company?: EventUpdatecompanyInput | string[]
     director?: NullableStringFieldUpdateOperationsInput | string | null
     cast?: EventUpdatecastInput | string[]
-    synopsis?: NullableStringFieldUpdateOperationsInput | string | null
     subtitles?: NullableStringFieldUpdateOperationsInput | string | null
     duration?: NullableStringFieldUpdateOperationsInput | string | null
     is_featured?: BoolFieldUpdateOperationsInput | boolean
@@ -19600,7 +19575,6 @@ export namespace Prisma {
     company?: EventUpdatecompanyInput | string[]
     director?: NullableStringFieldUpdateOperationsInput | string | null
     cast?: EventUpdatecastInput | string[]
-    synopsis?: NullableStringFieldUpdateOperationsInput | string | null
     subtitles?: NullableStringFieldUpdateOperationsInput | string | null
     duration?: NullableStringFieldUpdateOperationsInput | string | null
     is_featured?: BoolFieldUpdateOperationsInput | boolean
@@ -20665,7 +20639,6 @@ export namespace Prisma {
     company?: SortOrder
     director?: SortOrder
     cast?: SortOrder
-    synopsis?: SortOrder
     subtitles?: SortOrder
     duration?: SortOrder
     is_featured?: SortOrder
@@ -20699,7 +20672,6 @@ export namespace Prisma {
     subtitle_language?: SortOrder
     genre?: SortOrder
     director?: SortOrder
-    synopsis?: SortOrder
     subtitles?: SortOrder
     duration?: SortOrder
     is_featured?: SortOrder
@@ -20726,7 +20698,6 @@ export namespace Prisma {
     subtitle_language?: SortOrder
     genre?: SortOrder
     director?: SortOrder
-    synopsis?: SortOrder
     subtitles?: SortOrder
     duration?: SortOrder
     is_featured?: SortOrder
@@ -22119,7 +22090,6 @@ export namespace Prisma {
     company?: EventCreatecompanyInput | string[]
     director?: string | null
     cast?: EventCreatecastInput | string[]
-    synopsis?: string | null
     subtitles?: string | null
     duration?: string | null
     is_featured?: boolean
@@ -22149,7 +22119,6 @@ export namespace Prisma {
     company?: EventCreatecompanyInput | string[]
     director?: string | null
     cast?: EventCreatecastInput | string[]
-    synopsis?: string | null
     subtitles?: string | null
     duration?: string | null
     is_featured?: boolean
@@ -22262,7 +22231,6 @@ export namespace Prisma {
     company?: StringNullableListFilter<"Event">
     director?: StringNullableFilter<"Event"> | string | null
     cast?: StringNullableListFilter<"Event">
-    synopsis?: StringNullableFilter<"Event"> | string | null
     subtitles?: StringNullableFilter<"Event"> | string | null
     duration?: StringNullableFilter<"Event"> | string | null
     is_featured?: BoolFilter<"Event"> | boolean
@@ -22477,7 +22445,6 @@ export namespace Prisma {
     company?: EventCreatecompanyInput | string[]
     director?: string | null
     cast?: EventCreatecastInput | string[]
-    synopsis?: string | null
     subtitles?: string | null
     duration?: string | null
     is_featured?: boolean
@@ -22507,7 +22474,6 @@ export namespace Prisma {
     company?: EventCreatecompanyInput | string[]
     director?: string | null
     cast?: EventCreatecastInput | string[]
-    synopsis?: string | null
     subtitles?: string | null
     duration?: string | null
     is_featured?: boolean
@@ -23023,7 +22989,6 @@ export namespace Prisma {
     company?: EventCreatecompanyInput | string[]
     director?: string | null
     cast?: EventCreatecastInput | string[]
-    synopsis?: string | null
     subtitles?: string | null
     duration?: string | null
     is_featured?: boolean
@@ -23054,7 +23019,6 @@ export namespace Prisma {
     company?: EventCreatecompanyInput | string[]
     director?: string | null
     cast?: EventCreatecastInput | string[]
-    synopsis?: string | null
     subtitles?: string | null
     duration?: string | null
     is_featured?: boolean
@@ -23155,7 +23119,6 @@ export namespace Prisma {
     company?: EventUpdatecompanyInput | string[]
     director?: NullableStringFieldUpdateOperationsInput | string | null
     cast?: EventUpdatecastInput | string[]
-    synopsis?: NullableStringFieldUpdateOperationsInput | string | null
     subtitles?: NullableStringFieldUpdateOperationsInput | string | null
     duration?: NullableStringFieldUpdateOperationsInput | string | null
     is_featured?: BoolFieldUpdateOperationsInput | boolean
@@ -23186,7 +23149,6 @@ export namespace Prisma {
     company?: EventUpdatecompanyInput | string[]
     director?: NullableStringFieldUpdateOperationsInput | string | null
     cast?: EventUpdatecastInput | string[]
-    synopsis?: NullableStringFieldUpdateOperationsInput | string | null
     subtitles?: NullableStringFieldUpdateOperationsInput | string | null
     duration?: NullableStringFieldUpdateOperationsInput | string | null
     is_featured?: BoolFieldUpdateOperationsInput | boolean
@@ -23397,7 +23359,6 @@ export namespace Prisma {
     company?: EventCreatecompanyInput | string[]
     director?: string | null
     cast?: EventCreatecastInput | string[]
-    synopsis?: string | null
     subtitles?: string | null
     duration?: string | null
     is_featured?: boolean
@@ -23463,7 +23424,6 @@ export namespace Prisma {
     company?: EventUpdatecompanyInput | string[]
     director?: NullableStringFieldUpdateOperationsInput | string | null
     cast?: EventUpdatecastInput | string[]
-    synopsis?: NullableStringFieldUpdateOperationsInput | string | null
     subtitles?: NullableStringFieldUpdateOperationsInput | string | null
     duration?: NullableStringFieldUpdateOperationsInput | string | null
     is_featured?: BoolFieldUpdateOperationsInput | boolean
@@ -23493,7 +23453,6 @@ export namespace Prisma {
     company?: EventUpdatecompanyInput | string[]
     director?: NullableStringFieldUpdateOperationsInput | string | null
     cast?: EventUpdatecastInput | string[]
-    synopsis?: NullableStringFieldUpdateOperationsInput | string | null
     subtitles?: NullableStringFieldUpdateOperationsInput | string | null
     duration?: NullableStringFieldUpdateOperationsInput | string | null
     is_featured?: BoolFieldUpdateOperationsInput | boolean
@@ -23522,7 +23481,6 @@ export namespace Prisma {
     company?: EventUpdatecompanyInput | string[]
     director?: NullableStringFieldUpdateOperationsInput | string | null
     cast?: EventUpdatecastInput | string[]
-    synopsis?: NullableStringFieldUpdateOperationsInput | string | null
     subtitles?: NullableStringFieldUpdateOperationsInput | string | null
     duration?: NullableStringFieldUpdateOperationsInput | string | null
     is_featured?: BoolFieldUpdateOperationsInput | boolean
@@ -23557,7 +23515,6 @@ export namespace Prisma {
     company?: EventCreatecompanyInput | string[]
     director?: string | null
     cast?: EventCreatecastInput | string[]
-    synopsis?: string | null
     subtitles?: string | null
     duration?: string | null
     is_featured?: boolean
@@ -23605,7 +23562,6 @@ export namespace Prisma {
     company?: EventUpdatecompanyInput | string[]
     director?: NullableStringFieldUpdateOperationsInput | string | null
     cast?: EventUpdatecastInput | string[]
-    synopsis?: NullableStringFieldUpdateOperationsInput | string | null
     subtitles?: NullableStringFieldUpdateOperationsInput | string | null
     duration?: NullableStringFieldUpdateOperationsInput | string | null
     is_featured?: BoolFieldUpdateOperationsInput | boolean
@@ -23635,7 +23591,6 @@ export namespace Prisma {
     company?: EventUpdatecompanyInput | string[]
     director?: NullableStringFieldUpdateOperationsInput | string | null
     cast?: EventUpdatecastInput | string[]
-    synopsis?: NullableStringFieldUpdateOperationsInput | string | null
     subtitles?: NullableStringFieldUpdateOperationsInput | string | null
     duration?: NullableStringFieldUpdateOperationsInput | string | null
     is_featured?: BoolFieldUpdateOperationsInput | boolean
@@ -23664,7 +23619,6 @@ export namespace Prisma {
     company?: EventUpdatecompanyInput | string[]
     director?: NullableStringFieldUpdateOperationsInput | string | null
     cast?: EventUpdatecastInput | string[]
-    synopsis?: NullableStringFieldUpdateOperationsInput | string | null
     subtitles?: NullableStringFieldUpdateOperationsInput | string | null
     duration?: NullableStringFieldUpdateOperationsInput | string | null
     is_featured?: BoolFieldUpdateOperationsInput | boolean

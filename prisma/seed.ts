@@ -172,7 +172,6 @@ async function main() {
         director: performance.director,
         cast: performance.cast,
         poster_url: performance.posterUrl,
-        synopsis: performance.synopsis,
         subtitles: performance.subtitles,
         duration: performance.duration,
       },

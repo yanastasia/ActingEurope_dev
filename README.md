@@ -74,10 +74,11 @@ Acting Europe is a modern web application designed to connect theatre enthusiast
 ### Backend
 - **Runtime**: Node.js with Next.js API routes
 - **Database**: PostgreSQL with Prisma ORM 6.10.1
-- **Authentication**: Custom JWT-based authentication
+- **Authentication**: Supabase authentication with SSR-compatible session management
 - **Email Service**: Nodemailer for transactional emails
 - **PDF Generation**: PDFKit for ticket generation
 - **File Handling**: Next.js built-in file upload
+- **Data Synchronization**: Automated performance data sync between development and production
 
 ### Development Tools
 - **Language**: TypeScript for type safety

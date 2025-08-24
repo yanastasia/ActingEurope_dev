@@ -44,7 +44,7 @@ export async function GET(request: Request, { params }: { params: { translationG
       language: event.language,
       contentLanguage: event.content_language,
       duration: event.duration,
-      synopsis: event.synopsis,
+
       subtitles: event.subtitles,
       theatreName: event.theatre?.name || 'Unknown Theatre',
       theatreCity: event.theatre?.city || '',

@@ -30,7 +30,6 @@ interface Event {
   theatreId?: number[]
   company: string[]
   description: string
-  synopsis?: string
   imageUrl: string
   isFeatured: boolean
   price: string
@@ -580,7 +579,7 @@ export default function AdminPage() {
         venue: eventToEdit.venue || '',
         theatreId: [], // Will be populated based on company names
         company: Array.isArray(eventToEdit.company) ? eventToEdit.company : [],
-        description: eventToEdit.synopsis || eventToEdit.description || '',
+        description: eventToEdit.description || '',
         imageUrl: eventToEdit.imageUrl || '',
         isFeatured: eventToEdit.isFeatured || false,
         price: eventToEdit.price ? eventToEdit.price.replace('€', '').replace('Free', '0') : '0',
@@ -755,7 +754,7 @@ export default function AdminPage() {
              updatedEventFromAPI.time,
            venue: updatedEventFromAPI.venue || 'TBA',
            company: Array.isArray(updatedEventFromAPI.company) ? updatedEventFromAPI.company : [updatedEventFromAPI.company || ''],
-           description: updatedEventFromAPI.description || updatedEventFromAPI.synopsis || '',
+           description: updatedEventFromAPI.description || '',
            imageUrl: updatedEventFromAPI.imageUrl || '/placeholder.svg?height=400&width=600',
            isFeatured: updatedEventFromAPI.isFeatured,
            price: updatedEventFromAPI.price ? updatedEventFromAPI.price.toString() : '0',

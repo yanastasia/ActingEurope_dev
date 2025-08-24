@@ -69,7 +69,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       genre: event.genre || 'Drama',
       language: event.language || 'Bulgarian',
       duration: event.duration || '120 min',
-      synopsis: event.description,
+      description: event.description,
       director: event.director,
       cast: event.cast,
       price: event.price ? `€${event.price}` : 'Free',
@@ -164,7 +164,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       company,
       director,
       cast,
-      synopsis,
+
       subtitles,
       duration,
       isFeatured,
@@ -230,7 +230,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       company: Array.isArray(company) ? company : (company ? [company] : undefined),
       director,
       cast: Array.isArray(cast) ? cast : (cast ? [cast] : undefined),
-      synopsis,
+
       subtitles,
       duration,
       isFeatured,

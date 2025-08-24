@@ -253,6 +253,23 @@ npm run lint
    - Check that schema is up to date
    - Clear existing data if needed
 
+4. **Authentication and Session Issues**
+   - **Admin Panel Redirect Loops**: If admin users are redirected to login page repeatedly:
+     - Ensure Supabase environment variables are correctly configured
+     - Check that user email domain matches admin requirements (@actingeurope.eu)
+     - Verify session synchronization between client and server
+   - **Session Not Found**: If middleware cannot detect user sessions:
+     - Clear browser cookies and localStorage
+     - Restart the development server
+     - Check that Supabase client is using SSR-compatible configuration
+   - **Deprecated Function Warnings**: Update any usage of `createServerClient` to `createBrowserClient` for SSR compatibility
+
+5. **Missing Performance Data**
+   - If events like "Don Juan" are missing from the database:
+     - Run the data synchronization script: `node reset-events-from-performance-data.js`
+     - Verify theatre and venue ID mappings are correct
+     - Check for foreign key constraint violations in the console output
+
 ### Reset Database
 
 To completely reset your database:

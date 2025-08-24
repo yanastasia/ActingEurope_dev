@@ -5,17 +5,18 @@ import { render } from "@react-email/render"
 import VerificationEmail from "@/emails/verification-email"
 import TicketEmail from "@/emails/ticket-email"
 import ReminderEmail from "@/emails/reminder-email"
+import WelcomeEmail from "@/emails/welcome-email"
 import { generatePDF } from "./pdf-generator"
 
 // Configure email transporter
 // For production, use your actual SMTP credentials
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || "smtp.example.com",
-  port: Number.parseInt(process.env.SMTP_PORT || "587"),
-  secure: process.env.SMTP_SECURE === "true",
+  host: process.env.EMAIL_SERVER_HOST,
+  port: Number.parseInt(process.env.EMAIL_SERVER_PORT || "587"),
+  secure: process.env.EMAIL_SERVER_PORT === "465",
   auth: {
-    user: process.env.SMTP_USER || "user@example.com",
-    pass: process.env.SMTP_PASSWORD || "password",
+    user: process.env.EMAIL_SERVER_USER,
+    pass: process.env.EMAIL_SERVER_PASSWORD,
   },
 })
 
@@ -28,7 +29,7 @@ export async function sendVerificationEmail(email: string, verificationToken: st
   const emailHtml = await render(VerificationEmail({ verificationUrl }))
 
   const mailOptions = {
-    from: process.env.EMAIL_FROM || "Acting Europe <noreply@actingeurope.com>",
+    from: process.env.EMAIL_FROM,
     to: email,
     subject: "Verify your email address",
     html: emailHtml,
@@ -64,7 +65,7 @@ export async function sendTicketEmail(email: string, ticketData: any) {
   )
 
   const mailOptions = {
-    from: process.env.EMAIL_FROM || "Acting Europe <tickets@actingeurope.com>",
+    from: process.env.EMAIL_FROM,
     to: email,
     subject: `Your tickets for ${ticketData.title}`,
     html: emailHtml,
@@ -104,7 +105,7 @@ export async function sendReminderEmail(email: string, eventData: any) {
   )
 
   const mailOptions = {
-    from: process.env.EMAIL_FROM || "Acting Europe <reminders@actingeurope.com>",
+    from: process.env.EMAIL_FROM,
     to: email,
     subject: `Reminder: ${eventData.title} starts in 2 hours`,
     html: emailHtml,
@@ -120,6 +121,32 @@ export async function sendReminderEmail(email: string, eventData: any) {
     return { success: true }
   } catch (error) {
     console.error("Failed to send reminder email:", error)
+    return { success: false, error }
+  }
+}
+
+export async function sendWelcomeEmail(email: string, name?: string) {
+  const programUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/program`
+
+  const emailHtml = await render(WelcomeEmail({ name, programUrl }))
+
+  const mailOptions = {
+    from: process.env.EMAIL_FROM,
+    to: email,
+    subject: "Welcome to Acting Europe - Theatre Without Borders",
+    html: emailHtml,
+  }
+
+  if (isDevelopment) {
+    console.log("Development mode: Welcome email would be sent with:", mailOptions)
+    return { success: true }
+  }
+
+  try {
+    await transporter.sendMail(mailOptions)
+    return { success: true }
+  } catch (error) {
+    console.error("Failed to send welcome email:", error)
     return { success: false, error }
   }
 }

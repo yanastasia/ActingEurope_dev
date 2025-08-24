@@ -172,9 +172,11 @@ export default function PerformancesPage() {
                   </Badge>
                 </div>
                 <CardDescription>
-                  {performance.theatreName || (Array.isArray(performance.company) 
-                    ? performance.company.join(' & ') 
-                    : performance.company)}
+                  {performance.theatreName 
+                    ? (translations[language][performance.theatreName as keyof typeof translations[typeof language]] || performance.theatreName)
+                    : (Array.isArray(performance.company) 
+                      ? performance.company.join(' & ') 
+                      : performance.company)}
                 </CardDescription>
               </CardHeader>
               <CardContent>

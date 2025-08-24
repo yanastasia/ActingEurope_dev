@@ -45,6 +45,7 @@
     "@radix-ui/react-toggle": "latest",
     "@radix-ui/react-toggle-group": "latest",
     "@radix-ui/react-tooltip": "latest",
+    "@react-email/components": "^0.5.1",
     "@react-email/render": "latest",
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.56.0",

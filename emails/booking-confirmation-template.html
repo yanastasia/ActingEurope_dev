@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmation - Acting Europe</title>
+    <style>
+        /* Reset styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f8f9fa;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Header with Acting Europe branding */
+        .header {
+            background: linear-gradient(135deg, #021a4a 0%, #0d2a5c 100%);
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(255, 204, 0, 0.1) 0%, rgba(255, 255, 255, 0) 60%);
+            pointer-events: none;
+        }
+        
+        .header-title {
+            color: #ffffff;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header-subtitle {
+            color: #ffcc00;
+            font-size: 16px;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Main content */
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .confirmation-message {
+            font-size: 24px;
+            font-weight: 600;
+            color: #021a4a;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .message-text {
+            font-size: 16px;
+            color: #555555;
+            margin-bottom: 30px;
+            text-align: center;
+            line-height: 1.7;
+        }
+        
+        /* Booking details */
+        .booking-details {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 30px 0;
+            border-left: 4px solid #28a745;
+        }
+        
+        .booking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .booking-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #021a4a;
+        }
+        
+        .booking-id {
+            font-size: 14px;
+            color: #666666;
+            font-family: monospace;
+            background-color: #e9ecef;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        .performance-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #021a4a;
+            margin-bottom: 15px;
+        }
+        
+        .booking-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .info-item {
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .info-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666666;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 14px;
+            color: #333333;
+            font-weight: 500;
+        }
+        
+        /* Seat information */
+        .seats-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .seats-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #021a4a;
+            margin-bottom: 10px;
+        }
+        
+        .seats-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .seat-item {
+            background-color: #ffcc00;
+            color: #021a4a;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        /* Total amount */
+        .total-section {
+            background-color: #021a4a;
+            color: #ffffff;
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .total-label {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .total-amount {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffcc00;
+        }
+        
+        /* CTA Buttons */
+        .cta-container {
+            text-align: center;
+            margin: 40px 0;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffcc00 0%, #ffd700 100%);
+            color: #021a4a;
+            text-decoration: none;
+            padding: 14px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(255, 204, 0, 0.3);
+        }
+        
+        .cta-button.secondary {
+            background: #ffffff;
+            border: 2px solid #021a4a;
+            color: #021a4a;
+            box-shadow: none;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 204, 0, 0.4);
+        }
+        
+        .cta-button.secondary:hover {
+            background-color: #f8f9fa;
+            box-shadow: 0 4px 12px rgba(2, 26, 74, 0.1);
+        }
+        
+        /* Important notice */
+        .important-notice {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #d1ecf1;
+            border-radius: 6px;
+            border-left: 4px solid #17a2b8;
+        }
+        
+        .important-notice-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0c5460;
+            margin-bottom: 8px;
+        }
+        
+        .important-notice-text {
+            font-size: 14px;
+            color: #0c5460;
+            line-height: 1.5;
+        }
+        
+        /* Footer */
+        .footer {
+            background-color: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .footer-text {
+            font-size: 14px;
+            color: #666666;
+            margin-bottom: 15px;
+        }
+        
+        .footer-links {
+            margin-bottom: 20px;
+        }
+        
+        .footer-link {
+            color: #021a4a;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 14px;
+        }
+        
+        .footer-link:hover {
+            color: #ffcc00;
+        }
+        
+        .copyright {
+            font-size: 12px;
+            color: #999999;
+        }
+        
+        /* Responsive design */
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                margin: 0;
+                border-radius: 0;
+            }
+            
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .content {
+                padding: 30px 20px;
+            }
+            
+            .header-title {
+                font-size: 24px;
+            }
+            
+            .confirmation-message {
+                font-size: 20px;
+            }
+            
+            .booking-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .cta-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .cta-button {
+                width: 100%;
+                max-width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="header-title">Acting Europe</h1>
+            <p class="header-subtitle">Theatre Without Borders</p>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="content">
+            <!-- English Content -->
+            <h2 class="confirmation-message">✅ Booking Confirmed!</h2>
+            
+            <p class="message-text">
+                Congratulations! Your ticket reservation has been successfully confirmed. 
+                We're excited to see you at the performance!
+            </p>
+            
+            <div class="booking-details">
+                <div class="booking-header">
+                    <div class="booking-title">Booking Details</div>
+                    <div class="booking-id">ID: {{ .BookingID }}</div>
+                </div>
+                
+                <h3 class="performance-title">{{ .PerformanceTitle }}</h3>
+                
+                <div class="booking-info">
+                    <div class="info-item">
+                        <div class="info-label">Theatre</div>
+                        <div class="info-value">{{ .TheatreName }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Date & Time</div>
+                        <div class="info-value">{{ .DateTime }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Genre</div>
+                        <div class="info-value">{{ .Genre }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Language</div>
+                        <div class="info-value">{{ .Language }}</div>
+                    </div>
+                </div>
+                
+                <div class="seats-section">
+                    <div class="seats-title">Your Seats</div>
+                    <div class="seats-list">
+                        {{ range .Seats }}
+                        <span class="seat-item">{{ . }}</span>
+                        {{ end }}
+                    </div>
+                </div>
+                
+                <div class="total-section">
+                    <div class="total-label">Total Amount</div>
+                    <div class="total-amount">{{ .TotalAmount }}</div>
+                </div>
+            </div>
+            
+            <div class="cta-container">
+                <a href="{{ .TicketURL }}" class="cta-button">
+                    Download Tickets
+                </a>
+                <a href="{{ .ProfileURL }}" class="cta-button secondary">
+                    View in Profile
+                </a>
+            </div>
+            
+            <div class="important-notice">
+                <div class="important-notice-title">📱 Important Information</div>
+                <div class="important-notice-text">
+                    Please arrive at the theatre 15-30 minutes before the performance starts. 
+                    Bring your digital ticket (on your phone) or a printed copy. 
+                    Late arrivals may not be admitted until a suitable break in the performance.
+                </div>
+            </div>
+            
+            <!-- Bulgarian Content -->
+            <hr style="margin: 40px 0; border: none; border-top: 2px solid #e9ecef;">
+            
+            <h2 class="confirmation-message">✅ Резервацията е потвърдена!</h2>
+            
+            <p class="message-text">
+                Поздравления! Вашата резервация за билети беше успешно потвърдена.
+                Радваме се да ви видим на представлението!
+            </p>
+            
+            <div class="booking-details">
+                <div class="booking-header">
+                    <div class="booking-title">Детайли за резервацията</div>
+                    <div class="booking-id">ID: {{ .BookingID }}</div>
+                </div>
+                
+                <h3 class="performance-title">{{ .PerformanceTitle }}</h3>
+                
+                <div class="booking-info">
+                    <div class="info-item">
+                        <div class="info-label">Театър</div>
+                        <div class="info-value">{{ .TheatreName }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Дата и час</div>
+                        <div class="info-value">{{ .DateTime }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Жанр</div>
+                        <div class="info-value">{{ .Genre }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Език</div>
+                        <div class="info-value">{{ .Language }}</div>
+                    </div>
+                </div>
+                
+                <div class="seats-section">
+                    <div class="seats-title">Вашите места</div>
+                    <div class="seats-list">
+                        {{ range .Seats }}
+                        <span class="seat-item">{{ . }}</span>
+                        {{ end }}
+                    </div>
+                </div>
+                
+                <div class="total-section">
+                    <div class="total-label">Обща сума</div>
+                    <div class="total-amount">{{ .TotalAmount }}</div>
+                </div>
+            </div>
+            
+            <div class="cta-container">
+                <a href="{{ .TicketURL }}" class="cta-button">
+                    Изтеглете билетите
+                </a>
+                <a href="{{ .ProfileURL }}" class="cta-button secondary">
+                    Вижте в профила
+                </a>
+            </div>
+            
+            <div class="important-notice">
+                <div class="important-notice-title">📱 Важна информация</div>
+                <div class="important-notice-text">
+                    Моля, пристигнете в театъра 15-30 минути преди началото на представлението.
+                    Носете вашия цифров билет (на телефона) или разпечатано копие.
+                    Закъснелите може да не бъдат допуснати до подходяща пауза в представлението.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p class="footer-text">
+                Thank you for choosing Acting Europe - where cultures meet through theatre!
+            </p>
+            
+            <div class="footer-links">
+                <a href="https://your-domain.com/about" class="footer-link">About Us</a>
+                <a href="https://your-domain.com/program" class="footer-link">Program</a>
+                <a href="https://your-domain.com/contact" class="footer-link">Contact</a>
+                <a href="https://your-domain.com/profile" class="footer-link">My Profile</a>
+            </div>
+            
+            <p class="copyright">
+                © 2025 Acting Europe. All rights reserved.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Reservations Available - Acting Europe</title>
+    <style>
+        /* Reset styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f8f9fa;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Header with Acting Europe branding */
+        .header {
+            background: linear-gradient(135deg, #021a4a 0%, #0d2a5c 100%);
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(255, 204, 0, 0.1) 0%, rgba(255, 255, 255, 0) 60%);
+            pointer-events: none;
+        }
+        
+        .header-title {
+            color: #ffffff;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header-subtitle {
+            color: #ffcc00;
+            font-size: 16px;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Main content */
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .announcement-message {
+            font-size: 24px;
+            font-weight: 600;
+            color: #021a4a;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .message-text {
+            font-size: 16px;
+            color: #555555;
+            margin-bottom: 30px;
+            text-align: center;
+            line-height: 1.7;
+        }
+        
+        /* Performance details */
+        .performance-details {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 30px 0;
+            border-left: 4px solid #ffcc00;
+        }
+        
+        .performance-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #021a4a;
+            margin-bottom: 15px;
+        }
+        
+        .performance-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .info-item {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .info-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666666;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 14px;
+            color: #333333;
+            font-weight: 500;
+        }
+        
+        /* CTA Button */
+        .cta-container {
+            text-align: center;
+            margin: 40px 0;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffcc00 0%, #ffd700 100%);
+            color: #021a4a;
+            text-decoration: none;
+            padding: 16px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(255, 204, 0, 0.3);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 204, 0, 0.4);
+        }
+        
+        /* Urgency notice */
+        .urgency-notice {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #fff3cd;
+            border-radius: 6px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .urgency-notice-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 8px;
+        }
+        
+        .urgency-notice-text {
+            font-size: 14px;
+            color: #856404;
+            line-height: 1.5;
+        }
+        
+        /* Footer */
+        .footer {
+            background-color: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .footer-text {
+            font-size: 14px;
+            color: #666666;
+            margin-bottom: 15px;
+        }
+        
+        .footer-links {
+            margin-bottom: 20px;
+        }
+        
+        .footer-link {
+            color: #021a4a;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 14px;
+        }
+        
+        .footer-link:hover {
+            color: #ffcc00;
+        }
+        
+        .copyright {
+            font-size: 12px;
+            color: #999999;
+        }
+        
+        /* Responsive design */
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                margin: 0;
+                border-radius: 0;
+            }
+            
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .content {
+                padding: 30px 20px;
+            }
+            
+            .header-title {
+                font-size: 24px;
+            }
+            
+            .announcement-message {
+                font-size: 20px;
+            }
+            
+            .cta-button {
+                padding: 14px 28px;
+                font-size: 15px;
+            }
+            
+            .performance-info {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="header-title">Acting Europe</h1>
+            <p class="header-subtitle">Theatre Without Borders</p>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="content">
+            <!-- English Content -->
+            <h2 class="announcement-message">🎫 Tickets Now Available!</h2>
+            
+            <p class="message-text">
+                Great news! Ticket reservations are now open for an exciting new performance. 
+                Don't miss your chance to experience exceptional theatre.
+            </p>
+            
+            <div class="performance-details">
+                <h3 class="performance-title">{{ .PerformanceTitle }}</h3>
+                
+                <div class="performance-info">
+                    <div class="info-item">
+                        <div class="info-label">Theatre</div>
+                        <div class="info-value">{{ .TheatreName }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Date & Time</div>
+                        <div class="info-value">{{ .DateTime }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Genre</div>
+                        <div class="info-value">{{ .Genre }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Language</div>
+                        <div class="info-value">{{ .Language }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="cta-container">
+                <a href="{{ .BookingURL }}" class="cta-button">
+                    Reserve Your Tickets
+                </a>
+            </div>
+            
+            <div class="urgency-notice">
+                <div class="urgency-notice-title">⏰ Limited Availability</div>
+                <div class="urgency-notice-text">
+                    Tickets are selling fast! Reserve your seats early to secure the best spots and avoid disappointment.
+                </div>
+            </div>
+            
+            <!-- Bulgarian Content -->
+            <hr style="margin: 40px 0; border: none; border-top: 2px solid #e9ecef;">
+            
+            <h2 class="announcement-message">🎫 Билетите вече са налични!</h2>
+            
+            <p class="message-text">
+                Страхотни новини! Резервациите за билети вече са отворени за ново вълнуващо представление.
+                Не пропускайте шанса си да изживеете изключителен театър.
+            </p>
+            
+            <div class="performance-details">
+                <h3 class="performance-title">{{ .PerformanceTitle }}</h3>
+                
+                <div class="performance-info">
+                    <div class="info-item">
+                        <div class="info-label">Театър</div>
+                        <div class="info-value">{{ .TheatreName }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Дата и час</div>
+                        <div class="info-value">{{ .DateTime }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Жанр</div>
+                        <div class="info-value">{{ .Genre }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Език</div>
+                        <div class="info-value">{{ .Language }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="cta-container">
+                <a href="{{ .BookingURL }}" class="cta-button">
+                    Резервирайте билетите си
+                </a>
+            </div>
+            
+            <div class="urgency-notice">
+                <div class="urgency-notice-title">⏰ Ограничена наличност</div>
+                <div class="urgency-notice-text">
+                    Билетите се продават бързо! Резервирайте местата си рано, за да осигурите най-добрите места и да избегнете разочарование.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p class="footer-text">
+                Thank you for being part of Acting Europe - where cultures meet through theatre!
+            </p>
+            
+            <div class="footer-links">
+                <a href="https://your-domain.com/about" class="footer-link">About Us</a>
+                <a href="https://your-domain.com/program" class="footer-link">Program</a>
+                <a href="https://your-domain.com/contact" class="footer-link">Contact</a>
+            </div>
+            
+            <p class="copyright">
+                © 2025 Acting Europe. All rights reserved.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

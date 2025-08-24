@@ -19,7 +19,12 @@ export const metadata: Metadata = {
       name: "Anastasia Yakimovska",
       url: "https://www.linkedin.com/in/yakiman/"
     }
-  ]
+  ],
+  icons: {
+    icon: "/Acting Europe Mask.png",
+    shortcut: "/Acting Europe Mask.png",
+    apple: "/Acting Europe Mask.png"
+  }
 }
 
 export default function RootLayout({

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Acting Europe</title>
+    <style>
+        /* Reset styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f8f9fa;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Header with Acting Europe branding */
+        .header {
+            background: linear-gradient(135deg, #021a4a 0%, #0d2a5c 100%);
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(255, 204, 0, 0.1) 0%, rgba(255, 255, 255, 0) 60%);
+            pointer-events: none;
+        }
+        
+        .logo {
+            width: 120px;
+            height: auto;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header-title {
+            color: #ffffff;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header-subtitle {
+            color: #ffcc00;
+            font-size: 16px;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Main content */
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .welcome-message {
+            font-size: 24px;
+            font-weight: 600;
+            color: #021a4a;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .message-text {
+            font-size: 16px;
+            color: #555555;
+            margin-bottom: 30px;
+            text-align: center;
+            line-height: 1.7;
+        }
+        
+        /* Features section */
+        .features {
+            margin: 40px 0;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 25px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #ffcc00;
+        }
+        
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #ffcc00 0%, #ffd700 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+            font-size: 18px;
+            color: #021a4a;
+        }
+        
+        .feature-content {
+            flex: 1;
+        }
+        
+        .feature-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #021a4a;
+            margin-bottom: 5px;
+        }
+        
+        .feature-description {
+            font-size: 14px;
+            color: #666666;
+            line-height: 1.5;
+        }
+        
+        /* CTA Button */
+        .cta-container {
+            text-align: center;
+            margin: 40px 0;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffcc00 0%, #ffd700 100%);
+            color: #021a4a;
+            text-decoration: none;
+            padding: 16px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(255, 204, 0, 0.3);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 204, 0, 0.4);
+        }
+        
+        /* Footer */
+        .footer {
+            background-color: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .footer-text {
+            font-size: 14px;
+            color: #666666;
+            margin-bottom: 15px;
+        }
+        
+        .footer-links {
+            margin-bottom: 20px;
+        }
+        
+        .footer-link {
+            color: #021a4a;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 14px;
+        }
+        
+        .footer-link:hover {
+            color: #ffcc00;
+        }
+        
+        .copyright {
+            font-size: 12px;
+            color: #999999;
+        }
+        
+        /* Responsive design */
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                margin: 0;
+                border-radius: 0;
+            }
+            
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .content {
+                padding: 30px 20px;
+            }
+            
+            .header-title {
+                font-size: 24px;
+            }
+            
+            .welcome-message {
+                font-size: 20px;
+            }
+            
+            .cta-button {
+                padding: 14px 28px;
+                font-size: 15px;
+            }
+            
+            .feature-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .feature-icon {
+                margin: 0 auto 15px auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="header-title">Acting Europe</h1>
+            <p class="header-subtitle">Theatre Without Borders</p>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="content">
+            <!-- English Content -->
+            <h2 class="welcome-message">Welcome to Acting Europe!</h2>
+            
+            <p class="message-text">
+                Congratulations! Your account has been successfully created. You're now part of our vibrant international theatre community that connects cultures through the magic of performance.
+            </p>
+            
+            <div class="features">
+                <div class="feature-item">
+                    <div class="feature-icon">🎭</div>
+                    <div class="feature-content">
+                        <div class="feature-title">Discover Amazing Performances</div>
+                        <div class="feature-description">Explore theatre productions from Bulgaria, North Macedonia, Serbia, and beyond. Find drama, comedy, and monodrama performances in multiple languages.</div>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">🎫</div>
+                    <div class="feature-content">
+                        <div class="feature-title">Easy Ticket Booking</div>
+                        <div class="feature-description">Reserve your seats with just a few clicks. Get instant confirmations and digital tickets delivered to your email.</div>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">🌍</div>
+                    <div class="feature-content">
+                        <div class="feature-title">Multilingual Experience</div>
+                        <div class="feature-description">Enjoy performances in English, Bulgarian, Macedonian, and Serbian. Many shows include subtitles for better accessibility.</div>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">📧</div>
+                    <div class="feature-content">
+                        <div class="feature-title">Stay Updated</div>
+                        <div class="feature-description">Receive notifications about new performances, special events, and exclusive offers from your favorite theatres.</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="cta-container">
+                <a href="{{ .ProgramURL }}" class="cta-button">
+                    Explore Our Program
+                </a>
+            </div>
+            
+            <p class="message-text" style="margin-top: 30px; font-size: 14px; color: #666666;">
+                Ready to dive into the world of international theatre? Start by browsing our current program and discover your next unforgettable performance.
+            </p>
+            
+            <!-- Bulgarian Content -->
+            <hr style="margin: 40px 0; border: none; border-top: 2px solid #e9ecef;">
+            
+            <h2 class="welcome-message">Добре дошли в Acting Europe!</h2>
+            
+            <p class="message-text">
+                Поздравления! Вашият акаунт беше успешно създаден. Вече сте част от нашата жизнена международна театрална общност, която свързва културите чрез магията на представлението.
+            </p>
+            
+            <div class="features">
+                <div class="feature-item">
+                    <div class="feature-icon">🎭</div>
+                    <div class="feature-content">
+                        <div class="feature-title">Открийте невероятни представления</div>
+                        <div class="feature-description">Разгледайте театрални продукции от България, Северна Македония, Сърбия и други страни. Намерете драма, комедия и монодрама на множество езици.</div>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">🎫</div>
+                    <div class="feature-content">
+                        <div class="feature-title">Лесно резервиране на билети</div>
+                        <div class="feature-description">Резервирайте местата си само с няколко кликвания. Получете незабавни потвърждения и цифрови билети, доставени на вашия имейл.</div>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">🌍</div>
+                    <div class="feature-content">
+                        <div class="feature-title">Многоезично изживяване</div>
+                        <div class="feature-description">Насладете се на представления на английски, български, македонски и сръбски език. Много спектакли включват субтитри за по-добра достъпност.</div>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">📧</div>
+                    <div class="feature-content">
+                        <div class="feature-title">Бъдете в течение</div>
+                        <div class="feature-description">Получавайте известия за нови представления, специални събития и ексклузивни оферти от любимите си театри.</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="cta-container">
+                <a href="{{ .ProgramURL }}" class="cta-button">
+                    Разгледайте нашата програма
+                </a>
+            </div>
+            
+            <p class="message-text" style="margin-top: 30px; font-size: 14px; color: #666666;">
+                Готови ли сте да се потопите в света на международния театър? Започнете с разглеждане на нашата текуща програма и открийте следващото си незабравимо представление.
+            </p>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p class="footer-text">
+                Welcome to Acting Europe - where cultures meet through theatre!
+            </p>
+            
+            <div class="footer-links">
+                <a href="https://your-domain.com/about" class="footer-link">About Us</a>
+                <a href="https://your-domain.com/program" class="footer-link">Program</a>
+                <a href="https://your-domain.com/contact" class="footer-link">Contact</a>
+                <a href="https://your-domain.com/profile" class="footer-link">My Profile</a>
+            </div>
+            
+            <p class="copyright">
+                © 2025 Acting Europe. All rights reserved.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

@@ -45,6 +45,19 @@ All notable changes to the Acting Europe project will be documented in this file
   - Updated environment configuration for Supabase endpoints
   - Verified all API routes and database operations work correctly with new setup
 
+- **Supabase Session Synchronization**: Fixed authentication session synchronization issues
+  - Updated to use SSR-compatible `createBrowserClient` for better client-server session handling
+  - Enhanced middleware session handling with proper cookie management
+  - Fixed admin panel redirect loops that kept users on sign-in page
+  - Added comprehensive debugging for session state tracking
+  - Resolved deprecated `createServerClient` function usage
+
+- **Performance Data Synchronization**: Successfully synced missing performance data to database
+  - Added "Don Juan" and other missing performances from Prisma codebase to Supabase
+  - Synchronized 24 events across 6 performances in 4 languages (English, Bulgarian, Macedonian, Serbian)
+  - Fixed theatre and venue ID mappings to resolve foreign key constraints
+  - Ensured complete performance catalog availability in production database
+
 #### Database Integration and CMS Features
 - **About Page Database Integration**: Connected about page to database with full CRUD operations
   - Dynamic content loading with multi-language support
@@ -98,6 +111,18 @@ All notable changes to the Acting Europe project will be documented in this file
 - **Connection Errors**: Resolved database connection issues in development
 - **Environment Variables**: Fixed `DATABASE_URL` and `NEXTAUTH_URL` configuration
 - **Login Service**: Corrected authentication service database connectivity
+- **Missing Performance Data**: Resolved missing "Don Juan" and other performance data in Supabase database
+  - Successfully synchronized 24 events across 6 performances in 4 languages
+  - Fixed theatre and venue ID mapping conflicts during data migration
+  - Ensured complete performance catalog consistency between development and production
+
+#### Authentication Issues
+- **Session Synchronization**: Fixed Supabase session synchronization between client and server
+  - Resolved admin panel redirect loops that prevented access to admin features
+  - Updated to SSR-compatible authentication client for better session handling
+  - Fixed deprecated `createServerClient` function usage
+  - Enhanced middleware session detection and cookie management
+  - Added comprehensive session debugging for troubleshooting
 
 #### Translation Issues
 - **Bulgarian Translation**: Added missing translations for about and contact pages

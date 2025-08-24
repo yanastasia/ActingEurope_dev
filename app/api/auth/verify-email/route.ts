@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getVerificationToken, deleteVerificationToken } from '@/lib/tokens'
 import { getUsers } from '@/lib/database-operations'
+import { sendWelcomeEmail } from '@/lib/email-service'
 
 export async function POST(request: NextRequest) {
   try {
@@ -46,6 +47,15 @@ export async function POST(request: NextRequest) {
 
     // Remove the used token
     await deleteVerificationToken(token)
+
+    // Send welcome email to the newly verified user
+    try {
+      await sendWelcomeEmail(verification.email, `${user.first_name} ${user.last_name}`.trim() || user.email)
+      console.log('Welcome email sent to:', verification.email)
+    } catch (emailError) {
+      console.error('Failed to send welcome email:', emailError)
+      // Don't fail the verification if email sending fails
+    }
 
     return NextResponse.json({
       success: true,
