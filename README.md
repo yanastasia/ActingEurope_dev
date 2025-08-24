@@ -154,26 +154,38 @@ ActingEurope_dev/
    
    Copy the example environment file and configure your variables:
    ```bash
-   cp .env.example .env.local
+   cp .env.example .env
    ```
    
-   Configure the following environment variables:
+   Configure the following environment variables in your `.env` file:
    ```env
-   # Database (Supabase)
-   DATABASE_URL="postgresql://postgres.xxx:password@aws-0-eu-central-2.pooler.supabase.com:6543/postgres"
+   # Supabase Configuration
+   NEXT_PUBLIC_SUPABASE_URL="your-supabase-url"
+   NEXT_PUBLIC_SUPABASE_ANON_KEY="your-supabase-anon-key"
+   SUPABASE_SERVICE_ROLE_KEY="your-supabase-service-role-key"
+   
+   # Database Configuration
+   DATABASE_URL="postgresql://postgres.xxx:password@aws-0-eu-central-2.pooler.supabase.com:6543/postgres?pgbouncer=true"
    DIRECT_URL="postgresql://postgres.xxx:password@aws-0-eu-central-2.pooler.supabase.com:5432/postgres"
    
-   # Authentication
-   JWT_SECRET="your-jwt-secret-key"
+   # Next.js Configuration
+   NEXTAUTH_SECRET="your-nextauth-secret-key"
+   NEXTAUTH_URL="http://localhost:3000"
+   
+   # Application Configuration
+   NODE_ENV="development"
+   PORT=3000
+   NEXT_PUBLIC_APP_URL="http://localhost:3000"
    
    # Email Configuration
-   SMTP_HOST="your-smtp-host"
-   SMTP_PORT=587
-   SMTP_USER="your-email@domain.com"
-   SMTP_PASS="your-email-password"
+   EMAIL_SERVER_HOST="smtp.postmarkapp.com"
+   EMAIL_SERVER_PORT="587"
+   EMAIL_SERVER_USER="your-email-user"
+   EMAIL_SERVER_PASSWORD="your-email-password"
+   EMAIL_FROM="Your App <noreply@yourdomain.com>"
    
-   # Application
-   NEXT_PUBLIC_APP_URL="http://localhost:3000"
+   # Security
+   JWT_SECRET="your-jwt-secret-key"
    ```
 
 ### Database Setup

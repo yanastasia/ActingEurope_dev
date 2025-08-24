@@ -25,18 +25,38 @@ This guide covers the complete workflow for setting up, building, and running th
    ```
 
 3. **Environment variables**
-   - Copy `.env.example` to `.env.local`
+   - Copy `.env.example` to `.env`
    - Configure your Supabase database connection strings and other required variables
    
-   **Supabase Configuration:**
+   **Complete Environment Configuration:**
    ```env
+   # Supabase Configuration
+   NEXT_PUBLIC_SUPABASE_URL="your-supabase-url"
+   NEXT_PUBLIC_SUPABASE_ANON_KEY="your-supabase-anon-key"
+   SUPABASE_SERVICE_ROLE_KEY="your-supabase-service-role-key"
+   
    # Database URLs (from Supabase Project Settings > Database)
-   DATABASE_URL="postgresql://postgres.xxx:password@aws-0-eu-central-2.pooler.supabase.com:6543/postgres"
+   DATABASE_URL="postgresql://postgres.xxx:password@aws-0-eu-central-2.pooler.supabase.com:6543/postgres?pgbouncer=true"
    DIRECT_URL="postgresql://postgres.xxx:password@aws-0-eu-central-2.pooler.supabase.com:5432/postgres"
    
-   # Other required variables
-   JWT_SECRET="your-secure-jwt-secret"
+   # Next.js Configuration
+   NEXTAUTH_SECRET="your-nextauth-secret-key"
+   NEXTAUTH_URL="http://localhost:3000"
+   
+   # Application Configuration
+   NODE_ENV="development"
+   PORT=3000
    NEXT_PUBLIC_APP_URL="http://localhost:3000"
+   
+   # Email Configuration (Optional)
+   EMAIL_SERVER_HOST="smtp.postmarkapp.com"
+   EMAIL_SERVER_PORT="587"
+   EMAIL_SERVER_USER="your-email-user"
+   EMAIL_SERVER_PASSWORD="your-email-password"
+   EMAIL_FROM="Your App <noreply@yourdomain.com>"
+   
+   # Security
+   JWT_SECRET="your-secure-jwt-secret"
    ```
    
    **Important Notes:**
@@ -57,7 +77,7 @@ This guide covers the complete workflow for setting up, building, and running th
    - Navigate to Project Settings > Database
    - Copy the "Connection string" for pooled connections (port 6543)
    - Copy the "Direct connection" string (port 5432)
-   - Use these in your `.env.local` file
+   - Use these in your `.env` file
 
 3. **Configure Environment Variables**
    ```env
@@ -192,8 +212,8 @@ npm run lint
    npm install
    
    # Configure environment
-   cp .env.example .env.local
-   # Edit .env.local with your database URL and other settings
+   cp .env.example .env
+   # Edit .env with your database URL and other settings
    ```
 
 2. **Database Setup**
@@ -340,12 +360,12 @@ The application now includes a fully database-connected CMS for dynamic content 
 │   └── upload/               # File upload handling
 ├── components/               # React components
 ├── public/uploads/           # Uploaded files directory
-└── .env.local               # Environment variables
+└── .env                     # Environment variables
 ```
 
 ## Security Notes
 
-- Never commit `.env.local` or any files containing secrets
+- Never commit `.env` or any files containing secrets
 - Use strong passwords for admin accounts in production
 - Regularly update dependencies for security patches
 - Use environment-specific database URLs
