@@ -14,48 +14,28 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import { useLanguage, translations } from "@/lib/language-context"
+import { useLanguage } from "@/lib/language-context"
 
 // Helper function to translate subtitle languages
-const translateSubtitleLanguages = (subtitles: string, language: string) => {
+const translateSubtitleLanguages = (subtitles: string, t: any) => {
   if (!subtitles) return '';
   
-  const languageMap: { [key: string]: { [key: string]: string } } = {
-    en: {
-      'English': translations.en.subtitlesEn,
-      'Bulgarian': translations.en.subtitlesBg,
-      'Macedonian': translations.en.subtitlesMk,
-      'Serbian': translations.en.subtitlesSr
-    },
-    bg: {
-      'English': translations.bg.subtitlesEn,
-      'Bulgarian': translations.bg.subtitlesBg,
-      'Macedonian': translations.bg.subtitlesMk,
-      'Serbian': translations.bg.subtitlesSr
-    },
-    mk: {
-      'English': translations.mk.subtitlesEn,
-      'Bulgarian': translations.mk.subtitlesBg,
-      'Macedonian': translations.mk.subtitlesMk,
-      'Serbian': translations.mk.subtitlesSr
-    },
-    sr: {
-      'English': translations.sr.subtitlesEn,
-      'Bulgarian': translations.sr.subtitlesBg,
-      'Macedonian': translations.sr.subtitlesMk,
-      'Serbian': translations.sr.subtitlesSr
-    }
+  const languageMap: { [key: string]: string } = {
+    'English': t('subtitlesEn'),
+    'Bulgarian': t('subtitlesBg'),
+    'Macedonian': t('subtitlesMk'),
+    'Serbian': t('subtitlesSr')
   };
   
   // Split by comma and translate each language
   return subtitles.split(',').map(lang => {
     const trimmedLang = lang.trim();
-    return languageMap[language]?.[trimmedLang] || trimmedLang;
+    return languageMap[trimmedLang] || trimmedLang;
   }).join(', ');
 };
 
 export default function PerformancePage({ params }: { params: Promise<{ id: string }> }) {
-  const { t, language } = useLanguage()
+  const { language, setLanguage, t } = useLanguage()
   const [performance, setPerformance] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [id, setId] = useState<string>('')
@@ -149,7 +129,7 @@ export default function PerformancePage({ params }: { params: Promise<{ id: stri
 
           <h1 className="mb-2 text-3xl font-bold text-secondary-blue md:text-4xl">{performance.title}</h1>
           <p className="mb-4 text-xl text-muted-foreground">
-            {translations[language][performance.theatreName as keyof typeof translations[typeof language]] || performance.theatreName || (Array.isArray(performance.company) ? performance.company.join(' & ') : performance.company)}
+            {t(performance.theatreName) || performance.theatreName || (Array.isArray(performance.company) ? performance.company.map((comp: string) => t(comp) || comp).join(' & ') : (t(performance.company) || performance.company))}
           </p>
 
           <div className="mb-6 flex flex-wrap gap-2">
@@ -170,12 +150,12 @@ export default function PerformancePage({ params }: { params: Promise<{ id: stri
             <div className="flex items-center gap-2">
               <MapPin className="h-5 w-5 text-primary-gold" />
               <div>
-                <div className="font-medium">{translations[language][performance.venue as keyof typeof translations[typeof language]] || performance.venue}</div>
+                <div className="font-medium">{t(performance.venue) || performance.venue}</div>
               </div>
             </div>
           </div>
 
-          <h2 className="mb-4 text-2xl font-semibold text-secondary-blue">{translations[language].synopsis}</h2>
+          <h2 className="mb-4 text-2xl font-semibold text-secondary-blue">{t('synopsis')}</h2>
           <div className="mb-8 space-y-4">
             {performance.description ? performance.description.split("\n\n").map((paragraph: string, index: number) => (
               <p key={index} className="text-muted-foreground">
@@ -188,17 +168,17 @@ export default function PerformancePage({ params }: { params: Promise<{ id: stri
 
           {(performance.director !== "TBA" || performance.cast.length > 0) && (
             <>
-              <h2 className="mb-4 text-2xl font-semibold text-secondary-blue">{translations[language].castAndCrew}</h2>
+              <h2 className="mb-4 text-2xl font-semibold text-secondary-blue">{t('castAndCrew')}</h2>
               <div className="mb-8 space-y-2">
                 {performance.director !== "TBA" && (
                   <div className="flex">
-                    <span className="w-24 font-medium">{translations[language].director}:</span>
+                    <span className="w-24 font-medium">{t('director')}:</span>
                     <span className="text-muted-foreground">{performance.director}</span>
                   </div>
                 )}
                 {performance.cast.length > 0 && (
                   <div className="flex flex-col">
-                    <span className="mb-2 w-24 font-medium">{translations[language].cast}:</span>
+                    <span className="mb-2 w-24 font-medium">{t('cast')}:</span>
                     <ul className="ml-6 list-disc space-y-1">
                       {performance.cast.map((actor: string, index: number) => (
                         <li key={index} className="text-muted-foreground">
@@ -216,24 +196,24 @@ export default function PerformancePage({ params }: { params: Promise<{ id: stri
         {/* Sidebar */}
         <div>
           <div className="sticky top-20 space-y-6 rounded-lg border p-6">
-            <h2 className="text-xl font-semibold text-secondary-blue">{translations[language].bookYourTickets}</h2>
+            <h2 className="text-xl font-semibold text-secondary-blue">{t('bookYourTickets')}</h2>
             <Separator />
 
             <div className="space-y-4">
               <div className="flex justify-between">
-                <span className="font-medium">{translations[language].date}:</span>
+                <span className="font-medium">{t('date')}:</span>
                 <span>{performance.date}</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-medium">{translations[language].time}:</span>
+                <span className="font-medium">{t('time')}:</span>
                 <span>{performance.time}</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-medium">{translations[language].venue}:</span>
-                <span>{translations[language][performance.venue as keyof typeof translations[typeof language]] || performance.venue}</span>
+                <span className="font-medium">{t('venue')}:</span>
+                <span>{t(performance.venue) || performance.venue}</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-medium">{translations[language].duration}:</span>
+                <span className="font-medium">{t('duration')}:</span>
                 <span>{performance.duration}</span>
               </div>
             </div>
@@ -248,12 +228,12 @@ export default function PerformancePage({ params }: { params: Promise<{ id: stri
               {performance.subtitles && (
                 <div className="flex items-center gap-2">
                   <Subtitles className="h-5 w-5 text-primary-gold" />
-                  <span className="text-sm">{translations[language].subtitles} {translateSubtitleLanguages(performance.subtitles, language)}</span>
+                  <span className="text-sm">{t('subtitles')} {translateSubtitleLanguages(performance.subtitles, t)}</span>
                 </div>
               )}
               <div className="flex items-center gap-2">
                 <Users className="h-5 w-5 text-primary-gold" />
-                <span className="text-sm">{translations[language].suitableForAges}</span>
+                <span className="text-sm">{t('suitableForAges')}</span>
               </div>
             </div>
 
@@ -261,13 +241,13 @@ export default function PerformancePage({ params }: { params: Promise<{ id: stri
 
             <div className="space-y-4">
               <Button className="w-full" size="lg" asChild>
-                <Link href="/ticket-reservation">{translations[language].bookTicket}</Link>
+                <Link href="/ticket-reservation">{t('bookTicket')}</Link>
               </Button>
             </div>
 
             <div className="mt-6 rounded-lg bg-muted/30 p-4 text-center text-sm">
-              <p className="font-medium">{translations[language].needAssistance}</p>
-              <p className="text-muted-foreground">{translations[language].contactBoxOffice}</p>
+              <p className="font-medium">{t('needAssistance')}</p>
+              <p className="text-muted-foreground">{t('contactBoxOffice')}</p>
               <p className="text-primary-gold">tickets@actingeurope.com</p>
             </div>
           </div>

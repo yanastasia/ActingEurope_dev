@@ -914,21 +914,89 @@ export const getTheatresWithLanguage = async (language: string = 'en'): Promise<
 };
 
 export const getTheatreByIdAndLanguage = async (theatreId: number, language: string = 'en'): Promise<Theatre | null> => {
-  const baseTheatre = baseTheatres.find(theatre => theatre.id === theatreId);
-  if (!baseTheatre) {
+  try {
+    // First try to find theatre with exact ID and language
+    let theatre = await prisma.theatre.findFirst({
+      where: {
+        id: theatreId,
+        content_language: language
+      },
+      include: {
+        images: true,
+        tags: true
+      }
+    });
+    
+    // If not found, try to find theatre with same translation group and language
+    if (!theatre) {
+      const originalTheatre = await prisma.theatre.findUnique({
+        where: { id: theatreId }
+      });
+      
+      if (originalTheatre?.translation_group) {
+        theatre = await prisma.theatre.findFirst({
+          where: {
+            translation_group: originalTheatre.translation_group,
+            content_language: language
+          },
+          include: {
+            images: true,
+            tags: true
+          }
+        });
+      }
+    }
+    
+    // If still not found, fallback to English
+    if (!theatre && language !== 'en') {
+      return await getTheatreByIdAndLanguage(theatreId, 'en');
+    }
+    
+    if (!theatre) {
+      return null;
+    }
+    
+    return {
+      id: theatre.id,
+      name: theatre.name,
+      city: theatre.city,
+      country: theatre.country,
+      description: theatre.description || '',
+      history: theatre.history || '',
+      website: theatre.website ?? undefined,
+      foundedYear: theatre.founded_year || 0,
+      images: theatre.images.map(img => ({
+        id: img.id,
+        imageUrl: img.image_url,
+        caption: img.caption ?? undefined,
+        isPrimary: img.is_primary
+      })),
+      tags: theatre.tags.map(tag => tag.tag_name)
+    };
+  } catch (error) {
+    console.error('Error fetching theatre:', error);
     return null;
   }
-  
-  const translations = theatreTranslations[language as keyof typeof theatreTranslations] || theatreTranslations.en;
-  const translation = translations[theatreId as keyof typeof translations];
-  
-  return {
-    ...baseTheatre,
-    name: translation?.name || `Theatre ${theatreId}`,
-    description: translation?.description || 'No description available',
-    history: translation?.history || 'No history available',
-    tags: translation?.tags || []
-  };
+};
+
+export const getTheatreNamesByIds = async (theatreIds: number[], language: string = 'en'): Promise<string[]> => {
+  try {
+    const theatreNames: string[] = [];
+    
+    for (const theatreId of theatreIds) {
+      const theatre = await getTheatreByIdAndLanguage(theatreId, language);
+      if (theatre) {
+        theatreNames.push(theatre.name);
+      } else {
+        theatreNames.push(`Theatre ${theatreId}`);
+      }
+    }
+    
+    return theatreNames;
+  } catch (error) {
+    console.error('Error fetching theatre names:', error);
+    return theatreIds.map(id => `Theatre ${id}`);
+  }
 };
 
 // Event Management Functions

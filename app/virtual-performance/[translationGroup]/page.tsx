@@ -166,8 +166,8 @@ export default function VirtualPerformancePage() {
             {virtualPerformance.company && virtualPerformance.company.length > 0 && (
               <p className="text-xl text-primary-gold">
                 {Array.isArray(virtualPerformance.company) 
-                  ? virtualPerformance.company.join(' & ') 
-                  : virtualPerformance.company}
+                  ? virtualPerformance.company.map((comp: string) => t(comp) || comp).join(' & ') 
+                  : (t(virtualPerformance.company) || virtualPerformance.company)}
               </p>
             )}
           </div>
@@ -263,13 +263,13 @@ export default function VirtualPerformancePage() {
                 {virtualPerformance.duration && (
                   <div className="flex items-center gap-2">
                     <Clock className="h-5 w-5 text-primary-gold" />
-                    <span className="text-sm">Duration: {virtualPerformance.duration}</span>
+                    <span className="text-sm">{t('duration')}: {virtualPerformance.duration}</span>
                   </div>
                 )}
                 {virtualPerformance.subtitles && (
                   <div className="flex items-center gap-2">
                     <Subtitles className="h-5 w-5 text-primary-gold" />
-                    <span className="text-sm">Subtitles: {virtualPerformance.subtitles}</span>
+                    <span className="text-sm">{t('subtitles')}{virtualPerformance.subtitles}</span>
                   </div>
                 )}
                 <div className="flex items-center gap-2">

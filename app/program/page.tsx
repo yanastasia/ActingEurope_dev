@@ -41,7 +41,7 @@ interface Event {
 import Link from "next/link"
 
 export default function ProgramPage() {
-  const { t, language } = useLanguage()
+  const { language, t } = useLanguage()
   const [selectedDate, setSelectedDate] = useState<string>("All Dates")
   const [selectedVenue, setSelectedVenue] = useState("All Venues")
   const [selectedType, setSelectedType] = useState("All Types")
@@ -270,7 +270,9 @@ export default function ProgramPage() {
                             <h3 className="text-lg font-semibold text-secondary-blue">{event.title}</h3>
                             {event.company && (
                               <p className="text-sm text-muted-foreground italic mb-6">
-                                {Array.isArray(event.company) ? event.company.join(' & ') : event.company}
+                                {Array.isArray(event.company) 
+                                  ? event.company.map((comp: string) => t(comp) || comp).join(' & ') 
+                                  : (t(event.company) || event.company)}
                               </p>
                             )}
                             <div className="flex flex-wrap gap-2">
@@ -436,7 +438,7 @@ export default function ProgramPage() {
                                   </p>
                                   <p className="text-sm mb-3">
                                     <span className="font-medium">{translations[language].theatreName}: </span>
-                                    {Array.isArray(event.company) ? event.company.join(' & ') : event.company}
+                                    {Array.isArray(event.company) ? event.company.map((comp: string) => t(comp) || comp).join(' & ') : (t(event.company) || event.company)}
                                   </p>
                                   <div className="flex gap-2">
                                     <Link href={getBookingUrl(event)}>

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useLanguage, translations } from "@/lib/language-context"
+import { useLanguage } from "@/lib/language-context"
 import { Calendar, Clock, MapPin, Search } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
@@ -173,7 +173,7 @@ export default function PerformancesPage() {
                 </div>
                 <CardDescription>
                   {performance.theatreName 
-                    ? (translations[language][performance.theatreName as keyof typeof translations[typeof language]] || performance.theatreName)
+                    ? (t(performance.theatreName) || performance.theatreName)
                     : (Array.isArray(performance.company) 
                       ? performance.company.join(' & ') 
                       : performance.company)}
@@ -191,7 +191,7 @@ export default function PerformancesPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <MapPin className="h-4 w-4" />
-                    {translations[language][performance.venue as keyof typeof translations[typeof language]] || performance.venue}
+                    {t(performance.venue) || performance.venue}
                   </div>
                 </div>
                 <div className="flex gap-2">

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { performances } from '@/lib/performance-data'
 import { getEventsByLanguage, getAllEvents, createEventWithTranslations, getTheatreByIdAndLanguage } from '@/lib/database-operations'
+import { translations } from '@/lib/translations'
 
 export async function GET(request: Request) {
   try {
@@ -72,8 +73,18 @@ export async function GET(request: Request) {
         }
       }
       
-      // Get translated theatre information
+      // Get translated theatre information for primary theatre (for location info)
       const theatre = await getTheatreByIdAndLanguage(event.theatreId, event.contentLanguage || language || 'en');
+      
+      // Handle multiple theatre names from company field
+      let theatreNames = 'Theatre Name';
+      if (event.company && event.company.length > 0) {
+        // Filter out non-theatre companies like 'ActingEurope'
+        const theatreCompanies = event.company.filter(company => company !== 'ActingEurope');
+        if (theatreCompanies.length > 0) {
+          theatreNames = theatreCompanies.join(' & ');
+        }
+      }
       
       // Get venue information if venue_id exists
       let venueName = 'TBA';
@@ -91,10 +102,18 @@ export async function GET(request: Request) {
         }
       }
       
+      // Translate company names based on the requested language
+      const translatedCompany = event.company ? event.company.map((comp: string) => {
+        const langTranslations = translations[language as keyof typeof translations] || translations.en;
+        // Safely access the translation using bracket notation
+        const translation = langTranslations && typeof langTranslations === 'object' ? (langTranslations as Record<string, string>)[comp] : undefined;
+        return translation || comp;
+      }) : [];
+
       return {
         id: event.id.toString(),
         title: event.title,
-        company: event.company,
+        company: translatedCompany,
         date: eventDate.toISOString().split('T')[0].split('-').reverse().join('-'), // DD-MM-YYYY format for display
         time: timeString, // HH:MM format
         venue: venueName,
@@ -109,7 +128,7 @@ export async function GET(request: Request) {
         price: event.price ? `€${event.price}` : 'Free',
         eventType: event.eventType,
         isFeatured: event.isFeatured,
-        theatreName: theatre?.name || 'Theatre Name',
+        theatreName: theatreNames,
         theatreCity: theatre?.city || 'City',
         theatreCountry: theatre?.country || 'Country',
         contentLanguage: event.contentLanguage,

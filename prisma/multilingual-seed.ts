@@ -385,7 +385,7 @@ async function main() {
         event_date: new Date(event.date.split('-').reverse().join('-')),
         event_time: new Date(`1970-01-01T${event.time}:00.000Z`),
         description: event.description,
-        price: 25, // Default price
+        price: 0, // Default price
         image_url: event.imageUrl,
         poster_url: event.posterUrl,
         language: event.language || 'Bulgarian',
@@ -394,7 +394,6 @@ async function main() {
         company: event.company,
         director: event.director,
         cast: event.cast,
-        synopsis: event.synopsis,
         subtitles: event.subtitles,
         duration: event.duration,
         content_language: event.content_language,

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { performances } from '@/lib/performance-data'
 import { getEventTranslationGroup, updateEvent, deleteEventWithTranslations, getTheatreByIdAndLanguage } from '@/lib/database-operations'
+import { translations } from '@/lib/translations'
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
@@ -48,11 +49,29 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     // Get theatre name in the requested language instead of event's content language
     const theatre = await getTheatreByIdAndLanguage(event.theatre_id, requestedLanguage);
 
+    // Handle multiple theatre names from company field
+    let theatreNames = theatre?.name || event.theatre.name;
+    if (event.company && event.company.length > 0) {
+      // Filter out non-theatre companies like 'ActingEurope'
+      const theatreCompanies = event.company.filter(company => company !== 'ActingEurope');
+      if (theatreCompanies.length > 0) {
+        theatreNames = theatreCompanies.join(' & ');
+      }
+    }
+
+    // Translate company names based on the requested language
+    const translatedCompany = event.company ? event.company.map((comp: string) => {
+      const langTranslations = translations[requestedLanguage as keyof typeof translations] || translations.en;
+      // Safely access the translation using bracket notation
+      const translation = langTranslations && typeof langTranslations === 'object' ? (langTranslations as Record<string, string>)[comp] : undefined;
+      return translation || comp;
+    }) : [];
+
     // Transform the data to match the expected format
     const transformedEvent = {
       id: event.id.toString(),
       title: event.title,
-      company: event.company,
+      company: translatedCompany,
       date: event.event_date.toLocaleDateString('en-GB', {
         day: '2-digit',
         month: '2-digit',
@@ -75,7 +94,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       price: event.price ? `€${event.price}` : 'Free',
       eventType: event.event_type,
       isFeatured: event.is_featured,
-      theatreName: theatre?.name || event.theatre.name,
+      theatreName: theatreNames,
       theatreCity: theatre?.city || event.theatre.city,
       theatreCountry: theatre?.country || event.theatre.country,
       contentLanguage: event.content_language,
@@ -164,7 +183,6 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       company,
       director,
       cast,
-
       subtitles,
       duration,
       isFeatured,

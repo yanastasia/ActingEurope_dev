@@ -14,7 +14,7 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import { useLanguage, translations } from "@/lib/language-context"
+import { useLanguage, translations, Language } from "@/lib/language-context"
 import { notFound } from 'next/navigation'
 
 // Helper function to translate subtitle languages
@@ -79,7 +79,7 @@ export default function PerformancePage({ params }: PerformancePageProps) {
         return
       }
       setResolvedParams(p)
-      setLanguage(p.lang)
+      setLanguage(p.lang as Language)
     })
   }, [params, setLanguage])
 
@@ -133,7 +133,7 @@ export default function PerformancePage({ params }: PerformancePageProps) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">{t.error}</h1>
+          <h1 className="text-2xl font-bold text-red-600 mb-4">{t('error')}</h1>
           <p className="text-gray-600">{error}</p>
         </div>
       </div>
@@ -162,11 +162,11 @@ export default function PerformancePage({ params }: PerformancePageProps) {
       <Breadcrumb className="mb-6">
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href={`/${resolvedParams.lang}`}>{t.home}</BreadcrumbLink>
+            <BreadcrumbLink href={`/${resolvedParams.lang}`}>{t('home')}</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href={`/${resolvedParams.lang}/program`}>{t.program}</BreadcrumbLink>
+            <BreadcrumbLink href={`/${resolvedParams.lang}/program`}>{t('program')}</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem className="text-muted-foreground">
@@ -201,7 +201,7 @@ export default function PerformancePage({ params }: PerformancePageProps) {
             <div className="mb-6">
               <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
                 <Users className="h-5 w-5" />
-                {t.cast}
+                {t('cast')}
               </h3>
               <div className="flex flex-wrap gap-2">
                 {event.cast.map((actor: string, index: number) => (
@@ -215,18 +215,18 @@ export default function PerformancePage({ params }: PerformancePageProps) {
 
           {event.director && (
             <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-2">{t.director}</h3>
+              <h3 className="text-xl font-semibold mb-2">{t('director')}</h3>
               <p className="text-gray-700">{event.director}</p>
             </div>
           )}
 
           {(event.company && event.company.length > 0) && (
             <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-3">{t.company}</h3>
+              <h3 className="text-xl font-semibold mb-3">{t('company')}</h3>
               <div className="flex flex-wrap gap-2">
                 {event.company.map((comp: string, index: number) => (
                   <Badge key={index} variant="outline">
-                    {comp}
+                    {t(comp) || comp}
                   </Badge>
                 ))}
               </div>
@@ -236,14 +236,14 @@ export default function PerformancePage({ params }: PerformancePageProps) {
 
         <div className="lg:col-span-1">
           <div className="bg-gray-50 rounded-lg p-6 sticky top-6">
-            <h2 className="text-xl font-semibold mb-4">{t.eventDetails}</h2>
+            <h2 className="text-xl font-semibold mb-4">{t('eventDetails')}</h2>
             
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <Calendar className="h-5 w-5 text-gray-500 mt-0.5" />
                 <div>
                   <p className="font-medium">{formatDate(event.event_date)}</p>
-                  <p className="text-sm text-gray-600">{t.date}</p>
+                  <p className="text-sm text-gray-600">{t('date')}</p>
                 </div>
               </div>
 
@@ -251,7 +251,7 @@ export default function PerformancePage({ params }: PerformancePageProps) {
                 <Clock className="h-5 w-5 text-gray-500 mt-0.5" />
                 <div>
                   <p className="font-medium">{formatTime(event.event_time)}</p>
-                  <p className="text-sm text-gray-600">{t.time}</p>
+                  <p className="text-sm text-gray-600">{t('time')}</p>
                 </div>
               </div>
 
@@ -259,8 +259,8 @@ export default function PerformancePage({ params }: PerformancePageProps) {
                 <div className="flex items-start gap-3">
                   <MapPin className="h-5 w-5 text-gray-500 mt-0.5" />
                   <div>
-                    <p className="font-medium">{event.venue.name}</p>
-                    <p className="text-sm text-gray-600">{t.venue}</p>
+                    <p className="font-medium">{t(event.venue.name) || event.venue.name}</p>
+                    <p className="text-sm text-gray-600">{t('venue')}</p>
                     {event.venue.address && (
                       <p className="text-sm text-gray-500">{event.venue.address}</p>
                     )}
@@ -273,7 +273,7 @@ export default function PerformancePage({ params }: PerformancePageProps) {
                   <Languages className="h-5 w-5 text-gray-500 mt-0.5" />
                   <div>
                     <p className="font-medium">{event.performance_language}</p>
-                    <p className="text-sm text-gray-600">{t.performanceLanguage}</p>
+                    <p className="text-sm text-gray-600">{t('performanceLanguage')}</p>
                   </div>
                 </div>
               )}
@@ -283,7 +283,7 @@ export default function PerformancePage({ params }: PerformancePageProps) {
                   <Subtitles className="h-5 w-5 text-gray-500 mt-0.5" />
                   <div>
                     <p className="font-medium">{translateSubtitleLanguages(event.subtitles, resolvedParams.lang)}</p>
-                    <p className="text-sm text-gray-600">{t.subtitles}</p>
+                    <p className="text-sm text-gray-600">{t('subtitles')}</p>
                   </div>
                 </div>
               )}
@@ -293,14 +293,14 @@ export default function PerformancePage({ params }: PerformancePageProps) {
                   <Clock className="h-5 w-5 text-gray-500 mt-0.5" />
                   <div>
                     <p className="font-medium">{event.duration}</p>
-                    <p className="text-sm text-gray-600">{t.duration}</p>
+                    <p className="text-sm text-gray-600">{t('duration')}</p>
                   </div>
                 </div>
               )}
 
               {event.genre && (
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">{t.genre}</p>
+                  <p className="text-sm text-gray-600 mb-1">{t('genre')}</p>
                   <Badge variant="secondary">{event.genre}</Badge>
                 </div>
               )}
@@ -309,11 +309,11 @@ export default function PerformancePage({ params }: PerformancePageProps) {
 
               <div className="text-center">
                 <p className="text-2xl font-bold text-primary mb-2">
-                  {event.price} {t.currency}
+                  {event.price} {t('currency')}
                 </p>
                 <Button asChild className="w-full">
                   <Link href={`/${resolvedParams.lang}/ticket-reservation?event=${event.id}`}>
-                    {t.bookTickets}
+                    {t('bookTickets')}
                   </Link>
                 </Button>
               </div>

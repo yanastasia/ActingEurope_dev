@@ -274,7 +274,7 @@ export default function TicketsPage() {
                       <h3 className="font-semibold text-secondary-blue">{selectedPerformanceData.title}</h3>
                       <p className="text-sm text-muted-foreground">
                         {selectedPerformanceData.date} • {selectedPerformanceData.time} •{" "}
-                        {selectedPerformanceData.venue}
+                        {t(selectedPerformanceData.venue) || selectedPerformanceData.venue}
                       </p>
                     </div>
                   </div>
@@ -307,7 +307,7 @@ export default function TicketsPage() {
                               <div>
                                 <h3 className="mb-1 text-lg font-semibold text-secondary-blue">{performance.title}</h3>
                                 <p className="mb-2 text-sm text-muted-foreground">
-                                  {Array.isArray(performance.company) ? performance.company.join(' & ') : performance.company}
+                                  {Array.isArray(performance.company) ? performance.company.map((comp: string) => t(comp) || comp).join(' & ') : (t(performance.company) || performance.company)}
                                 </p>
                                 <div className="mb-4 space-y-1 text-sm">
                                   <div className="flex items-center gap-2">

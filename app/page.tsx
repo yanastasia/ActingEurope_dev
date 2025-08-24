@@ -208,15 +208,15 @@ export default function Home() {
                             <div>
                               <h1 className="mb-4 text-4xl font-bold md:text-6xl">{slide.title}</h1>
                               <h2 className="mb-6 text-xl font-medium text-primary-gold md:text-2xl">
-                                {slide.company ? (Array.isArray(slide.company) ? slide.company.join(' & ') : slide.company) : "Acting Europe Festival"}
+                                {slide.company ? (Array.isArray(slide.company) ? slide.company.map((comp: string) => t(comp) || comp).join(' & ') : (t(slide.company) || slide.company)) : "Acting Europe Festival"}
                               </h2>
                               <div className="mb-8 space-y-2">
                                 <p className="text-lg text-white/90">{slide.date} • {slide.time}</p>
-                                <p className="text-lg text-white/90">{slide.venue}</p>
+                                <p className="text-lg text-white/90">{t(slide.venue) || slide.venue}</p>
                               </div>
                               <Button size="lg" className="bg-primary-gold hover:bg-primary-gold/90 text-white font-semibold transform transition-transform hover:scale-105" asChild>
                                 <Link href={`/performances/${slide.id}`}>
-                                  Learn More
+                                  {t("learnMore")}
                                 </Link>
                               </Button>
                             </div>
