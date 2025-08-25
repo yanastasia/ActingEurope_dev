@@ -179,39 +179,24 @@ export default function AdminPage() {
     const fetchData = async () => {
       try {
         // Load events from API
-        console.log('Fetching events...')
         const eventsResponse = await fetch('/api/events')
-        console.log('Events response status:', eventsResponse.status)
         if (eventsResponse.ok) {
           const eventsData = await eventsResponse.json()
-          console.log('Events data received:', eventsData?.length || 0, 'events')
           setEvents(eventsData || [])
-        } else {
-          console.error('Events fetch failed with status:', eventsResponse.status)
         }
         
         // Load venues from API
-        console.log('Fetching venues...')
         const venuesResponse = await fetch('/api/venues')
-        console.log('Venues response status:', venuesResponse.status)
         if (venuesResponse.ok) {
           const venuesData = await venuesResponse.json()
-          console.log('Venues data received:', venuesData?.length || 0, 'venues')
           setVenues(venuesData || [])
-        } else {
-          console.error('Venues fetch failed with status:', venuesResponse.status)
         }
         
         // Load theatres from API
-        console.log('Fetching theatres...')
         const theatresResponse = await fetch('/api/theatres?admin=true')
-        console.log('Theatres response status:', theatresResponse.status)
         if (theatresResponse.ok) {
           const theatresData = await theatresResponse.json()
-          console.log('Theatres data received:', theatresData?.length || 0, 'theatres')
           setTheatres(theatresData || [])
-        } else {
-          console.error('Theatres fetch failed with status:', theatresResponse.status)
         }
       } catch (error) {
         console.error('Error fetching data:', error)

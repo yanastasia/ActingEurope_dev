@@ -398,6 +398,7 @@ const translations = {
     // Venue translations
     "Main Stage": "Main Stage",
     "Chamber Stage": "Chamber Stage",
+    "Cinema hall": "Cinema hall",
 
     // Theatre name translations
     "Drama Theatre Kyustendil": "Drama Theatre Kyustendil",
@@ -733,6 +734,7 @@ const translations = {
     // Venue translations
     "Main Stage": "Голяма зала",
     "Chamber Stage": "Камерна зала",
+    "Cinema hall": "Кино зала",
     
     // Theatre name translations
     "Drama Theatre Kyustendil": "Драматичен театър Кюстендил",
@@ -1168,6 +1170,7 @@ const translations = {
     // Venue translations
     "Main Stage": "Голема сала",
     "Chamber Stage": "Камерна сала",
+    "Cinema hall": "Кино сала",
     
     // Theatre name translations
     "Drama Theatre Kyustendil": "Драматски театар Ќустендил",
@@ -1604,6 +1607,7 @@ const translations = {
     // Venue translations
     "Main Stage": "Велика Сала",
     "Chamber Stage": "Камерна Сала",
+    "Cinema hall": "Биоскопска сала",
     
     // Theatre name translations
     "Drama Theatre Kyustendil": "Драмски театар Ћустендил",
