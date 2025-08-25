@@ -78,6 +78,7 @@ const AdminTheatresPage = () => {
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
+  const [photoLink, setPhotoLink] = useState<string>('');
   const [isUploading, setIsUploading] = useState(false);
   const [newTag, setNewTag] = useState('');
   const [translationGroups, setTranslationGroups] = useState<{ [key: string]: Theatre[] }>({});
@@ -134,19 +135,14 @@ const AdminTheatresPage = () => {
 
   const fetchTheatres = async () => {
     try {
-      // Fetch theatres for all languages
-      const languages = ['en', 'bg', 'mk', 'sr'];
-      const allTheatres = [];
-      
-      for (const lang of languages) {
-        const response = await fetch(`/api/theatres?language=${lang}`);
-        if (response.ok) {
-          const data = await response.json();
-          allTheatres.push(...data);
-        }
+      // Fetch all theatres for admin interface
+      const response = await fetch('/api/theatres?admin=true');
+      if (response.ok) {
+        const data = await response.json();
+        setTheatres(data);
+      } else {
+        throw new Error('Failed to fetch theatres');
       }
-      
-      setTheatres(allTheatres);
     } catch (error) {
       console.error('Error fetching theatres:', error);
       toast({
@@ -159,6 +155,16 @@ const AdminTheatresPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate photo link if provided
+    if (photoLink && !isValidImageUrl(photoLink)) {
+      toast({
+        title: 'Invalid Photo Link',
+        description: 'Please enter a valid image URL or remove the photo link',
+        variant: 'destructive',
+      });
+      return;
+    }
     
     try {
       let imageUrl = '';
@@ -181,6 +187,9 @@ const AdminTheatresPage = () => {
           throw new Error('Failed to upload image');
         }
         setIsUploading(false);
+      } else if (photoLink) {
+        // Use photo link if no file is uploaded
+        imageUrl = photoLink;
       }
 
       const theatreData = {
@@ -225,6 +234,7 @@ const AdminTheatresPage = () => {
         setEditingTheatre(null);
         setImageFile(null);
         setImagePreview('');
+        setPhotoLink('');
         
         // Refresh theatres list
         fetchTheatres();
@@ -295,6 +305,10 @@ const AdminTheatresPage = () => {
     });
     if (theatre.images && theatre.images.length > 0) {
       setImagePreview(theatre.images[0].image_url);
+      // If it's not a file upload (no blob URL), it's a photo link
+      if (!theatre.images[0].image_url.startsWith('blob:')) {
+        setPhotoLink(theatre.images[0].image_url);
+      }
     }
   };
 
@@ -313,6 +327,37 @@ const AdminTheatresPage = () => {
   const removeImage = () => {
     setImageFile(null);
     setImagePreview('');
+    setPhotoLink('');
+  };
+
+  const isValidImageUrl = (url: string) => {
+    try {
+      new URL(url);
+      return url.match(/\.(jpeg|jpg|gif|png|webp|svg)$/i) !== null;
+    } catch {
+      return false;
+    }
+  };
+
+  const handlePhotoLinkChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const url = e.target.value;
+    setPhotoLink(url);
+    
+    if (url) {
+      if (isValidImageUrl(url)) {
+        setImagePreview(url);
+        setImageFile(null); // Clear file upload if using link
+      } else if (url.length > 10) {
+        // Only show error for URLs that seem complete
+        toast({
+          title: 'Invalid Image URL',
+          description: 'Please enter a valid image URL ending with .jpg, .png, .gif, .webp, or .svg',
+          variant: 'destructive',
+        });
+      }
+    } else {
+      setImagePreview('');
+    }
   };
 
   const addTag = () => {
@@ -673,14 +718,33 @@ const AdminTheatresPage = () => {
             {/* Image Upload */}
             <div>
               <Label htmlFor="image">Theatre Image</Label>
-              <div className="mt-2">
-                <input
-                  id="image"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                />
+              <div className="mt-2 space-y-4">
+                <div>
+                  <Label htmlFor="image-file" className="text-sm font-medium">Upload Image File</Label>
+                  <input
+                    id="image-file"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  />
+                </div>
+                <div className="flex items-center">
+                  <div className="flex-1 border-t border-gray-300"></div>
+                  <span className="px-3 text-sm text-gray-500">OR</span>
+                  <div className="flex-1 border-t border-gray-300"></div>
+                </div>
+                <div>
+                  <Label htmlFor="photo-link" className="text-sm font-medium">Photo Link URL</Label>
+                  <Input
+                    id="photo-link"
+                    type="url"
+                    value={photoLink}
+                    onChange={handlePhotoLinkChange}
+                    placeholder="https://example.com/image.jpg"
+                    className="mt-1"
+                  />
+                </div>
                 {imagePreview && (
                   <div className="mt-4 relative">
                     <img src={imagePreview} alt="Preview" className="w-32 h-32 object-cover rounded" />
@@ -755,6 +819,7 @@ const AdminTheatresPage = () => {
                     });
                     setImagePreview('');
                     setImageFile(null);
+                    setPhotoLink('');
                   }}
                 >
                   Cancel
