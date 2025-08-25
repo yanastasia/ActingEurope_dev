@@ -439,8 +439,9 @@ const translations = {
     sendMessageButton: "Send Message",
     ourInformation: "Our Information",
     address: "Address",
+    addressText: "bul. \"Bulgaria\" 26А, 2500 Kyustendil, Bulgaria",
     businessHours: "Business Hours",
-    businessHoursText: "Monday – Friday, 9:00 AM – 5:00 PM (EET)",
+    businessHoursText: "Monday - Friday: 9:00 AM - 5:00 PM",
     followUsContact: "Follow Us",
   },
   bg: {
@@ -776,8 +777,9 @@ const translations = {
     sendMessageButton: "Изпрати съобщение",
     ourInformation: "Наша информация",
     address: "Адрес",
+    addressText: "бул. \"България\" 26А, 2500 Кюстендил, България",
     businessHours: "Работно време",
-    businessHoursText: "Понеделник – Петък, 9:00 – 17:00 (ЕET)",
+    businessHoursText: "Понеделник - Петък: 9:00 - 17:00",
     followUsContact: "Последвайте ни",
 
     // Authentication
@@ -1212,8 +1214,9 @@ const translations = {
     sendMessageButton: "Испрати порака",
     ourInformation: "Наши информации",
     address: "Адреса",
+    addressText: "бул. \"България\" 26А, 2500 Ќустендил, Бугарија",
     businessHours: "Работно време",
-    businessHoursText: "Понеделник – Петок, 9:00 – 17:00 (ЕET)",
+    businessHoursText: "Понеделник - Петок: 9:00 - 17:00",
     followUsContact: "Следете не",
 
     // Authentication
@@ -1649,8 +1652,9 @@ const translations = {
     sendMessageButton: "Пошаљи поруку",
     ourInformation: "Наше информације",
     address: "Адреса",
+    addressText: "бул. \"Бугарска\" 26А, 2500 Ћустендил, Бугарска",
     businessHours: "Радно време",
-    businessHoursText: "Понедељак – Петак, 9:00 – 17:00 (ЕET)",
+    businessHoursText: "Понедељак - Петак: 9:00 - 17:00",
     followUsContact: "Пратите нас",
 
     // Authentication

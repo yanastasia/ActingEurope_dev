@@ -21,10 +21,10 @@ export default function ContactPage() {
   const [contactContent, setContactContent] = useState({
     title: '',
     content: '',
-    address: 'bul. "Bulgaria" 26А, 2500 Kyustendil, Bulgaria',
+    address: '',
     phone: '+359 87 696 7588',
     email: 'info@actingeurope.eu',
-    businessHours: 'Monday - Friday: 9:00 AM - 6:00 PM'
+    businessHours: ''
   });
   const [isEditing, setIsEditing] = useState(false);
   const [userIsAdmin, setUserIsAdmin] = useState(false);
@@ -48,10 +48,10 @@ export default function ContactPage() {
             setContactContent({
               title: data.title || t('contactUs'),
               content: content.description || t('contactDescription'),
-              address: content.address || 'bul. "Bulgaria" 26А, 2500 Kyustendil, Bulgaria',
+              address: content.address || t('addressText'),
               phone: content.phone || '+359 87 696 7588',
               email: content.email || 'info@actingeurope.eu',
-              businessHours: content.businessHours || 'Monday - Friday: 9:00 AM - 6:00 PM'
+              businessHours: content.businessHours || t('businessHoursText')
             });
             setContactPageId(data.id);
           } else {
@@ -59,7 +59,9 @@ export default function ContactPage() {
             setContactContent(prev => ({
               ...prev,
               title: t('contactUs'),
-              content: t('contactDescription')
+              content: t('contactDescription'),
+              address: t('addressText'),
+              businessHours: t('businessHoursText')
             }));
           }
         } else {
@@ -67,7 +69,9 @@ export default function ContactPage() {
           setContactContent(prev => ({
             ...prev,
             title: t('contactUs'),
-            content: t('contactDescription')
+            content: t('contactDescription'),
+            address: t('addressText'),
+            businessHours: t('businessHoursText')
           }));
         }
       } catch (error) {
@@ -76,7 +80,9 @@ export default function ContactPage() {
         setContactContent(prev => ({
           ...prev,
           title: t('contactUs'),
-          content: t('contactDescription')
+          content: t('contactDescription'),
+          address: t('addressText'),
+          businessHours: t('businessHoursText')
         }));
       } finally {
         setLoading(false);
@@ -94,11 +100,36 @@ export default function ContactPage() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Handle form submission here
-    toast.success('Message sent successfully!');
-    setFormData({ name: '', email: '', subject: '', message: '' });
+    
+    // Validate form data
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+    
+    try {
+      const response = await fetch('/api/contact/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+      
+      const result = await response.json();
+      
+      if (response.ok) {
+        toast.success('Message sent successfully!');
+        setFormData({ name: '', email: '', subject: '', message: '' });
+      } else {
+        toast.error(result.error || 'Failed to send message');
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast.error('Failed to send message. Please try again.');
+    }
   };
 
   const handleSaveContact = async () => {
