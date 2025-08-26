@@ -65,6 +65,7 @@
     "node-fetch": "^3.3.2",
     "nodemailer": "latest",
     "pdfkit": "latest",
+    "postmark": "^4.0.5",
     "react": "^19",
     "react-day-picker": "latest",
     "react-dom": "^19",

@@ -149,7 +149,6 @@ export default function Navigation() {
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onSelect={() => navigateToProfile()}>{t("myProfile")}</DropdownMenuItem>
                   <DropdownMenuItem onSelect={() => navigateToProfile("tickets")}>{t("myTickets")}</DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => navigateToProfile("favorites")}>{t("favorites")}</DropdownMenuItem>
 
                   {userIsAdmin && (
                     <>

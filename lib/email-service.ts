@@ -1,6 +1,7 @@
 "use server"
 
 import nodemailer from "nodemailer"
+import { ServerClient } from "postmark"
 import { render } from "@react-email/render"
 import VerificationEmail from "@/emails/verification-email"
 import TicketEmail from "@/emails/ticket-email"
@@ -53,25 +54,70 @@ async function sendEmailWithRetry(mailOptions: any, maxRetries = 3) {
   return { success: false, error: new Error('Max retries exceeded') }
 }
 
+// Initialize Postmark client
+const postmarkClient = process.env.POSTMARK_SERVER_TOKEN 
+  ? new ServerClient(process.env.POSTMARK_SERVER_TOKEN)
+  : null;
+
 // For testing/development, we'll log emails instead of sending them
 // Set to false to actually send emails, true to only log them
 const isDevelopment = process.env.NODE_ENV === 'development' && process.env.SEND_EMAILS !== 'true'
 
+// Helper function to send email via Postmark template
+async function sendPostmarkTemplate(templateAlias: string, to: string, templateModel: any, subject?: string) {
+  if (!postmarkClient) {
+    throw new Error('Postmark client not initialized. Check POSTMARK_SERVER_TOKEN.');
+  }
+
+  try {
+    const result = await postmarkClient.sendEmailWithTemplate({
+      TemplateAlias: templateAlias,
+      To: to,
+      From: process.env.EMAIL_FROM || 'info@actingeurope.eu',
+      TemplateModel: templateModel,
+      ...(subject && { Subject: subject })
+    });
+    
+    console.log('Postmark email sent successfully:', result.MessageID);
+    return { success: true, messageId: result.MessageID };
+  } catch (error: any) {
+    console.error('Postmark email failed:', error.message);
+    throw error;
+  }
+}
+
 export async function sendVerificationEmail(email: string, verificationToken: string) {
   const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/verify-email?token=${verificationToken}`
 
-  const emailHtml = await render(VerificationEmail({ verificationUrl }))
+  if (isDevelopment) {
+    console.log("Development mode: Verification email would be sent to:", email, "with URL:", verificationUrl)
+    return { success: true }
+  }
 
+  // Try Postmark template first
+  if (postmarkClient && process.env.POSTMARK_VERIFICATION_TEMPLATE_ALIAS) {
+    try {
+      return await sendPostmarkTemplate(
+        process.env.POSTMARK_VERIFICATION_TEMPLATE_ALIAS,
+        email,
+        {
+          email: email,
+          confirmationUrl: verificationUrl,
+          userName: email.split('@')[0] // Use email prefix as fallback name
+        }
+      );
+    } catch (error) {
+      console.error('Postmark template failed, falling back to SMTP:', error);
+    }
+  }
+
+  // Fallback to SMTP
+  const emailHtml = await render(VerificationEmail({ verificationUrl }))
   const mailOptions = {
     from: process.env.EMAIL_FROM,
     to: email,
     subject: "Verify your email address",
     html: emailHtml,
-  }
-
-  if (isDevelopment) {
-    console.log("Development mode: Email would be sent with:", mailOptions)
-    return { success: true }
   }
 
   try {
@@ -161,18 +207,18 @@ export async function sendReminderEmail(email: string, eventData: any) {
 export async function sendWelcomeEmail(email: string, name?: string) {
   const programUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/program`
 
-  const emailHtml = await render(WelcomeEmail({ name, programUrl }))
+  if (isDevelopment) {
+    console.log("Development mode: Welcome email would be sent to:", email, "with name:", name)
+    return { success: true }
+  }
 
+  // Use SMTP for welcome emails
+  const emailHtml = await render(WelcomeEmail({ name, programUrl }))
   const mailOptions = {
     from: process.env.EMAIL_FROM,
     to: email,
     subject: "Welcome to Acting Europe - Theatre Without Borders",
     html: emailHtml,
-  }
-
-  if (isDevelopment) {
-    console.log("Development mode: Welcome email would be sent with:", mailOptions)
-    return { success: true }
   }
 
   try {

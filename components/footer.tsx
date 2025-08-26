@@ -45,7 +45,7 @@ export default function Footer() {
             <ul className="space-y-2">
               <li className="text-sm text-muted-foreground">Email: info@actingeurope.eu</li>
               <li className="text-sm text-muted-foreground">{t('phone')}: +359 87 696 7588</li>
-              <li className="text-sm text-muted-foreground">{t('address')}: bul. "Bulgaria" 26А, 2500 Kyustendil, Bulgaria</li>
+              <li className="text-sm text-muted-foreground">{t('address')}: {t('addressText')}</li>
             </ul>
           </div>
           <div className="space-y-3">

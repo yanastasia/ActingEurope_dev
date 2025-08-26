@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/lib/language-context"
 import { useAuth } from "@/components/providers/supabase-auth-provider"
-import { Calendar, Clock, MapPin, Ticket, Settings, User, Heart } from "lucide-react"
+import { Calendar, Clock, MapPin, Ticket, Settings, User } from "lucide-react"
 
 interface UserProfile {
   email: string
@@ -48,7 +48,6 @@ export default function ProfilePage() {
     marketingPreferences: false
   })
   const [bookedTickets, setBookedTickets] = useState<BookedTicket[]>([])
-  const [favoritePerformances, setFavoritePerformances] = useState<any[]>([])
   const [activeTab, setActiveTab] = useState("upcoming")
   const [isSaving, setIsSaving] = useState(false)
 
@@ -164,14 +163,7 @@ export default function ProfilePage() {
                   <Clock className="mr-2 h-4 w-4" />
                   {t("past")}
                 </Button>
-                <Button
-                  variant={activeTab === "favorites" ? "default" : "ghost"}
-                  className="w-full justify-start"
-                  onClick={() => setActiveTab("favorites")}
-                >
-                  <Heart className="mr-2 h-4 w-4" />
-                  {t("favoritePerformances")}
-                </Button>
+
                 <Button
                   variant={activeTab === "settings" ? "default" : "ghost"}
                   className="w-full justify-start"
@@ -283,24 +275,7 @@ export default function ProfilePage() {
             </Card>
           )}
 
-          {activeTab === "favorites" && (
-            <Card>
-              <CardHeader>
-                <CardTitle>{t("favoritePerformances")}</CardTitle>
-                <CardDescription>Performances you've marked as favorites</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8">
-                  <Heart className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-medium mb-2">{t("noFavoritesYet")}</h3>
-                  <p className="text-muted-foreground mb-4">{t("noFavoritesYetDesc")}</p>
-                  <Button onClick={() => router.push("/program")}>
-                    {t("browseProgram")}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+
 
           {activeTab === "settings" && (
             <Card>
