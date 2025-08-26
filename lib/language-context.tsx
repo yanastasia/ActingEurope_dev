@@ -151,14 +151,22 @@ const translations = {
     confirmationLinkSentDesc: "We've sent you a confirmation link to verify your account.",
     accountCreatedSuccessfully: "Account created successfully",
     welcomeToActingEurope: "Welcome to Acting Europe – Theatre Without Borders!",
-    signedInSuccessfully: "You have been successfully signed in.",
-    emailRequired: "Email required",
+    signedInSuccessfully: "You have been signed in successfully.",
+    emailRequired: "Email is required",
     enterEmailFirst: "Please enter your email address first.",
-    passwordResetSent: "Password reset sent",
+    passwordResetSent: "Password reset request sent",
     checkEmailPasswordReset: "Check your email for password reset instructions.",
     failedToSendReset: "Failed to send reset email",
     passwordMustBe6Chars: "Password must be at least 6 characters",
     unexpectedError: "An unexpected error occurred",
+
+    // Profile Page
+    profile: "Profile",
+    manageAccountAndBookings: "Manage your account and view your bookings",
+    yourBookedTickets: "Your booked tickets for upcoming events",
+    noPastEvents: "No past events",
+    noAttendedEvents: "You haven't attended any events yet.",
+    saving: "Saving...",
 
     // Email Verification Page
     emailVerification: "Email Verification",
@@ -355,8 +363,6 @@ const translations = {
     failedToLoadArticle: "Failed to load article",
 
     // Profile
-    profile: "Profile",
-    manageAccountAndBookings: "Manage your account and view your bookings",
     settings: "Settings",
     account: "Account",
     upcoming: "Upcoming",
@@ -378,8 +384,6 @@ const translations = {
     calendarIntegration: "Calendar Integration",
     calendarIntegrationDesc: "Add booked performances to your calendar",
     saveChanges: "Save Changes",
-    saving: "Saving...",
-    noPastEvents: "No past events",
     noPastEventsDesc: "You haven't attended any events yet.",
     upcomingEventsDescription: "Your booked tickets for upcoming events",
     pastEventsDescription: "Your previously attended events",
@@ -890,6 +894,10 @@ const translations = {
     passwordMustBe6Chars: "Паролата трябва да бъде поне 6 символа",
     unexpectedError: "Възникна неочаквана грешка",
 
+    // Profile Page
+    yourBookedTickets: "Вашите резервирани билети за предстоящи събития",
+    noAttendedEvents: "Все още не сте посетили никакви събития.",
+
     // Email Verification Page
     emailVerification: "Потвърждение на имейл",
     verifyingEmailAddress: "Потвърждаваме имейл адреса ви...",
@@ -1099,6 +1107,14 @@ const translations = {
     addEvent: "Додај настан",
     eventAddedSuccess: "Настанот е успешно додаден",
 
+    // Profile Page
+    profile: "Профил",
+    manageAccountAndBookings: "Управувајте со вашата сметка и прегледајте ги вашите резервации",
+    yourBookedTickets: "Вашите резервирани билети за претстојни настани",
+    noPastEvents: "Нема минати настани",
+    noAttendedEvents: "Сè уште не сте присуствувале на никакви настани.",
+    saving: "Зачувување...",
+
     // Language
     language: "Јазик",
     english: "Англиски",
@@ -1164,10 +1180,6 @@ const translations = {
     failedToLoadArticle: "Неуспешно вчитување на статијата",
 
     // Profile
-    profile: "Профил",
-    manageAccountAndBookings: "Управувајте со вашата сметка и прегледајте ги вашите резервации",
-    saving: "Се зачувува...",
-    noPastEvents: "Нема минати настани",
     noPastEventsDesc: "Сè уште не сте присуствувале на настани.",
     upcomingEventsDescription: "Вашите претстојни резервации",
     pastEventsDescription: "Вашите претходно посетени настани",
@@ -1799,6 +1811,15 @@ const translations = {
     failedToSendReset: "Неуспешно слање е–маила за ресетовање",
     passwordMustBe6Chars: "Лозинка мора имати најмање 6 карактера",
     unexpectedError: "Догодила се неочекивана грешка",
+
+    // Profile Page
+    profile: "Профил",
+    manageAccountAndBookings: "Управљајте својим налогом и прегледајте своје резервације",
+    yourBookedTickets: "Ваше резервисане карте за предстојеће догађаје",
+    noPastEvents: "Нема прошлих догађаја",
+    noAttendedEvents: "Још увек нисте присуствовали никаквим догађајима.",
+    saving: "Чување...",
+    logout: "Одјава",
 
     // Email Verification Page
     emailVerification: "Потврда е–маила",

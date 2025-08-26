@@ -127,8 +127,8 @@ export default function ProfilePage() {
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-secondary-blue mb-2">Profile</h1>
-        <p className="text-muted-foreground">Manage your account and view your bookings</p>
+        <h1 className="text-3xl font-bold text-secondary-blue mb-2">{t("profile")}</h1>
+        <p className="text-muted-foreground">{t("manageAccountAndBookings")}</p>
       </div>
 
       <div className="grid gap-8 md:grid-cols-3">
@@ -187,7 +187,7 @@ export default function ProfilePage() {
             <Card>
               <CardHeader>
                 <CardTitle>Upcoming {t("performances")}</CardTitle>
-                <CardDescription>Your booked tickets for upcoming events</CardDescription>
+                <CardDescription>{t("yourBookedTickets")}</CardDescription>
               </CardHeader>
               <CardContent>
                 {upcomingTickets.length === 0 ? (
@@ -246,8 +246,8 @@ export default function ProfilePage() {
                 {pastTickets.length === 0 ? (
                   <div className="text-center py-8">
                     <Clock className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-medium mb-2">No past events</h3>
-                    <p className="text-muted-foreground">You haven't attended any events yet.</p>
+                    <h3 className="text-lg font-medium mb-2">{t("noPastEvents")}</h3>
+                    <p className="text-muted-foreground">{t("noAttendedEvents")}</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -288,32 +288,32 @@ export default function ProfilePage() {
                   <h3 className="text-lg font-medium mb-4">{t("personalInformation")}</h3>
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">
-                      <Label htmlFor="firstName">First Name</Label>
+                      <Label htmlFor="firstName">{t.firstName}</Label>
                       <Input
                         id="firstName"
                         value={profile.firstName}
-                        onChange={(e) => setProfile(prev => ({ ...prev, firstName: e.target.value }))}
+                        onChange={(e) => setProfile({ ...profile, firstName: e.target.value })}
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="lastName">Last Name</Label>
+                      <Label htmlFor="lastName">{t.lastName}</Label>
                       <Input
                         id="lastName"
                         value={profile.lastName}
-                        onChange={(e) => setProfile(prev => ({ ...prev, lastName: e.target.value }))}
+                        onChange={(e) => setProfile({ ...profile, lastName: e.target.value })}
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
+                      <Label htmlFor="email">{t.email}</Label>
                       <Input
                         id="email"
                         type="email"
                         value={profile.email}
-                        disabled
+                        onChange={(e) => setProfile({ ...profile, email: e.target.value })}
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="phone">Phone</Label>
+                      <Label htmlFor="phone">{t.phone}</Label>
                       <Input
                         id="phone"
                         value={profile.phone}
@@ -360,7 +360,7 @@ export default function ProfilePage() {
                 </div>
 
                 <Button onClick={handleSaveProfile} disabled={isSaving}>
-                  {isSaving ? "Saving..." : t("saveChanges")}
+                  {isSaving ? t("saving") : t("saveChanges")}
                 </Button>
               </CardContent>
             </Card>
