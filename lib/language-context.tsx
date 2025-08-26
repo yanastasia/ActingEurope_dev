@@ -1813,13 +1813,8 @@ const translations = {
     unexpectedError: "Догодила се неочекивана грешка",
 
     // Profile Page
-    profile: "Профил",
-    manageAccountAndBookings: "Управљајте својим налогом и прегледајте своје резервације",
     yourBookedTickets: "Ваше резервисане карте за предстојеће догађаје",
-    noPastEvents: "Нема прошлих догађаја",
     noAttendedEvents: "Још увек нисте присуствовали никаквим догађајима.",
-    saving: "Чување...",
-    logout: "Одјава",
 
     // Email Verification Page
     emailVerification: "Потврда е–маила",
