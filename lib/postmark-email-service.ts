@@ -35,9 +35,16 @@ async function sendTemplateEmail(templateData: {
 
   try {
     const emailData: any = {
-      TemplateId: templateId,
+      From: process.env.EMAIL_FROM || "noreply@actingeurope.eu",
       To: to,
       TemplateModel: templateModel,
+    }
+
+    // Use TemplateAlias if templateId is a string, otherwise use TemplateId
+    if (typeof templateId === 'string') {
+      emailData.TemplateAlias = templateId
+    } else {
+      emailData.TemplateId = templateId
     }
 
     if (attachments && attachments.length > 0) {
@@ -106,8 +113,49 @@ export async function sendVerificationEmail(email: string, verificationToken: st
   })
 }
 
-// Note: Only verification emails use Postmark templates
-// Other email types (welcome, ticket, reminder, contact) use SMTP through email-service.ts
+// Send ticket email with PDF attachment using Postmark template
+export async function sendTicketEmailWithTemplate(ticketData: {
+  email: string
+  userName: string
+  eventTitle: string
+  eventDate: string
+  eventTime: string
+  venue: string
+  seats: string
+  bookingReference: string
+}) {
+  // Generate PDF ticket
+  const pdfBuffer = await generatePDF(ticketData)
+  
+  // Convert PDF buffer to base64 for Postmark attachment
+  const pdfBase64 = pdfBuffer.toString('base64')
+  
+  const templateAlias = process.env.POSTMARK_TICKET_TEMPLATE_ALIAS || 'ticket-delivery-acting-europe'
+  
+  return await sendTemplateEmail({
+    templateId: templateAlias,
+    to: ticketData.email,
+    templateModel: {
+      userName: ticketData.userName,
+      eventTitle: ticketData.eventTitle,
+      eventDate: ticketData.eventDate,
+      eventTime: ticketData.eventTime,
+      venue: ticketData.venue,
+      seats: ticketData.seats,
+      bookingReference: ticketData.bookingReference
+    },
+    attachments: [
+      {
+        name: `ticket-${ticketData.bookingReference}.pdf`,
+        content: pdfBase64,
+        contentType: 'application/pdf'
+      }
+    ]
+  })
+}
+
+// Note: Verification and ticket emails use Postmark templates
+// Other email types (welcome, reminder, contact) use SMTP through email-service.ts
 
 // Export a function to test Postmark configuration
 export async function testPostmarkConnection() {
