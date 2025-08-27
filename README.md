@@ -75,7 +75,7 @@ Acting Europe is a modern web application designed to connect theatre enthusiast
 - **Runtime**: Node.js with Next.js API routes
 - **Database**: PostgreSQL with Prisma ORM 6.10.1
 - **Authentication**: Supabase authentication with SSR-compatible session management
-- **Email Service**: Nodemailer for transactional emails
+- **Email Service**: Postmark for email verification with template support, Nodemailer for other transactional emails
 - **PDF Generation**: PDFKit for ticket generation
 - **File Handling**: Next.js built-in file upload
 - **Data Synchronization**: Automated performance data sync between development and production
@@ -95,6 +95,13 @@ Acting Europe is a modern web application designed to connect theatre enthusiast
 
 ## 📁 Project Structure
 
+```
+├── tests/                        # Organized test files
+│   ├── email/                   # Email and Postmark integration tests
+│   ├── database/                # Database operations tests
+│   ├── data/                    # Data validation tests
+│   ├── general/                 # General functionality tests
+│   └── README.md                # Test documentation
 ```
 ActingEurope_dev/
 ├── app/                          # Next.js App Router
@@ -271,6 +278,17 @@ ActingEurope_dev/
 - **Railway**: Simple deployment with PostgreSQL
 - **DigitalOcean App Platform**: Container-based deployment
 - **Self-hosted**: Docker containerization available
+
+## 📚 Documentation
+
+Comprehensive guides are available for different aspects of the application:
+
+- **[Database Integration Guide](DATABASE_INTEGRATION_GUIDE.md)** - Content management and database operations
+- **[Database and Build Guide](DATABASE_AND_BUILD_GUIDE.md)** - Setup and deployment instructions
+- **[Postmark Integration Guide](POSTMARK_INTEGRATION_GUIDE.md)** - Email verification setup and configuration
+- **[SMTP Testing Guide](SMTP_TESTING_GUIDE.md)** - Email service testing and troubleshooting
+- **[Test Documentation](tests/README.md)** - Organized test files and usage instructions
+- **[Changelog](CHANGELOG.md)** - Version history and recent updates
 
 ## 📊 Database Schema
 

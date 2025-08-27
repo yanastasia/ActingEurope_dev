@@ -2,9 +2,26 @@
 
 All notable changes to the Acting Europe project will be documented in this file.
 
-## [Latest] - 2024-12-XX
+## [Latest] - 2025-01-XX
 
 ### Added
+
+#### Email System Improvements
+- **Postmark Integration**: Implemented Postmark email service for verification emails
+  - Custom email verification service with template support
+  - Proper template variable mapping (userName, confirmationUrl)
+  - Development mode support with email logging
+  - Fallback to Nodemailer for other email types
+  - Environment configuration for POSTMARK_SERVER_TOKEN and template aliases
+
+#### Test Organization
+- **Structured Test Directory**: Organized all test files into categorized subdirectories
+  - `/tests/email/` - Email functionality and Postmark integration tests
+  - `/tests/database/` - Database operations and integrity tests
+  - `/tests/data/` - Data validation and content verification tests
+  - `/tests/general/` - Miscellaneous tests and utilities
+  - Comprehensive README documentation for test organization
+  - Maintained all original test functionality while improving organization
 
 #### Ticket Reservation Improvements
 - **Simplified Reservation Form**: Removed email field requirement from ticket reservation

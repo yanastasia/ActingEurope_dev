@@ -57,21 +57,55 @@ After updating your credentials:
 
 ```bash
 # Run the SMTP test
-node test-smtp.js
+node tests/email/test-smtp.js
 ```
 
 ### 4. Test Email Service Functions
 
 ```bash
 # Test your actual email service
-node test-email-service.js
+node tests/email/test-email-service.js
+
+# Test Postmark email delivery
+node tests/email/test-email-delivery.js
+
+# Test complete signup flow
+node tests/email/test-signup-flow.js
 ```
 
 **Note**: Your email service has `isDevelopment = true`, which means emails are logged but not sent. To actually send emails:
 
-1. Open `lib/email-service.ts`
-2. Change `const isDevelopment = true` to `const isDevelopment = false`
+1. Set `SEND_EMAILS=true` in your `.env` file
+2. Or change `NODE_ENV` to `production`
 3. Run the test again
+
+## Postmark Integration
+
+The application now uses **Postmark for email verification** and **Nodemailer for other emails**.
+
+### Postmark Configuration
+
+Add these environment variables to your `.env` file:
+
+```env
+# Postmark Configuration
+POSTMARK_SERVER_TOKEN="your-postmark-server-token"
+POSTMARK_VERIFICATION_TEMPLATE_ALIAS="confirm-sign-up-for-acting-eur"
+SEND_EMAILS="true"
+```
+
+### Test Postmark Integration
+
+```bash
+# Check Postmark template configuration
+node tests/email/check-postmark-template.js
+
+# Test direct Postmark email delivery
+node tests/email/test-email-delivery.js
+
+# Test complete signup flow with Postmark
+node tests/email/test-signup-flow.js
+```
 
 ## Alternative SMTP Providers
 

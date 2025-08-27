@@ -48,12 +48,20 @@ This guide covers the complete workflow for setting up, building, and running th
    PORT=3000
    NEXT_PUBLIC_APP_URL="http://localhost:3000"
    
-   # Email Configuration (Optional)
+   # Email Configuration
+   # Postmark (for email verification)
+   POSTMARK_SERVER_TOKEN="your-postmark-server-token"
+   POSTMARK_VERIFICATION_TEMPLATE_ALIAS="confirm-sign-up-for-acting-eur"
+   
+   # SMTP (for other emails)
    EMAIL_SERVER_HOST="smtp.postmarkapp.com"
    EMAIL_SERVER_PORT="587"
    EMAIL_SERVER_USER="your-email-user"
    EMAIL_SERVER_PASSWORD="your-email-password"
    EMAIL_FROM="Your App <noreply@yourdomain.com>"
+   
+   # Email Control
+   SEND_EMAILS="true"
    
    # Security
    JWT_SECRET="your-secure-jwt-secret"

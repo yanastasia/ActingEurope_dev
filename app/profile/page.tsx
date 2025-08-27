@@ -177,7 +177,7 @@ export default function ProfilePage() {
           </Card>
 
           <Button onClick={handleLogout} variant="outline" className="w-full">
-            Logout
+            {t("logout")}
           </Button>
         </div>
 
@@ -186,8 +186,8 @@ export default function ProfilePage() {
           {activeTab === "upcoming" && (
             <Card>
               <CardHeader>
-                <CardTitle>Upcoming {t("performances")}</CardTitle>
-                <CardDescription>{t("yourBookedTickets")}</CardDescription>
+                <CardTitle>{t("upcoming")} {t("performances")}</CardTitle>
+                <CardDescription>{t("upcomingEventsDescription")}</CardDescription>
               </CardHeader>
               <CardContent>
                 {upcomingTickets.length === 0 ? (
@@ -239,8 +239,8 @@ export default function ProfilePage() {
           {activeTab === "past" && (
             <Card>
               <CardHeader>
-                <CardTitle>Past {t("performances")}</CardTitle>
-                <CardDescription>Your previously attended events</CardDescription>
+                <CardTitle>{t("past")} {t("performances")}</CardTitle>
+                <CardDescription>{t("pastEventsDescription")}</CardDescription>
               </CardHeader>
               <CardContent>
                 {pastTickets.length === 0 ? (
@@ -288,7 +288,7 @@ export default function ProfilePage() {
                   <h3 className="text-lg font-medium mb-4">{t("personalInformation")}</h3>
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">
-                      <Label htmlFor="firstName">{t.firstName}</Label>
+                      <Label htmlFor="firstName">{t("firstName")}</Label>
                       <Input
                         id="firstName"
                         value={profile.firstName}
@@ -296,7 +296,7 @@ export default function ProfilePage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="lastName">{t.lastName}</Label>
+                      <Label htmlFor="lastName">{t("lastName")}</Label>
                       <Input
                         id="lastName"
                         value={profile.lastName}
@@ -304,7 +304,7 @@ export default function ProfilePage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="email">{t.email}</Label>
+                      <Label htmlFor="email">{t("email")}</Label>
                       <Input
                         id="email"
                         type="email"
@@ -313,7 +313,7 @@ export default function ProfilePage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="phone">{t.phone}</Label>
+                      <Label htmlFor="phone">{t("phone")}</Label>
                       <Input
                         id="phone"
                         value={profile.phone}

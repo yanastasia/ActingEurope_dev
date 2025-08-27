@@ -8,7 +8,7 @@ async function sendTestVerificationEmail() {
   console.log('📧 Sending test verification email...');
   
   // CHANGE THIS TO YOUR EMAIL ADDRESS
-  const testEmail = 'your-email@example.com'; // ⚠️ UPDATE THIS!
+  const testEmail = 'jakimanastasija@gmail.com'; // ⚠️ UPDATE THIS!
   
   if (testEmail === 'your-email@example.com') {
     console.log('❌ Please update the testEmail variable with your actual email address!');
