@@ -18,7 +18,7 @@ async function testEmailDelivery() {
   console.log('- Template Alias:', process.env.POSTMARK_VERIFICATION_TEMPLATE_ALIAS || 'confirm-signup')
   console.log('')
   
-  const testEmail = 'jakimanastasija@gmail.com'
+  const testEmail = 'janastasija17@gmail.com'
   const testPassword = 'testpassword123'
   const userMetadata = {
     first_name: 'Anastasija',
