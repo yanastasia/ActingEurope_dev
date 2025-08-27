@@ -71,7 +71,7 @@ async function sendVerificationEmail(email: string, password: string, userMetada
   }
 
   const confirmationUrl = data.properties.action_link;
-  const templateAlias = process.env.POSTMARK_VERIFICATION_TEMPLATE_ALIAS || 'confirm-signup'
+  const templateAlias = process.env.POSTMARK_VERIFICATION_TEMPLATE_ALIAS || 'confirm-sign-up-for-acting-eur'
   
   await client.sendEmailWithTemplate({
     TemplateAlias: templateAlias,
