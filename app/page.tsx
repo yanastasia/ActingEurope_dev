@@ -64,7 +64,7 @@ export default function Home() {
           type: "performance",
           synopsis: event.synopsis,
           director: event.director,
-          cast: event.cast
+          cast: event.cast ? (Array.isArray(event.cast) ? event.cast : event.cast.split(',').map((c: string) => c.trim())) : []
         }));
 
         // Create hero slide
@@ -335,7 +335,7 @@ export default function Home() {
       <section className="py-12 md:py-16">
         <div className="container mx-auto px-4">
           <h2 className="mb-12 text-center text-3xl font-bold text-secondary-blue">{t("ourPartners")}</h2>
-          <div className="flex items-center justify-center gap-8 overflow-x-auto w-full">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 md:gap-8 items-center justify-items-center">
             {[1, 2, 3, 4, 5].map((i) => {
               const partnerImages = ['ec.png', 'Kyustendil_logo.png', 'SAB_logo_site_2017-500x500.png', 'bgnmk.png', 'bgrs.png'];
               const partnerLinks = [
@@ -346,8 +346,8 @@ export default function Home() {
                 'https://ipa-bgrs.mrrb.bg/en'
               ];
               return (
-                <Link key={i} href={partnerLinks[i-1]} target="_blank" rel="noopener noreferrer">
-                  <div className="h-24 w-48 grayscale transition-all hover:grayscale-0">
+                <Link key={i} href={partnerLinks[i-1]} target="_blank" rel="noopener noreferrer" className="block">
+                  <div className="h-16 w-32 sm:h-20 sm:w-40 md:h-24 md:w-48 grayscale transition-all hover:grayscale-0 hover:scale-105">
                     <Image
                       src={`/${partnerImages[i-1]}`}
                       alt={`Partner ${i}`}

@@ -1,9 +1,10 @@
 import Link from "next/link"
-import { Calendar, Clock, MapPin } from "lucide-react"
+import { Calendar, Clock, MapPin, User, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import Image from "next/image"
+import { useLanguage } from "@/lib/language-context"
 
 interface PerformanceCardProps {
   id: string
@@ -17,6 +18,10 @@ interface PerformanceCardProps {
   language: string
   duration: string
   featured?: boolean
+  synopsis?: string
+  director?: string
+  cast?: string[]
+  price?: number
 }
 
 export default function PerformanceCard({
@@ -31,7 +36,12 @@ export default function PerformanceCard({
   language,
   duration,
   featured = false,
+  synopsis,
+  director,
+  cast,
+  price,
 }: PerformanceCardProps) {
+  const { t } = useLanguage()
 
   return (
     <Card className={`overflow-hidden transition-all hover:shadow-md ${featured ? "border-primary-gold/50" : ""}`}>
@@ -47,7 +57,7 @@ export default function PerformanceCard({
       <CardHeader className="p-4">
         <CardTitle className="line-clamp-1 text-xl text-secondary-blue">{title}</CardTitle>
         <p className="text-sm font-medium text-muted-foreground">
-          {Array.isArray(company) ? company.join(' & ') : company}
+          {Array.isArray(company) ? company.map((comp: string) => t(comp) || comp).join(' & ') : (t(company) || company)}
         </p>
       </CardHeader>
       <CardContent className="p-4 pt-0">
@@ -73,16 +83,24 @@ export default function PerformanceCard({
           </div>
           <div className="flex items-center gap-2">
             <MapPin className="h-4 w-4 text-primary-gold" />
-            <span>{venue}</span>
+            <span>{t(venue) || venue}</span>
           </div>
+
         </div>
+        {synopsis && (
+          <div className="mt-3 pt-3 border-t border-muted">
+            <p className="text-xs text-muted-foreground line-clamp-2">
+              {synopsis}
+            </p>
+          </div>
+        )}
       </CardContent>
       <CardFooter className="flex justify-between p-4 pt-0">
         <Link href={`/performances/${id}`}>
-          <Button variant="outline">Details</Button>
+          <Button variant="outline">{t('details')}</Button>
         </Link>
-        <Link href={`/tickets?performance=${id}`}>
-          <Button>Book Ticket</Button>
+        <Link href={`/events/${id.replace('performance-', '')}/seats`}>
+          <Button className="bg-primary-gold hover:bg-primary-gold/90">{t('bookTicket')}</Button>
         </Link>
       </CardFooter>
     </Card>

@@ -104,12 +104,13 @@ export default function Navigation() {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="pr-0">
-            <Link href="/" className="flex items-center" onClick={() => setIsOpen(false)}>
+            <Link href="/" className="flex items-center justify-center mb-4" onClick={() => setIsOpen(false)}>
             <Image
               src="/logo.png"
               alt="Acting Europe logo"
-              width={100}
-              height={100}
+              width={140}
+              height={140}
+              className="h-16 w-auto"
             />
             </Link>
             <nav className="mt-8 flex flex-col space-y-3">
@@ -132,7 +133,7 @@ export default function Navigation() {
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
           <div className="w-full flex-1 md:w-auto md:flex-none">
             <Link href="/" className="mr-6 flex items-center space-x-2 md:hidden">
-              <Image src="/logo.png" alt="Acting Europe Logo" width={140} height={32} className="h-8 w-auto" />
+              <Image src="/logo.png" alt="Acting Europe Logo" width={160} height={40} className="h-10 w-auto" />
             </Link>
           </div>
           <nav className="flex items-center gap-2">

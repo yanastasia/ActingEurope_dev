@@ -205,7 +205,7 @@ export default function PerformancePage({ params }: PerformancePageProps) {
               </h3>
               <div className="flex flex-wrap gap-2">
                 {event.cast.map((actor: string, index: number) => (
-                  <Badge key={index} variant="secondary">
+                  <Badge key={index} className="bg-secondary">
                     {actor}
                   </Badge>
                 ))}
@@ -225,7 +225,7 @@ export default function PerformancePage({ params }: PerformancePageProps) {
               <h3 className="text-xl font-semibold mb-3">{t('company')}</h3>
               <div className="flex flex-wrap gap-2">
                 {event.company.map((comp: string, index: number) => (
-                  <Badge key={index} variant="outline">
+                  <Badge key={index}>
                     {t(comp) || comp}
                   </Badge>
                 ))}
@@ -301,7 +301,7 @@ export default function PerformancePage({ params }: PerformancePageProps) {
               {event.genre && (
                 <div>
                   <p className="text-sm text-gray-600 mb-1">{t('genre')}</p>
-                  <Badge variant="secondary">{event.genre}</Badge>
+                  <Badge className="bg-secondary">{event.genre}</Badge>
                 </div>
               )}
 
@@ -312,7 +312,7 @@ export default function PerformancePage({ params }: PerformancePageProps) {
                   {event.price} {t('currency')}
                 </p>
                 <Button asChild className="w-full">
-                  <Link href={`/${resolvedParams.lang}/ticket-reservation?event=${event.id}`}>
+                  <Link href={`/${resolvedParams.lang}/events/${event.id}/seat-selection`}>
                     {t('bookTickets')}
                   </Link>
                 </Button>
