@@ -13,6 +13,15 @@ import Image from "next/image"
 import Link from "next/link"
 import { Language } from "@/lib/language-context"
 
+// Helper function to fix company names
+const fixCompanyName = (name: string): string => {
+  return name
+    .replace(/OSAIK "39 Monkeys"/g, 'OCAAC "36 Monkeys"')
+    .replace(/ОСАИК "39 Маймуни"/g, 'ОСАИК „36 Маймуни"')
+    .replace(/ОСАИК "39 Мајмуни"/g, 'ОСАУК „36 Мајмуни"')
+    .replace(/ОСАУК "39 мајмуна"/g, 'ОСАУК „36 мајмуна"')
+}
+
 interface Performance {
   id: string
   title: string
@@ -176,10 +185,10 @@ export default function PerformancesPage({ params }: PerformancesPageProps) {
                 </div>
                 <CardDescription>
                   {performance.theatreName 
-                    ? (t(performance.theatreName) || performance.theatreName)
+                    ? fixCompanyName(t(performance.theatreName) || performance.theatreName)
                     : (Array.isArray(performance.company) 
-                      ? performance.company.join(' & ') 
-                      : performance.company)}
+                      ? fixCompanyName(performance.company.join(' & ')) 
+                      : fixCompanyName(performance.company))}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -204,7 +213,7 @@ export default function PerformancesPage({ params }: PerformancesPageProps) {
                     </Link>
                   </Button>
                   <Button variant="outline" asChild>
-                    <Link href={`/${params.lang}/ticket-reservation`}>
+                    <Link href="/tickets-coming-soon">
                       {t('bookTickets')}
                     </Link>
                   </Button>

@@ -11,12 +11,39 @@ import PerformanceCard from "@/components/performance-card"
 import { useLanguage } from "@/lib/language-context"
 // Removed static import - now using API
 
+// Helper function to fix company names
+const fixCompanyName = (name: string): string => {
+  return name
+    .replace(/OSAIK "39 Monkeys"/g, 'OCAAC "36 Monkeys"')
+    .replace(/ОСАИК "39 Маймуни"/g, 'ОСАИК „36 Маймуни"')
+    .replace(/ОСАИК "39 Мајмуни"/g, 'ОСАУК „36 Мајмуни"')
+    .replace(/ОСАУК "39 мајмуна"/g, 'ОСАУК „36 мајмуна"')
+}
+
 export default function Home() {
   const { t, language } = useLanguage()
   const [featuredPerformance, setFeaturedPerformance] = useState<any | null>(null)
   const [featuredPerformances, setFeaturedPerformances] = useState<any[]>([])
   const [allSlides, setAllSlides] = useState<any[]>([])
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [events, setEvents] = useState<any[]>([])
+
+  // Function to generate booking URL - always use English version for translation groups
+  const getBookingUrl = (event: any) => {
+    // If event has a translation group, find the English version
+    if (event.translationGroup) {
+      const englishEvent = events.find((e: any) => 
+        e.translationGroup === event.translationGroup && 
+        e.contentLanguage === 'en'
+      )
+      if (englishEvent) {
+        return `/events/${englishEvent.id}/seat-selection`
+      }
+    }
+    // Extract original ID from formatted ID (remove 'performance-' prefix)
+    const originalId = event.id.replace('performance-', '')
+    return `/events/${originalId}/seat-selection`
+  }
 
   // Auto-advance slider functionality
   useEffect(() => {
@@ -46,6 +73,7 @@ export default function Home() {
           throw new Error('Failed to fetch events')
         }
         const events = await response.json()
+        setEvents(events) // Store original events for translation group lookup
         
         // Format events for the frontend
         const formattedPerformances = events.map((event: any) => ({
@@ -200,7 +228,7 @@ export default function Home() {
                                   className="bg-secondary-blue border-2 border-white text-white hover:bg-secondary-blue/90 font-semibold px-8 py-3 transform transition-transform hover:scale-105"
                                   asChild
                                 >
-                                  <Link href="/ticket-reservation">{t("bookTickets")}</Link>
+                                  <Link href="/tickets-coming-soon">{t("bookTickets")}</Link>
                                 </Button>
                               </div>
                             </div>
@@ -208,7 +236,7 @@ export default function Home() {
                             <div>
                               <h1 className="mb-4 text-4xl font-bold md:text-6xl">{slide.title}</h1>
                               <h2 className="mb-6 text-xl font-medium text-primary-gold md:text-2xl">
-                                {slide.company ? (Array.isArray(slide.company) ? slide.company.map((comp: string) => t(comp) || comp).join(' & ') : (t(slide.company) || slide.company)) : "Acting Europe Festival"}
+                                {slide.company ? (Array.isArray(slide.company) ? slide.company.map((comp: string) => fixCompanyName(t(comp) || comp)).join(' & ') : fixCompanyName(t(slide.company) || slide.company)) : "Acting Europe Festival"}
                               </h2>
                               <div className="mb-8 space-y-2">
                                 <p className="text-lg text-white/90">{slide.date} • {slide.time}</p>
@@ -288,7 +316,7 @@ export default function Home() {
           <div className="grid gap-6 md:grid-cols-3">
             <QuickLinkCard title={t("latestNews")} href="/news" icon={Newspaper} description={t("latestNewsDesc")} />
             <QuickLinkCard title={t("program")} href="/program" icon={Calendar} description={t("programDesc")} />
-            <QuickLinkCard title={t("bookTickets")} href="/ticket-reservation" icon={Ticket} description={t("bookTicketsDesc")} />
+            <QuickLinkCard title={t("bookTickets")} href="/tickets-coming-soon" icon={Ticket} description={t("bookTicketsDesc")} />
           </div>
         </div>
       </section>

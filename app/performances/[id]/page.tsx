@@ -40,6 +40,15 @@ export default function PerformancePage({ params }: { params: Promise<{ id: stri
   const [loading, setLoading] = useState(true)
   const [id, setId] = useState<string>('')
 
+  // Helper function to fix company names
+  const fixCompanyName = (name: string): string => {
+    return name
+      .replace(/OSAIK "39 Monkeys"/g, 'OCAAC "36 Monkeys"')
+      .replace(/ОСАИК "39 Маймуни"/g, 'ОСАИК „36 Маймуни"')
+      .replace(/ОСАИК "39 Мајмуни"/g, 'ОСАУК „36 Мајмуни"')
+      .replace(/ОСАУК "39 мајмуна"/g, 'ОСАУК „36 мајмуна"')
+  }
+
   useEffect(() => {
     const getParams = async () => {
       const resolvedParams = await params
@@ -129,7 +138,7 @@ export default function PerformancePage({ params }: { params: Promise<{ id: stri
 
           <h1 className="mb-2 text-3xl font-bold text-secondary-blue md:text-4xl">{performance.title}</h1>
           <p className="mb-4 text-xl text-muted-foreground">
-            {t(performance.theatreName) || performance.theatreName || (Array.isArray(performance.company) ? performance.company.map((comp: string) => t(comp) || comp).join(' & ') : (t(performance.company) || performance.company))}
+            {fixCompanyName(t(performance.theatreName) || performance.theatreName || (Array.isArray(performance.company) ? performance.company.map((comp: string) => fixCompanyName(t(comp) || comp)).join(' & ') : fixCompanyName(t(performance.company) || performance.company)))}
           </p>
 
           <div className="mb-6 flex flex-wrap gap-2">
@@ -241,7 +250,7 @@ export default function PerformancePage({ params }: { params: Promise<{ id: stri
 
             <div className="space-y-4">
               <Button className="w-full" size="lg" asChild>
-                <Link href={`/events/${performance.id}/seat-selection`}>{t('bookTicket')}</Link>
+                <Link href="/tickets-coming-soon">{t('bookTicket')}</Link>
               </Button>
             </div>
 

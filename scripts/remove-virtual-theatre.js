@@ -71,7 +71,7 @@ async function removeVirtualTheatre() {
     }
 
     console.log('\n🎉 Successfully removed all virtual theatre entries!');
-    console.log('Virtual performances are now handled through the new virtual-performance system.');
+    console.log('Virtual theatre entries have been cleaned up from the database.');
 
   } catch (error) {
     console.error('❌ Error removing virtual theatre:', error);

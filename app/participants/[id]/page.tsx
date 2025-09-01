@@ -8,6 +8,15 @@ import { Separator } from "@/components/ui/separator"
 import { getTheatreById } from "@/lib/database"
 import { notFound } from "next/navigation"
 
+// Helper function to fix company names
+const fixCompanyName = (name: string): string => {
+  return name
+    .replace(/OSAIK "39 Monkeys"/g, 'OSAIK "36 Monkeys"')
+    .replace(/ОСАИК "39 Маймуни"/g, 'ОСАИК "36 Маймуни"')
+    .replace(/ОСАИК "39 Мајмуни"/g, 'ОСАИК "36 Мајмуни"')
+    .replace(/ОСАИК "39 Мајмуна"/g, 'ОСАИК "36 Мајмуна"');
+};
+
 export default async function TheatrePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const theatre = await getTheatreById(Number.parseInt(id))
@@ -53,7 +62,7 @@ export default async function TheatrePage({ params }: { params: Promise<{ id: st
 
           {/* Theatre Info */}
           <div className="mb-8">
-            <h1 className="mb-4 text-3xl font-bold text-secondary-blue md:text-4xl">{theatre.name}</h1>
+            <h1 className="mb-4 text-3xl font-bold text-secondary-blue md:text-4xl">{fixCompanyName(theatre.name)}</h1>
             <div className="mb-4 flex flex-wrap gap-4 text-muted-foreground">
               <div className="flex items-center gap-1">
                 <MapPin className="h-4 w-4" />
@@ -172,7 +181,7 @@ export default async function TheatrePage({ params }: { params: Promise<{ id: st
                   <Link href="/program">View Festival Program</Link>
                 </Button>
                 <Button variant="outline" className="w-full" asChild>
-                  <Link href="/ticket-reservation">Book Tickets</Link>
+                  <Link href="/tickets-coming-soon">Book Tickets</Link>
                 </Button>
               </div>
             </CardContent>

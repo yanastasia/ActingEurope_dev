@@ -84,6 +84,15 @@ export default function PerformancesPage() {
   const genres = [...new Set(performances.map(p => p.genre))]
   const venues = [...new Set(performances.map(p => p.venue))]
 
+  // Helper function to fix company names
+  const fixCompanyName = (name: string): string => {
+    return name
+      .replace(/OSAIK "39 Monkeys"/g, 'OSAIK "36 Monkeys"')
+      .replace(/ОСАИК "39 Маймуни"/g, 'ОСАИК "36 Маймуни"')
+      .replace(/ОСАИК "39 Мајмуни"/g, 'ОСАИК "36 Мајмуни"')
+      .replace(/ОСАИК "39 Мајмуна"/g, 'ОСАИК "36 Мајмуна"')
+  }
+
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-12">
@@ -175,8 +184,8 @@ export default function PerformancesPage() {
                   {performance.theatreName 
                     ? (t(performance.theatreName) || performance.theatreName)
                     : (Array.isArray(performance.company) 
-                      ? performance.company.join(' & ') 
-                      : performance.company)}
+                      ? performance.company.map(comp => fixCompanyName(t(comp) || comp)).join(' & ') 
+                      : fixCompanyName(t(performance.company) || performance.company))}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -201,7 +210,7 @@ export default function PerformancesPage() {
                     </Link>
                   </Button>
                   <Button variant="outline" asChild>
-                    <Link href="/ticket-reservation">
+                    <Link href="/tickets-coming-soon">
                       Book Tickets
                     </Link>
                   </Button>
