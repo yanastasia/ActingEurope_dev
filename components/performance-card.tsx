@@ -22,6 +22,8 @@ interface PerformanceCardProps {
   director?: string
   cast?: string[]
   price?: number
+  translationGroup?: string
+  originalId?: string
 }
 
 export default function PerformanceCard({
@@ -40,8 +42,25 @@ export default function PerformanceCard({
   director,
   cast,
   price,
+  translationGroup,
+  originalId,
 }: PerformanceCardProps) {
   const { t } = useLanguage()
+
+  // Helper function to fix company names
+  const fixCompanyName = (companyName: string) => {
+    return companyName
+      .replace(/OSAIK "39 Monkeys"/g, 'OSAIK "36 Monkeys"')
+      .replace(/ОСАИК "39 Маймуни"/g, 'ОСАИК "36 Маймуни"')
+      .replace(/ОСАИК "39 Мајмуни"/g, 'ОСАИК "36 Мајмуни"')
+      .replace(/ОСАИК "39 Мајмуна"/g, 'ОСАИК "36 Мајмуна"')
+  }
+
+  const getBookingUrl = () => {
+    // Use originalId if available, otherwise use the current id
+    const eventId = originalId || id
+    return `/events/${eventId}/seat-selection`
+  }
 
   return (
     <Card className={`overflow-hidden transition-all hover:shadow-md ${featured ? "border-primary-gold/50" : ""}`}>
@@ -57,7 +76,7 @@ export default function PerformanceCard({
       <CardHeader className="p-4">
         <CardTitle className="line-clamp-1 text-xl text-secondary-blue">{title}</CardTitle>
         <p className="text-sm font-medium text-muted-foreground">
-          {Array.isArray(company) ? company.map((comp: string) => t(comp) || comp).join(' & ') : (t(company) || company)}
+          {Array.isArray(company) ? company.map((comp: string) => fixCompanyName(t(comp) || comp)).join(' & ') : fixCompanyName(t(company) || company)}
         </p>
       </CardHeader>
       <CardContent className="p-4 pt-0">
@@ -99,7 +118,7 @@ export default function PerformanceCard({
         <Link href={`/performances/${id}`}>
           <Button variant="outline">{t('details')}</Button>
         </Link>
-        <Link href={`/events/${id.replace('performance-', '')}/seats`}>
+        <Link href={getBookingUrl()}>
           <Button className="bg-primary-gold hover:bg-primary-gold/90">{t('bookTicket')}</Button>
         </Link>
       </CardFooter>

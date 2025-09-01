@@ -43,15 +43,13 @@ interface EventData {
 interface Event {
   id: number
   title: string
-  event_date: string
-  event_time: string
-  price: number
-  venue: {
-    name: string
-  }
-  theatre: {
-    name: string
-  }
+  date: string
+  time: string
+  price: string
+  venue: string
+  theatreName: string
+  theatreCity: string
+  theatreCountry: string
 }
 
 export default function SeatSelectionPage() {
@@ -73,8 +71,11 @@ export default function SeatSelectionPage() {
 
   const fetchEventAndSeats = async () => {
     try {
-      // Fetch seat data
+      setLoading(true)
+      
+      // Fetch seats data
       const seatsResponse = await fetch(`/api/events/${params.id}/seats`)
+      
       if (seatsResponse.ok) {
         const seatsData = await seatsResponse.json()
         setEventData(seatsData)
@@ -82,6 +83,7 @@ export default function SeatSelectionPage() {
 
       // Fetch event details
       const eventResponse = await fetch(`/api/events/${params.id}`)
+      
       if (eventResponse.ok) {
         const eventDetails = await eventResponse.json()
         setEvent(eventDetails)
@@ -95,7 +97,6 @@ export default function SeatSelectionPage() {
         })
       }
     } catch (error) {
-      console.error('Error fetching event:', error)
       toast({
         title: "Error",
         description: "Failed to load event details",
@@ -172,7 +173,6 @@ export default function SeatSelectionPage() {
         })
       }
     } catch (error) {
-      console.error('Error making reservation:', error)
       toast({
         title: "Error",
         description: "Failed to reserve seats",
@@ -210,7 +210,15 @@ export default function SeatSelectionPage() {
     )
   }
 
-  const totalPrice = selectedSeats.length * event.price
+  // Helper function to extract numeric price from string
+  const getPriceValue = (priceString: string): number => {
+    if (priceString === 'Free' || priceString === 'TBA') return 0
+    // Extract number from string like "€25" or "25"
+    const match = priceString.match(/\d+(\.\d+)?/)
+    return match ? parseFloat(match[0]) : 0
+  }
+
+  const totalPrice = selectedSeats.length * getPriceValue(event.price)
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -230,21 +238,21 @@ export default function SeatSelectionPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-xl">{event.title}</CardTitle>
-              <CardDescription>{event.theatre.name}</CardDescription>
+              <CardDescription>{event.theatreName}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2 text-sm">
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
-                  {new Date(event.event_date).toLocaleDateString()}
+                  {new Date(event.date).toLocaleDateString()}
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4" />
-                  {event.event_time}
+                  {event.time}
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
-                  {event.venue.name}
+                  {event.venue}
                 </div>
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4" />
@@ -334,8 +342,9 @@ export default function SeatSelectionPage() {
 
               {/* Sections */}
               <div className="space-y-8">
-                {eventData.sections.map(sectionData => (
-                  <div key={sectionData.section.id}>
+                {eventData.sections && eventData.sections.length > 0 ? (
+                  eventData.sections.map(sectionData => (
+                    <div key={sectionData.section.id}>
                     <h3 className="font-medium mb-4">
                       {sectionData.section.name} 
                       <Badge variant="outline" className="ml-2">
@@ -374,8 +383,13 @@ export default function SeatSelectionPage() {
                         </div>
                       </div>
                     ))}
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground">No seats available for this event.</p>
                   </div>
-                ))}
+                )}
               </div>
             </CardContent>
           </Card>
