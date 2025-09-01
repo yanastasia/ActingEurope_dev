@@ -114,3 +114,6 @@ Thumbs.db
 
 # Turbo
 .turbo
+
+# Database JSON files
+app/api/database-json/

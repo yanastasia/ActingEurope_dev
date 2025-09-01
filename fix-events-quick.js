@@ -35,15 +35,15 @@ async function main() {
     // Theatre ID mappings
     const theatreMapping = {
       'National Theatre in Niš': 123,
-      'OSAIK \'39 Monkeys\'': 124,
+      'OSAIK \'36 Monkeys\'': 124,
       'Macedonian National Theatre': 121
     };
     
     // Update specific problematic events
     const problematicEvents = [
       { title: 'Don Juan', expectedCompany: 'National Theatre in Niš' },
-      { title: 'Aivar', expectedCompany: 'OSAIK \'39 Monkeys\'' },
-      { title: 'Lutenitsa', expectedCompany: 'OSAIK \'39 Monkeys\'' },
+      { title: 'Aivar', expectedCompany: 'OSAIK \'36 Monkeys\'' },
+      { title: 'Lutenitsa', expectedCompany: 'OSAIK \'36 Monkeys\'' },
       { title: 'No Man\'s Land', expectedCompany: 'Macedonian National Theatre' }
     ];
     

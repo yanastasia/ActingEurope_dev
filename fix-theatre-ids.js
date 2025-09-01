@@ -42,8 +42,8 @@ async function updateEventTheatres() {
         // Check company to determine correct theatre
         const companyStr = Array.isArray(event.company) ? event.company.join(' ') : (event.company || '');
         
-        if (companyStr.includes('39 Monkeys')) {
-          theatreId = 124; // OSAIK "39 Monkeys"
+        if (companyStr.includes('36 Monkeys')) {
+          theatreId = 124; // OSAIK "36 Monkeys"
         }
       }
       

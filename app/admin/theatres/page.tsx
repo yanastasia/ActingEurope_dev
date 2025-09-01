@@ -27,6 +27,15 @@ import {
 import { Badge } from '../../../components/ui/badge';
 import { Trash2, Edit, Plus, Save, X, Upload } from 'lucide-react';
 
+// Helper function to fix company names
+const fixCompanyName = (name: string): string => {
+  return name
+    .replace(/OSAIK "39 Monkeys"/g, 'OSAIK "36 Monkeys"')
+    .replace(/ОСАИК "39 Маймуни"/g, 'ОСАИК "36 Маймуни"')
+    .replace(/ОСАИК "39 Мајмуни"/g, 'ОСАИК "36 Мајмуни"')
+    .replace(/ОСАИК "39 Мајмуна"/g, 'ОСАИК "36 Мајмуна"');
+};
+
 interface Theatre {
   id: number;
   name: string;
@@ -680,7 +689,7 @@ const AdminTheatresPage = () => {
                 <Label htmlFor="content_language">Content Language</Label>
                 <Select
                   value={newTheatreData.content_language}
-                  onValueChange={(value) => setNewTheatreData({ ...newTheatreData, content_language: value })}
+                  onValueChange={(value: string) => setNewTheatreData({ ...newTheatreData, content_language: value })}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -854,7 +863,7 @@ const AdminTheatresPage = () => {
                 <Card key={groupId} className="p-6">
                   <div className="flex justify-between items-start mb-4">
                     <div>
-                      <h3 className="text-xl font-semibold">{primaryTheatre.name}</h3>
+                      <h3 className="text-xl font-semibold">{fixCompanyName(primaryTheatre.name)}</h3>
                       <p className="text-gray-600">
                         {primaryTheatre.city}, {primaryTheatre.country}
                         {primaryTheatre.founded_year && ` • Founded ${primaryTheatre.founded_year}`}
@@ -879,7 +888,7 @@ const AdminTheatresPage = () => {
                           </div>
                           {theatre ? (
                             <div>
-                              <p className="font-medium text-sm">{theatre.name}</p>
+                              <p className="font-medium text-sm">{fixCompanyName(theatre.name)}</p>
                               {theatre.description && (
                                 <p className="text-xs text-gray-500 mt-1 line-clamp-2">{theatre.description}</p>
                               )}
@@ -947,7 +956,7 @@ const AdminTheatresPage = () => {
               <Card key={theatre.id} className="p-4">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="font-semibold">{theatre.name}</h3>
+                    <h3 className="font-semibold">{fixCompanyName(theatre.name)}</h3>
                     <p className="text-gray-600 text-sm">
                       {theatre.city}, {theatre.country}
                       {theatre.founded_year && ` • Founded ${theatre.founded_year}`}

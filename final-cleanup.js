@@ -87,7 +87,7 @@ async function finalCleanup() {
       },
       {
         title: "Aivar or Lutenitsa",
-        theatreName: 'OSAIK "39 Monkeys"',
+        theatreName: 'OSAIK "36 Monkeys"',
         director: "Gergana Dimitrova",
         date: "2025-09-20",
         time: "16:00",

@@ -47,7 +47,6 @@ interface Venue {
   id: string
   name: string
   description: string
-  location: string
   capacity: number
   sections: VenueSection[]
 }
@@ -99,10 +98,18 @@ interface Theatre {
 interface VenueFormState {
   name: string;
   description: string;
-  location: string;
   capacity: number;
   imageUrl: string;
 }
+
+// Helper function to fix company names
+const fixCompanyName = (name: string): string => {
+  return name
+    .replace(/OSAIK "39 Monkeys"/g, 'OSAIK "36 Monkeys"')
+    .replace(/ОСАИК "39 Маймуни"/g, 'ОСАИК "36 Маймуни"')
+    .replace(/ОСАИК "39 Мајмуни"/g, 'ОСАИК "36 Мајмуни"')
+    .replace(/ОСАИК "39 Мајмуна"/g, 'ОСАИК "36 Мајмуна"');
+};
 
 export default function AdminPage() {
   const router = useRouter()
@@ -142,7 +149,6 @@ export default function AdminPage() {
   const [venueFormData, setVenueFormData] = useState<VenueFormState>({
     name: "",
     description: "",
-    location: "",
     capacity: 0,
     imageUrl: "",
   })
@@ -484,7 +490,6 @@ export default function AdminPage() {
       id: `venue-${Date.now()}`,
       name: venueFormData.name,
       description: venueFormData.description,
-      location: venueFormData.location,
       capacity: venueFormData.capacity,
       sections: [{
         id: 'section-1',
@@ -548,7 +553,6 @@ export default function AdminPage() {
     setVenueFormData({
       name: "",
       description: "",
-      location: "",
       capacity: 0,
       imageUrl: "",
     })
@@ -858,10 +862,10 @@ export default function AdminPage() {
     if (!editingVenue) return
 
     // Validate form
-    if (!editingVenue.name || !editingVenue.location || !editingVenue.capacity) {
+    if (!editingVenue.name || !editingVenue.capacity) {
       toast({
         title: "Missing information",
-        description: "Please provide a venue name",
+        description: "Please provide a venue name and capacity",
         variant: "destructive",
       })
       return
@@ -1338,7 +1342,7 @@ export default function AdminPage() {
                               }}
                             />
                             <Label htmlFor={`theatre-${theatre.id}`} className="text-sm">
-                              {theatre.name} ({theatre.city}, {theatre.country})
+                              {fixCompanyName(theatre.name)} ({theatre.city}, {theatre.country})
                             </Label>
                           </div>
                         ))}
@@ -1500,15 +1504,7 @@ export default function AdminPage() {
                   onChange={handleVenueInputChange}
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="location">Location</Label>
-                <Input
-                  id="location"
-                  placeholder="Enter venue location"
-                  value={editingVenue ? editingVenue.location : venueFormData.location}
-                  onChange={handleVenueInputChange}
-                />
-              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="capacity">Capacity</Label>
                 <Input
@@ -1654,10 +1650,10 @@ export default function AdminPage() {
                               <Label className="text-xs">Seats:</Label>
                               <Input
                                 type="number"
-                                min="1"
+                                min="0"
                                 value={row.seats.length}
                                 onChange={(e) => {
-                                  const seatCount = parseInt(e.target.value) || 1
+                                  const seatCount = parseInt(e.target.value) || 0
                                   const updatedSections = [...editingVenue.sections]
                                   const currentSeats = [...row.seats]
                                   
@@ -1740,7 +1736,6 @@ export default function AdminPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Name</TableHead>
-                    <TableHead>Location</TableHead>
                     <TableHead>Capacity</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
@@ -1749,7 +1744,6 @@ export default function AdminPage() {
                   {venues.map((venue) => (
                     <TableRow key={venue.id}>
                       <TableCell>{venue.name}</TableCell>
-                      <TableCell>{venue.location}</TableCell>
                       <TableCell>{venue.capacity}</TableCell>
                       <TableCell>
                         <Button 

@@ -24,9 +24,9 @@ const theatreTranslations = {
       history: 'Founded in 1887, the National Theatre in Niš has a rich history of theatrical excellence, presenting a wide range of plays from classical to contemporary. It has been a vital cultural institution for the city and the region, fostering artistic talent and engaging with the community.'
     },
     5: {
-      name: 'OSAIK "39 Monkeys"',
+      name: 'OSAIK "36 Monkeys"',
       description: 'An innovative independent theatre collective known for experimental and contemporary performances.',
-      history: 'OSAIK \'39 Monkeys\' is a dynamic theatre group that has been pushing the boundaries of contemporary theatre in Sofia. Known for their creative approach to storytelling and experimental performances, they have gained recognition for bringing fresh perspectives to the Bulgarian theatre scene.'
+      history: 'OSAIK \'36 Monkeys\' is a dynamic theatre group that has been pushing the boundaries of contemporary theatre in Sofia. Known for their creative approach to storytelling and experimental performances, they have gained recognition for bringing fresh perspectives to the Bulgarian theatre scene.'
     },
     6: {
       name: 'Intimate Theatre Bitola',
@@ -56,9 +56,9 @@ const theatreTranslations = {
       history: 'Основан през 1887 г., Националният театър в Ниш има богата история на театрално съвършенство, представяйки широк спектър от пиеси от класически до съвременни.'
     },
     5: {
-      name: 'ОСАИК "39 Маймуни"',
-      description: 'Иновативен независим театрален колектив, известен с експериментални и съвременни представления.',
-      history: 'ОСАИК "39 Маймуни" е динамична театрална група, която бутва границите на съвременния театър в София.'
+      name: 'ОСАИК "36 Маймуни"',
+        description: 'Иновативен независим театрален колектив, известен с експериментални и съвременни представления.',
+        history: 'ОСАИК "36 Маймуни" е динамична театрална група, която бутва границите на съвременния театър в София.'
     },
     6: {
       name: 'Интимен театър Битоля',
@@ -88,9 +88,9 @@ const theatreTranslations = {
       history: 'Основан во 1887 година, Националниот театар во Ниш има богата историја на театарско совршенство, презентирајќи широк спектар на пиеси.'
     },
     5: {
-      name: 'ОСАИК "39 Мајмуни"',
-      description: 'Иновативен независен театарски колектив познат по експериментални и современи претстави.',
-      history: 'ОСАИК "39 Мајмуни" е динамична театарска група која ги поместува границите на современиот театар во Софија.'
+      name: 'ОСАИК "36 Мајмуни"',
+        description: 'Иновативен независен театарски колектив познат по експериментални и современи претстави.',
+        history: 'ОСАИК "36 Мајмуни" е динамична театарска група која ги поместува границите на современиот театар во Софија.'
     },
     6: {
       name: 'Интимен театар Битола',
@@ -120,9 +120,9 @@ const theatreTranslations = {
       history: 'Основано 1887. године, Народно позориште у Нишу има богату историју позоришне изврсности, представљајући широк спектар представа од класичних до савремених.'
     },
     5: {
-      name: 'ОСАИК "39 Мајмуна"',
-      description: 'Иновативни независни позоришни колектив познат по експерименталним и савременим представама.',
-      history: 'ОСАИК "39 Мајмуна" је динамична позоришна група која помера границе савременог позоришта у Софији.'
+      name: 'ОСАИК "36 Мајмуна"',
+        description: 'Иновативни независни позоришни колектив познат по експерименталним и савременим представама.',
+        history: 'ОСАИК "36 Мајмуна" је динамична позоришна група која помера границе савременог позоришта у Софији.'
     },
     6: {
       name: 'Интимно позориште Битољ',

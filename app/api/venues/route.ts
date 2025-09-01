@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { getVenues } from '@/lib/database'
 
 export async function GET() {
   try {
@@ -25,13 +26,12 @@ export async function GET() {
     })
 
     // Transform the data to match the expected format
-    const transformedVenues = venues.map(venue => ({
+    const transformedVenues = venues.map((venue: any) => ({
       id: venue.id.toString(),
       name: venue.name,
       description: venue.description,
-      location: venue.address || venue.city || '',
       capacity: venue.capacity,
-      sections: venue.sections.map(section => ({
+      sections: venue.sections.map((section: any) => ({
         id: section.id.toString(),
         sectionName: section.section_name,
         sectionType: section.section_type,
@@ -41,16 +41,50 @@ export async function GET() {
 
     return NextResponse.json(transformedVenues)
   } catch (error) {
-    console.error('Error fetching venues:', error)
+    console.error('Error fetching venues from database:', error)
+    
+    // Check if it's a database connection error
+    if (error instanceof Error && 
+        (error.message.includes('Request Unit limit') || 
+         error.message.includes('database connections opened') ||
+         error.name === 'PrismaClientInitializationError')) {
+      
+      console.log('Database unavailable, using static venue data as fallback');
+      
+      // Fallback: return static venue data
+      try {
+        const staticVenues = await getVenues();
+        
+        // Transform static venues to match the expected API format
+        const transformedVenues = staticVenues.map((venue: any) => ({
+          id: venue.id.toString(),
+          name: venue.name,
+          description: venue.description,
+          capacity: venue.capacity,
+          sections: venue.sections.map((section: any) => ({
+            id: section.id.toString(),
+            sectionName: section.sectionName,
+            sectionType: section.sectionType,
+            rows: groupSeatsByRows(section.seats)
+          }))
+        }));
+        
+        return NextResponse.json(transformedVenues);
+      } catch (fallbackError) {
+        console.error('Error with static venue fallback:', fallbackError);
+        return NextResponse.json({ error: 'Failed to fetch venues' }, { status: 500 });
+      }
+    }
+    
     return NextResponse.json({ error: 'Failed to fetch venues' }, { status: 500 })
   }
 }
 
-// Helper function to group seats by row
+// Helper function to group seats by row (for database data)
 function groupSeatsByRow(seats: any[]) {
-  const rowMap = new Map()
+  const rowMap = new Map<number, { rowNumber: number; seats: any[] }>()
   
-  seats.forEach(seat => {
+  seats.forEach((seat: any) => {
     if (!rowMap.has(seat.row_number)) {
       rowMap.set(seat.row_number, {
         rowNumber: seat.row_number,
@@ -58,9 +92,30 @@ function groupSeatsByRow(seats: any[]) {
       })
     }
     
-    rowMap.get(seat.row_number).seats.push({
+    rowMap.get(seat.row_number)!.seats.push({
       seatNumber: seat.seat_number,
       isAccessible: seat.is_accessible
+    })
+  })
+  
+  return Array.from(rowMap.values()).sort((a, b) => a.rowNumber - b.rowNumber)
+}
+
+// Helper function to group seats by rows (for static data)
+function groupSeatsByRows(seats: any[]) {
+  const rowMap = new Map<number, { rowNumber: number; seats: any[] }>()
+  
+  seats.forEach((seat: any) => {
+    if (!rowMap.has(seat.rowNumber)) {
+      rowMap.set(seat.rowNumber, {
+        rowNumber: seat.rowNumber,
+        seats: []
+      })
+    }
+    
+    rowMap.get(seat.rowNumber)!.seats.push({
+      seatNumber: seat.seatNumber,
+      isAccessible: false // Static data doesn't have accessibility info
     })
   })
   
@@ -72,7 +127,6 @@ export async function POST(request: Request) {
     const body = await request.json()
     const {
       name,
-      location,
       capacity,
       description,
       imageUrl,
@@ -101,8 +155,6 @@ export async function POST(request: Request) {
     const venue = await prisma.venue.create({
       data: {
         name,
-        address: location || '',
-        city: location || '',
         capacity: parseInt(capacity) || 0,
         description,
         image_url: imageUrl

@@ -6,7 +6,7 @@ export const translations = {
     "\"Ivan Vazov\" National Theatre": "\"Ivan Vazov\" National Theatre",
     "Macedonian National Theatre": "Macedonian National Theatre",
     "National Theatre in Niš": "National Theatre in Niš",
-    "OSAIK \"39 Monkeys\"": "OSAIK \"39 Monkeys\"",
+    "OSAIK \"36 Monkeys\"": "OSAIK \"36 Monkeys\"",
     "Intimate Theatre Bitola": "Intimate Theatre Bitola",
   },
   bg: {
@@ -15,7 +15,7 @@ export const translations = {
     "\"Ivan Vazov\" National Theatre": "Народен театър \"Иван Вазов\"",
     "Macedonian National Theatre": "Македонски народен театър",
     "National Theatre in Niš": "Народен театър в Ниш",
-    "OSAIK \"39 Monkeys\"": "ОСАИК \"39 Маймуни\"",
+    "OSAIK \"36 Monkeys\"": "ОСАИК \"36 Маймуни\"",
     "Intimate Theatre Bitola": "Интимен театър Битоля",
   },
   mk: {
@@ -24,7 +24,7 @@ export const translations = {
     "\"Ivan Vazov\" National Theatre": "Народен театар \"Иван Вазов\"",
     "Macedonian National Theatre": "Македонски народен театар",
     "National Theatre in Niš": "Народен театар во Ниш",
-    "OSAIK \"39 Monkeys\"": "ОСАИК \"39 Мајмуни\"",
+    "OSAIK \"36 Monkeys\"": "ОСАИК \"36 Мајмуни\"",
     "Intimate Theatre Bitola": "Интимен театар Битола",
   },
   sr: {
@@ -33,7 +33,7 @@ export const translations = {
     "\"Ivan Vazov\" National Theatre": "Народно позориште \"Иван Вазов\"",
     "Macedonian National Theatre": "Македонско народно позориште",
     "National Theatre in Niš": "Народно позориште у Нишу",
-    "OSAIK \"39 Monkeys\"": "ОСАИК \"39 Мајмуна\"",
+    "OSAIK \"36 Monkeys\"": "ОСАИК \"36 Мајмуна\"",
     "Intimate Theatre Bitola": "Интимни театар Битоља",
   },
 };

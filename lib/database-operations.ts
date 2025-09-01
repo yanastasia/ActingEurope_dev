@@ -697,9 +697,9 @@ const theatreTranslations = {
       tags: ['Serbian Theatre', 'Regional Theatre', 'Classical Drama', 'Contemporary Plays']
     },
     165: {
-      name: 'OSAIK "39 Monkeys"',
+      name: 'OSAIK "36 Monkeys"',
       description: 'An innovative independent theatre collective known for experimental and contemporary performances.',
-      history: 'OSAIK \'39 Monkeys\' is a dynamic theatre group that has been pushing the boundaries of contemporary theatre in Sofia. Known for their creative approach to storytelling and experimental performances.',
+      history: 'OSAIK \'36 Monkeys\' is a dynamic theatre group that has been pushing the boundaries of contemporary theatre in Sofia. Known for their creative approach to storytelling and experimental performances.',
       tags: ['Independent Theatre', 'Experimental', 'Contemporary', 'Bulgarian Theatre']
     },
     166: {
@@ -735,9 +735,9 @@ const theatreTranslations = {
       tags: ['Сръбски театър', 'Регионален театър', 'Класическа драма', 'Съвременни пиеси']
     },
     165: {
-      name: 'ОСАИК "39 Маймуни"',
+      name: 'ОСАИК "36 Маймуни"',
       description: 'Иновативен независим театрален колектив, известен с експериментални и съвременни представления.',
-      history: 'ОСАИК "39 Маймуни" е динамична театрална група, която раздвижва границите на съвременния театър в София. Известни са с творческия си подход към разказването и експерименталните представления.',
+      history: 'ОСАИК "36 Маймуни" е динамична театрална група, която разширява границите на съвременния театър в София. Известни са с творческия си подход към разказването и експерименталните представления.',
       tags: ['Независим театър', 'Експериментален', 'Съвременен', 'Български театър']
     },
     166: {
@@ -773,9 +773,9 @@ const theatreTranslations = {
       tags: ['Српски театар', 'Регионален театар', 'Класична драма', 'Современи пиеси']
     },
     165: {
-      name: 'ОСАИК "39 Мајмуни"',
+      name: 'ОСАИК "36 Мајмуни"',
       description: 'Иновативен независен театарски колектив познат по експериментални и современи претстави.',
-      history: 'ОСАИК "39 Мајмуни" е динамична театарска група која ги поместува границите на современиот театар во Софија.',
+      history: 'ОСАИК "36 Мајмуни" е динамична театарска група која ги поместува границите на современиот театар во Софија.',
       tags: ['Независен театар', 'Експериментален', 'Современ', 'Бугарски театар']
     },
     166: {
@@ -811,9 +811,9 @@ const theatreTranslations = {
       tags: ['Српско позориште', 'Регионално позориште', 'Класична драма', 'Савремене представе']
     },
     165: {
-      name: 'ОСАИК "39 Мајмуна"',
+      name: 'ОСАИК "36 Мајмуна"',
       description: 'Иновативни независни позоришни колектив познат по експерименталним и савременим представама.',
-      history: 'ОСАИК "39 Мајмуна" је динамична позоришна група која помера границе савременог позоришта у Софији.',
+      history: 'ОСАИК "36 Мајмуна" је динамична позоришна група која помера границе савременог позоришта у Софији.',
       tags: ['Независно позориште', 'Експериментално', 'Савремено', 'Бугарско позориште']
     },
     166: {

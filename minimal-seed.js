@@ -37,7 +37,7 @@ const performances = [
   {
     id: "3",
     title: "Aivar or Lutenitsa",
-    company: ["OSAIK '39 Monkeys'"],
+    company: ["OSAIK '36 Monkeys'"],
     director: "Ivan Petrov",
     cast: ["Maria Dimitrova", "Georgi Stoyanov"],
     date: "22-09-2025",
@@ -92,7 +92,7 @@ async function main() {
     const theatres = [
       { id: 121, name: 'Macedonian National Theatre', city: 'Skopje', country: 'North Macedonia' },
       { id: 123, name: 'National Theatre in Niš', city: 'Niš', country: 'Serbia' },
-      { id: 124, name: 'OSAIK \'39 Monkeys\'', city: 'Sofia', country: 'Bulgaria' },
+      { id: 124, name: 'OSAIK \'36 Monkeys\'', city: 'Sofia', country: 'Bulgaria' },
     ]
     
     for (const theatre of theatres) {
@@ -122,7 +122,7 @@ async function main() {
     console.log('🎪 Creating events...')
     const theatreMapping = {
       'National Theatre in Niš': 123,
-      'OSAIK \'39 Monkeys\'': 124,
+      'OSAIK \'36 Monkeys\'': 124,
       'Macedonian National Theatre': 121
     }
     

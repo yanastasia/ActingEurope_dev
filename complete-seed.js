@@ -52,7 +52,7 @@ async function completeSeed() {
       { name: 'Macedonian National Theatre', city: 'Skopje', country: 'North Macedonia', description: 'National theatre of North Macedonia' },
       { name: 'National Theatre in Niš', city: 'Niš', country: 'Serbia', description: 'Regional theatre in Serbia' },
       { name: '"Ivan Vazov" National Theatre', city: 'Sofia', country: 'Bulgaria', description: 'National theatre of Bulgaria' },
-      { name: 'OSAIK "39 Monkeys"', city: 'Kyustendil', country: 'Bulgaria', description: 'Independent theatre group' },
+      { name: 'OSAIK "36 Monkeys"', city: 'Sofia', country: 'Bulgaria', description: 'Independent theatre group' },
       { name: 'Drama Theatre "Krum Kyulyavkov"', city: 'Shumen', country: 'Bulgaria', description: 'Regional drama theatre' },
       { name: 'Intimate Theatre Bitola', city: 'Bitola', country: 'North Macedonia', description: 'Small intimate theatre' }
     ];
@@ -145,7 +145,7 @@ async function completeSeed() {
       },
       {
         title: "Aivar or Lutenitsa",
-        company: ['OSAIK "39 Monkeys"'],
+        company: ['OSAIK "36 Monkeys"'],
         director: "Gergana Dimitrova",
         cast: ["Denitsa Darinova", "Sofia Ristevska"],
         date: "2025-09-20",

@@ -4,6 +4,15 @@ import { performances } from '@/lib/performance-data'
 import { getEventsByLanguage, getAllEvents, createEventWithTranslations, getTheatreByIdAndLanguage } from '@/lib/database-operations'
 import { translations } from '@/lib/translations'
 
+// Helper function to fix company names
+const fixCompanyName = (name: string): string => {
+  return name
+    .replace(/OSAIK "39 Monkeys"/g, 'OCAAC "36 Monkeys"')
+    .replace(/ОСАИК "39 Маймуни"/g, 'ОСАИК „36 Маймуни"')
+    .replace(/ОСАИК "39 Мајмуни"/g, 'ОСАУК „36 Мајмуни"')
+    .replace(/ОСАУК "39 мајмуна"/g, 'ОСАУК „36 мајмуна"')
+}
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -82,7 +91,7 @@ export async function GET(request: Request) {
         // Filter out non-theatre companies like 'ActingEurope'
         const theatreCompanies = event.company.filter(company => company !== 'ActingEurope');
         if (theatreCompanies.length > 0) {
-          theatreNames = theatreCompanies.join(' & ');
+          theatreNames = fixCompanyName(theatreCompanies.join(' & '));
         }
       }
       
@@ -107,7 +116,7 @@ export async function GET(request: Request) {
         const langTranslations = translations[language as keyof typeof translations] || translations.en;
         // Safely access the translation using bracket notation
         const translation = langTranslations && typeof langTranslations === 'object' ? (langTranslations as Record<string, string>)[comp] : undefined;
-        return translation || comp;
+        return fixCompanyName(translation || comp);
       }) : [];
 
       return {

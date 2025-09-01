@@ -107,7 +107,7 @@ export const performances: Performance[] = [
     {
     id: "4",
     title: "Aivar or Lutenitsa",
-    company: ['OSAIK "39 Monkeys"', 'Intimate Theatre Bitola'],
+    company: ['OSAIK "36 Monkeys"', 'Intimate Theatre Bitola'],
     director: "Gergana Dimitrova",
     cast: [
       "Denitsa Darinova",

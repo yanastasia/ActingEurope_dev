@@ -235,11 +235,11 @@ export const Theatres: Theatre[] = [
   },
   {
     id: 8,
-    name: 'OSAIK "39 Monkeys"',
+    name: 'OSAIK "36 Monkeys"',
     city: "Sofia",
     country: "Bulgaria",
     description: "An innovative independent theatre collective known for experimental and contemporary performances.",
-    history: "OSAIK '39 Monkeys' is a dynamic theatre group that has been pushing the boundaries of contemporary theatre in Sofia. Known for their creative approach to storytelling and experimental performances, they have gained recognition for bringing fresh perspectives to the Bulgarian theatre scene.",
+    history: "OSAIK '36 Monkeys' is a dynamic theatre group that has been pushing the boundaries of contemporary theatre in Sofia. Known for their creative approach to storytelling and experimental performances, they have gained recognition for bringing fresh perspectives to the Bulgarian theatre scene.",
     foundedYear: 2010,
     images: [
       {
@@ -358,8 +358,63 @@ export async function getTheatreById(id: number): Promise<Theatre | null> {
 }
 
 export async function getVenues(): Promise<Venue[]> {
-  // Return the static venues data
-  return Venues;
+  // Import Supabase client
+  const { createClient } = require('@supabase/supabase-js');
+  
+  try {
+    // Create Supabase client
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    
+    // Fetch venues from Supabase
+    const { data: venues, error } = await supabase
+      .from('venues')
+      .select(`
+        *,
+        sections:venue_sections(
+          *,
+          seats:seats(*)
+        )
+      `);
+    
+    if (error) {
+      console.error('Error fetching venues from Supabase:', error);
+      // Fallback to static data
+      return Venues;
+    }
+    
+    if (!venues || venues.length === 0) {
+      console.log('No venues found in Supabase, using static data');
+      return Venues;
+    }
+    
+    // Transform Supabase data to match our interface
+    const transformedVenues: Venue[] = venues.map((venue: any) => ({
+      id: venue.id,
+      name: venue.name,
+      description: venue.description || '',
+      capacity: venue.capacity || 0,
+      sections: venue.sections?.map((section: any) => ({
+        id: section.id,
+        sectionName: section.section_name,
+        sectionType: section.section_type as "regular" | "balcony",
+        seats: section.seats?.map((seat: any) => ({
+          id: seat.id,
+          rowNumber: seat.row_number,
+          seatNumber: seat.seat_number,
+          isAvailable: seat.is_available ?? true
+        })) || []
+      })) || []
+    }));
+    
+    return transformedVenues;
+  } catch (error) {
+    console.error('Error connecting to Supabase:', error);
+    // Fallback to static data
+    return Venues;
+  }
 }
 
 function generateMainStageRegularSeats(): Seat[] {

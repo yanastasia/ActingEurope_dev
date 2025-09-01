@@ -40,6 +40,15 @@ interface Event {
 }
 import Link from "next/link"
 
+// Helper function to fix company names
+const fixCompanyName = (name: string): string => {
+  return name
+    .replace(/OSAIK "39 Monkeys"/g, 'OCAAC "36 Monkeys"')
+    .replace(/ОСАИК "39 Маймуни"/g, 'ОСАИК „36 Маймуни"')
+    .replace(/ОСАИК "39 Мајмуни"/g, 'ОСАУК „36 Мајмуни"')
+    .replace(/ОСАУК "39 мајмуна"/g, 'ОСАУК „36 мајмуна"')
+}
+
 export default function ProgramPage() {
   const { language, t } = useLanguage()
   const [selectedDate, setSelectedDate] = useState<string>("All Dates")
@@ -51,9 +60,9 @@ export default function ProgramPage() {
   const [types, setTypes] = useState<string[]>(["All Types"])
 
 
-  // Function to generate booking URL
+  // Function to generate booking URL - redirect to tickets coming soon page
   const getBookingUrl = (event: Event) => {
-    return `/ticket-reservation`
+    return '/tickets-coming-soon'
   }
 
   const fetchEvents = async () => {
@@ -271,8 +280,8 @@ export default function ProgramPage() {
                             {event.company && (
                               <p className="text-sm text-muted-foreground italic mb-6">
                                 {Array.isArray(event.company) 
-                                  ? event.company.map((comp: string) => t(comp) || comp).join(' & ') 
-                                  : (t(event.company) || event.company)}
+                                  ? event.company.map((comp: string) => fixCompanyName(t(comp) || comp)).join(' & ') 
+                                  : fixCompanyName(t(event.company) || event.company)}
                               </p>
                             )}
                             <div className="flex flex-wrap gap-2">
@@ -438,7 +447,7 @@ export default function ProgramPage() {
                                   </p>
                                   <p className="text-sm mb-3">
                                     <span className="font-medium">{translations[language].theatreName}: </span>
-                                    {Array.isArray(event.company) ? event.company.map((comp: string) => t(comp) || comp).join(' & ') : (t(event.company) || event.company)}
+                                    {Array.isArray(event.company) ? event.company.map((comp: string) => fixCompanyName(t(comp) || comp)).join(' & ') : fixCompanyName(t(event.company) || event.company)}
                                   </p>
                                   <div className="flex gap-2">
                                     <Link href={getBookingUrl(event)}>

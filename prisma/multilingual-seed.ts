@@ -125,27 +125,27 @@ const multilingualTheatres = [
     tags: ['Serbian Theatre', 'Regional Theatre', 'Classical Drama', 'Contemporary Plays']
   },
   {
-    name: 'OSAIK "39 Monkeys"',
+    name: 'OSAIK "36 Monkeys"',
     city: 'Sofia',
     country: 'Bulgaria',
     foundedYear: 2010,
-    website: 'https://39monkeys.bg',
+    website: 'https://36monkeys.bg',
     translations: {
       en: {
         description: 'An innovative independent theatre collective known for experimental and contemporary performances.',
-        history: 'OSAIK "39 Monkeys" is a dynamic theatre group that has been pushing the boundaries of contemporary theatre in Sofia. Known for their creative approach to storytelling and experimental performances, they have gained recognition for bringing fresh perspectives to the Bulgarian theatre scene.'
+        history: 'OSAIK "36 Monkeys" is a dynamic theatre group that has been pushing the boundaries of contemporary theatre in Sofia. Known for their creative approach to storytelling and experimental performances, they have gained recognition for bringing fresh perspectives to the Bulgarian theatre scene.'
       },
       bg: {
         description: 'Иновативен независим театрален колектив, известен с експериментални и съвременни представления.',
-        history: 'ОСАИК "39 Маймуни" е динамична театрална група, която разширява границите на съвременния театър в София. Известни със своя творчески подход към разказването и експерименталните представления, те спечелиха признание за внасянето на свежи перспективи в българската театрална сцена.'
+        history: 'ОСАИК "36 Маймуни" е динамична театрална група, която разширява границите на съвременния театър в София. Известни със своя творчески подход към разказването и експерименталните представления, те спечелиха признание за внасянето на свежи перспективи в българската театрална сцена.'
       },
       mk: {
         description: 'Иновативен независен театарски колектив познат по експериментални и современи претстави.',
-        history: 'ОСАИК "39 Мајмуни" е динамична театарска група која ги поместува границите на современиот театар во Софија. Познати по својот креативен пристап кон раскажувањето и експерименталните претстави, тие добија признание за донесување свежи перспективи на бугарската театарска сцена.'
+        history: 'ОСАИК "36 Мајмуни" е динамична театарска група која ги поместува границите на современиот театар во Софија. Познати по својот креативен пристап кон раскажувањето и експерименталните претстави, тие добија признание за донесување свежи перспективи на бугарската театарска сцена.'
       },
       sr: {
         description: 'Иновативан независан позоришни колектив познат по експерименталним и савременим представама.',
-        history: 'ОСАИК "39 Мајмуна" је динамична позоришна група која помера границе савременог позоришта у Софији. Познати по свом креативном приступу приповедању и експерименталним представама, стекли су признање за доношење свежих перспектива на бугарску позоришну сцену.'
+        history: 'ОСАИК "36 Мајмуна" је динамична позоришна група која помера границе савременог позоришта у Софији. Познати по свом креативном приступу приповедању и експерименталним представама, стекли су признање за доношење свежих перспектива на бугарску позоришну сцену.'
       }
     },
     images: [

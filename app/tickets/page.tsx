@@ -41,6 +41,15 @@ export default function TicketsPage() {
   const { toast } = useToast()
   const { t } = useLanguage()
   const [selectedPerformance, setSelectedPerformance] = useState<string | null>(null)
+
+  // Helper function to fix company names
+  const fixCompanyName = (companyName: string) => {
+    return companyName
+      .replace(/OSAIK "39 Monkeys"/g, 'OSAIK "36 Monkeys"')
+      .replace(/ОСАИК "39 Маймуни"/g, 'ОСАИК "36 Маймуни"')
+      .replace(/ОСАИК "39 Мајмуни"/g, 'ОСАИК "36 Мајмуни"')
+      .replace(/ОСАИК "39 Мајмуна"/g, 'ОСАИК "36 Мајмуна"')
+  }
   const [step, setStep] = useState(1)
   const [formData, setFormData] = useState({
     firstName: "",
@@ -307,7 +316,7 @@ export default function TicketsPage() {
                               <div>
                                 <h3 className="mb-1 text-lg font-semibold text-secondary-blue">{performance.title}</h3>
                                 <p className="mb-2 text-sm text-muted-foreground">
-                                  {Array.isArray(performance.company) ? performance.company.map((comp: string) => t(comp) || comp).join(' & ') : (t(performance.company) || performance.company)}
+                                  {Array.isArray(performance.company) ? performance.company.map((comp: string) => fixCompanyName(t(comp) || comp)).join(' & ') : fixCompanyName(t(performance.company) || performance.company)}
                                 </p>
                                 <div className="mb-4 space-y-1 text-sm">
                                   <div className="flex items-center gap-2">

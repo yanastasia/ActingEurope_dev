@@ -11,7 +11,7 @@ async function main() {
     const theatres = [
       { name: 'Macedonian National Theatre', city: 'Skopje', country: 'North Macedonia', description: 'National theatre of North Macedonia' },
       { name: 'National Theatre in Niš', city: 'Niš', country: 'Serbia', description: 'Regional theatre in Serbia' },
-      { name: 'OSAIK \'39 Monkeys\'', city: 'Kyustendil', country: 'Bulgaria', description: 'Independent theatre group' },
+      { name: 'OSAIK \'36 Monkeys\'', city: 'Kyustendil', country: 'Bulgaria', description: 'Independent theatre group' },
       { name: 'Intimate Theatre Bitola', city: 'Bitola', country: 'North Macedonia', description: 'Small intimate theatre' },
     ];
     
@@ -88,7 +88,7 @@ async function main() {
       },
       {
         title: "Aivar or Lutenitsa",
-        company: ["OSAIK '39 Monkeys'"],
+        company: ["OSAIK '36 Monkeys'"],
         director: "Ivan Petrov",
         cast: ["Maria Dimitrova", "Georgi Stoyanov"],
         eventDate: "2025-09-22",

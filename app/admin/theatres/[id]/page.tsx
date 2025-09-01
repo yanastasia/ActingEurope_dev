@@ -16,6 +16,15 @@ import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/lib/language-context"
 import Image from "next/image"
 
+// Helper function to fix company names
+const fixCompanyName = (name: string): string => {
+  return name
+    .replace(/OSAIK "39 Monkeys"/g, 'OSAIK "36 Monkeys"')
+    .replace(/ОСАИК "39 Маймуни"/g, 'ОСАИК "36 Маймуни"')
+    .replace(/ОСАИК "39 Мајмуни"/g, 'ОСАИК "36 Мајмуни"')
+    .replace(/ОСАИК "39 Мајмуна"/g, 'ОСАИК "36 Мајмуна"');
+};
+
 interface Theatre {
   id: string
   name: string
@@ -285,7 +294,7 @@ export default function EditTheatrePage() {
               Back to Theatres
             </Button>
             <h1 className="text-3xl font-bold text-secondary-blue">
-              Edit Theatre: {theatre.name}
+              Edit Theatre: {fixCompanyName(theatre.name)}
             </h1>
           </div>
           <div className="flex gap-2">

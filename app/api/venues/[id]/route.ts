@@ -33,7 +33,6 @@ export async function GET(request: Request, { params }: { params: { id: string }
       id: venue.id.toString(),
       name: venue.name,
       description: venue.description,
-      location: venue.address || venue.city || '',
       capacity: venue.capacity,
       sections: venue.sections.map(section => ({
         id: section.id.toString(),
@@ -73,14 +72,13 @@ function groupSeatsByRow(seats: any[]) {
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
   const { id } = params
-  let name, location, capacity, description, imageUrl, sections, rows
+  let name, capacity, description, imageUrl, sections, rows
   
   try {
     const body = await request.json()
     console.log('PUT venue body:', JSON.stringify(body, null, 2))
     ;({
       name,
-      location,
       capacity,
       description,
       imageUrl,
@@ -93,8 +91,6 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       where: { id: parseInt(id) },
       data: {
         name,
-        address: location || '',
-        city: location || '',
         capacity: parseInt(capacity) || 0,
         description,
         image_url: imageUrl
