@@ -88,6 +88,8 @@ jspm_packages/
 
 # Prisma generated files
 /lib/generated/prisma
+/lib/prisma-client/*.dll.node
+/lib/prisma-client/query_engine-*
 
 # Temporary files
 .tmp/
