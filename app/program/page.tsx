@@ -62,7 +62,7 @@ export default function ProgramPage() {
 
   // Function to generate booking URL - redirect to tickets coming soon page
   const getBookingUrl = (event: Event) => {
-    return '/tickets-coming-soon'
+    return '/tickets'
   }
 
   const fetchEvents = async () => {

@@ -1,75 +1,59 @@
-interface TicketEmailProps {
-  name: string
-  eventTitle: string
-  eventDate: string
-  eventTime: string
-  venue: string
-  seats: string
-}
+import * as React from "react";
 
-export default function TicketEmail({ name, eventTitle, eventDate, eventTime, venue, seats }: TicketEmailProps) {
+type TicketSummary = {
+  bookingReference: string;
+  eventTitle: string;
+  date: string;
+  time: string;
+  venue: string;
+  tickets: { seatLabel: string; attendeeName: string }[];
+};
+
+export default function TicketEmail(props: TicketSummary) {
+  const { bookingReference, eventTitle, date, time, venue, tickets } = props;
   return (
-    <div style={{ fontFamily: "Arial, sans-serif", maxWidth: "600px", margin: "0 auto" }}>
-      <div style={{ backgroundColor: "#021a4a", padding: "20px", textAlign: "center" as const }}>
-        <h1 style={{ color: "white", margin: 0 }}>Acting Europe</h1>
-        <p style={{ color: "#ffcc00", margin: "5px 0 0" }}>Theatre Without Borders</p>
-      </div>
+    <html>
+      <body style={{ backgroundColor: "#f6f6f6", fontFamily: "Arial, sans-serif", margin: 0, padding: "20px" }}>
+        <div style={{ backgroundColor: "#ffffff", padding: "24px", maxWidth: "600px", margin: "0 auto", borderRadius: "8px" }}>
+          <div style={{ backgroundColor: "#021a4a", padding: "20px", textAlign: "center", marginBottom: "20px" }}>
+            <h1 style={{ color: "white", margin: 0, fontSize: "24px" }}>Acting Europe</h1>
+            <p style={{ color: "#ffcc00", margin: "5px 0 0", fontSize: "14px" }}>Theatre Without Borders</p>
+          </div>
+          
+          <h2 style={{ color: "#021a4a", fontSize: "22px", margin: "0 0 16px 0" }}>
+            Your tickets for {eventTitle}
+          </h2>
+          <p style={{ marginTop: 8, marginBottom: 8, color: "#333" }}>{date} at {time} · {venue}</p>
+          <p style={{ marginBottom: 16, color: "#333" }}>Booking reference: <strong>{bookingReference}</strong></p>
 
-      <div style={{ padding: "20px" }}>
-        <h2 style={{ color: "#021a4a" }}>Your Tickets Are Confirmed!</h2>
-        <p>Hello {name},</p>
-        <p>
-          Thank you for your booking. Your tickets for <strong>{eventTitle}</strong> are attached to this email as a
-          PDF.
-        </p>
+          <hr style={{ borderColor: "#ffcc00", margin: "16px 0", border: "none", borderTop: "2px solid #ffcc00" }} />
 
-        <div
-          style={{
-            border: "1px solid #ddd",
-            borderRadius: "4px",
-            padding: "15px",
-            margin: "20px 0",
-            backgroundColor: "#f9f9f9",
-          }}
-        >
-          <h3 style={{ color: "#021a4a", margin: "0 0 10px 0" }}>Booking Details</h3>
-          <p style={{ margin: "5px 0" }}>
-            <strong>Event:</strong> {eventTitle}
+          <div style={{ marginBottom: 20 }}>
+            <h3 style={{ fontSize: "16px", color: "#021a4a", margin: "0 0 12px 0" }}>
+              Tickets in this order
+            </h3>
+            <ul style={{ paddingLeft: 20, margin: 0 }}>
+              {tickets.map((t, i) => (
+                <li key={i} style={{ marginBottom: 4, color: "#333" }}>
+                  {t.attendeeName} — {t.seatLabel}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <p style={{ marginTop: 12, marginBottom: 12, color: "#333", lineHeight: 1.5 }}>
+            We attached a separate PDF file for each attendee. Each person should bring their own PDF or show it on a phone at the entrance.
           </p>
-          <p style={{ margin: "5px 0" }}>
-            <strong>Date:</strong> {eventDate}
+
+          <p style={{ fontSize: "12px", color: "#666", marginTop: 16, marginBottom: 0 }}>
+            Having trouble opening attachments? Reply to this email and we will resend them.
           </p>
-          <p style={{ margin: "5px 0" }}>
-            <strong>Time:</strong> {eventTime}
-          </p>
-          <p style={{ margin: "5px 0" }}>
-            <strong>Venue:</strong> {venue}
-          </p>
-          <p style={{ margin: "5px 0" }}>
-            <strong>Seats:</strong> {seats}
-          </p>
+          
+          <div style={{ marginTop: 20, padding: 15, backgroundColor: "#f8f9fa", borderRadius: 4, textAlign: "center" }}>
+            <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>Acting Europe Festival · tickets@actingeurope.com</p>
+          </div>
         </div>
-
-        <p>
-          Please bring your ticket (printed or on your mobile device) to the venue. We recommend arriving at least 30
-          minutes before the performance starts.
-        </p>
-
-        <p>We look forward to seeing you at the festival!</p>
-      </div>
-
-      <div
-        style={{
-          backgroundColor: "#f5f5f5",
-          padding: "15px",
-          textAlign: "center" as const,
-          fontSize: "12px",
-          color: "#666",
-        }}
-      >
-        <p>If you have any questions, please contact us at tickets@actingeurope.com</p>
-        <p>&copy; {new Date().getFullYear()} Acting Europe Festival. All rights reserved.</p>
-      </div>
-    </div>
-  )
+      </body>
+    </html>
+  );
 }

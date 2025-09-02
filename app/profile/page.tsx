@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/lib/language-context"
 import { useAuth } from "@/components/providers/supabase-auth-provider"
+import TicketCard from "@/components/tickets/TicketCard"
 import { Calendar, Clock, MapPin, Ticket, Settings, User } from "lucide-react"
 
 interface UserProfile {
@@ -29,8 +30,10 @@ interface BookedTicket {
   date: string
   time: string
   venue: string
-  seats: string[]
+  seats: { id: string; row_number: number; seat_number: number; attendee_name: string; qr_code_data: string }[]
   bookingReference: string
+  eventId: number
+  totalAmount: number
 }
 
 export default function ProfilePage() {
@@ -51,6 +54,43 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("upcoming")
   const [isSaving, setIsSaving] = useState(false)
 
+  const fetchUserBookings = async () => {
+    try {
+      const response = await fetch('/api/bookings')
+      if (!response.ok) {
+        throw new Error('Failed to fetch bookings')
+      }
+      const bookings = await response.json()
+      
+      const formattedTickets: BookedTicket[] = bookings.map((booking: any) => ({
+        id: booking.id.toString(),
+        eventTitle: booking.event.title,
+        date: new Date(booking.event.event_date).toLocaleDateString(),
+        time: new Date(`1970-01-01T${booking.event.event_time}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        venue: booking.event.venue?.name || 'TBA',
+        seats: booking.booked_seats.map((seat: any) => ({
+          id: seat.id.toString(),
+          row_number: seat.seat.row_number,
+          seat_number: seat.seat.seat_number,
+          attendee_name: seat.attendee_name,
+          qr_code_data: seat.qr_code_data
+        })),
+        bookingReference: booking.booking_reference,
+        eventId: booking.event_id,
+        totalAmount: parseFloat(booking.total_amount)
+      }))
+      
+      setBookedTickets(formattedTickets)
+    } catch (error) {
+      console.error('Error fetching bookings:', error)
+      toast({
+        title: "Error",
+        description: "Failed to load your bookings. Please try again.",
+        variant: "destructive"
+      })
+    }
+  }
+
   useEffect(() => {
     // Check authentication
     if (!authLoading && !user) {
@@ -66,6 +106,9 @@ export default function ProfilePage() {
         firstName: user.user_metadata?.first_name || '',
         lastName: user.user_metadata?.last_name || ''
       }))
+      
+      // Fetch user bookings
+      fetchUserBookings()
     }
 
     if (!authLoading) {
@@ -200,34 +243,28 @@ export default function ProfilePage() {
                     </Button>
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     {upcomingTickets.map((ticket) => (
-                      <div key={ticket.id} className="border rounded-lg p-4">
-                        <div className="flex justify-between items-start mb-2">
-                          <h3 className="font-semibold">{ticket.eventTitle}</h3>
+                      <div key={ticket.id} className="space-y-4">
+                        <div className="flex justify-between items-center mb-4">
+                          <h3 className="text-lg font-semibold">{ticket.eventTitle}</h3>
                           <Badge>{ticket.bookingReference}</Badge>
                         </div>
-                        <div className="space-y-1 text-sm text-muted-foreground">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4" />
-                            {ticket.date}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Clock className="h-4 w-4" />
-                            {ticket.time}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <MapPin className="h-4 w-4" />
-                            {ticket.venue}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Ticket className="h-4 w-4" />
-                            Seats: {ticket.seats.join(", ")}
-                          </div>
+                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                          {ticket.seats.map((seat) => (
+                            <TicketCard
+                              key={seat.id}
+                              bookingReference={ticket.bookingReference}
+                              attendeeName={seat.attendee_name}
+                              eventTitle={ticket.eventTitle}
+                              eventDate={ticket.date}
+                              eventTime={ticket.time}
+                              venue={ticket.venue}
+                              seat={{ row: seat.row_number, number: seat.seat_number }}
+                              qrPayload={seat.qr_code_data}
+                            />
+                          ))}
                         </div>
-                        <Button size="sm" className="mt-3">
-                          {t("viewDetails")}
-                        </Button>
                       </div>
                     ))}
                   </div>
@@ -250,22 +287,35 @@ export default function ProfilePage() {
                     <p className="text-muted-foreground">{t("noAttendedEvents")}</p>
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     {pastTickets.map((ticket) => (
-                      <div key={ticket.id} className="border rounded-lg p-4 opacity-75">
-                        <div className="flex justify-between items-start mb-2">
-                          <h3 className="font-semibold">{ticket.eventTitle}</h3>
+                      <div key={ticket.id} className="space-y-4 opacity-75">
+                        <div className="flex justify-between items-center mb-4">
+                          <h3 className="text-lg font-semibold">{ticket.eventTitle}</h3>
                           <Badge variant="secondary">{ticket.bookingReference}</Badge>
                         </div>
-                        <div className="space-y-1 text-sm text-muted-foreground">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4" />
-                            {ticket.date}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <MapPin className="h-4 w-4" />
-                            {ticket.venue}
-                          </div>
+                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                          {ticket.seats.map((seat) => (
+                            <div key={seat.id} className="border rounded-lg p-4 bg-muted/50">
+                              <div className="space-y-2">
+                                <div className="font-medium">{seat.attendee_name}</div>
+                                <div className="text-sm text-muted-foreground">
+                                  <div className="flex items-center gap-2">
+                                    <Calendar className="h-4 w-4" />
+                                    {ticket.date}
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <MapPin className="h-4 w-4" />
+                                    {ticket.venue}
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Ticket className="h-4 w-4" />
+                                    Row {seat.row_number}, Seat {seat.seat_number}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     ))}

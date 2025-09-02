@@ -138,7 +138,7 @@ export const BookingStatus: typeof $Enums.BookingStatus
  */
 export class PrismaClient<
   ClientOptions extends Prisma.PrismaClientOptions = Prisma.PrismaClientOptions,
-  U = 'log' extends keyof ClientOptions ? ClientOptions['log'] extends Array<Prisma.LogLevel | Prisma.LogDefinition> ? Prisma.GetEvents<ClientOptions['log']> : never : never,
+  const U = 'log' extends keyof ClientOptions ? ClientOptions['log'] extends Array<Prisma.LogLevel | Prisma.LogDefinition> ? Prisma.GetEvents<ClientOptions['log']> : never : never,
   ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs
 > {
   [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['other'] }
@@ -434,8 +434,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 6.10.1
-   * Query Engine version: 9b628578b3b7cae625e8c927178f15a170e74a9c
+   * Prisma Client JS version: 6.13.0
+   * Query Engine version: 361e86d0ea4987e9f53a565309b3eed797a6bcbd
    */
   export type PrismaVersion = {
     client: string
@@ -1856,16 +1856,24 @@ export namespace Prisma {
     /**
      * @example
      * ```
-     * // Defaults to stdout
+     * // Shorthand for `emit: 'stdout'`
      * log: ['query', 'info', 'warn', 'error']
      * 
-     * // Emit as events
+     * // Emit as events only
      * log: [
-     *   { emit: 'stdout', level: 'query' },
-     *   { emit: 'stdout', level: 'info' },
-     *   { emit: 'stdout', level: 'warn' }
-     *   { emit: 'stdout', level: 'error' }
+     *   { emit: 'event', level: 'query' },
+     *   { emit: 'event', level: 'info' },
+     *   { emit: 'event', level: 'warn' }
+     *   { emit: 'event', level: 'error' }
      * ]
+     * 
+     * / Emit as events and log to stdout
+     * og: [
+     *  { emit: 'stdout', level: 'query' },
+     *  { emit: 'stdout', level: 'info' },
+     *  { emit: 'stdout', level: 'warn' }
+     *  { emit: 'stdout', level: 'error' }
+     * 
      * ```
      * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/logging#the-log-option).
      */
@@ -1919,10 +1927,15 @@ export namespace Prisma {
     emit: 'stdout' | 'event'
   }
 
-  export type GetLogType<T extends LogLevel | LogDefinition> = T extends LogDefinition ? T['emit'] extends 'event' ? T['level'] : never : never
-  export type GetEvents<T extends any> = T extends Array<LogLevel | LogDefinition> ?
-    GetLogType<T[0]> | GetLogType<T[1]> | GetLogType<T[2]> | GetLogType<T[3]>
-    : never
+  export type CheckIsLogLevel<T> = T extends LogLevel ? T : never;
+
+  export type GetLogType<T> = CheckIsLogLevel<
+    T extends LogDefinition ? T['level'] : T
+  >;
+
+  export type GetEvents<T extends any[]> = T extends Array<LogLevel | LogDefinition>
+    ? GetLogType<T[number]>
+    : never;
 
   export type QueryEvent = {
     timestamp: Date
@@ -11814,6 +11827,7 @@ export namespace Prisma {
     booking_reference: number
     total_amount: number
     booking_status: number
+    attendee_names: number
     created_at: number
     updated_at: number
     _all: number
@@ -11863,6 +11877,7 @@ export namespace Prisma {
     booking_reference?: true
     total_amount?: true
     booking_status?: true
+    attendee_names?: true
     created_at?: true
     updated_at?: true
     _all?: true
@@ -11961,6 +11976,7 @@ export namespace Prisma {
     booking_reference: string
     total_amount: Decimal
     booking_status: $Enums.BookingStatus
+    attendee_names: JsonValue | null
     created_at: Date
     updated_at: Date
     _count: BookingCountAggregateOutputType | null
@@ -11991,6 +12007,7 @@ export namespace Prisma {
     booking_reference?: boolean
     total_amount?: boolean
     booking_status?: boolean
+    attendee_names?: boolean
     created_at?: boolean
     updated_at?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -12006,6 +12023,7 @@ export namespace Prisma {
     booking_reference?: boolean
     total_amount?: boolean
     booking_status?: boolean
+    attendee_names?: boolean
     created_at?: boolean
     updated_at?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -12019,6 +12037,7 @@ export namespace Prisma {
     booking_reference?: boolean
     total_amount?: boolean
     booking_status?: boolean
+    attendee_names?: boolean
     created_at?: boolean
     updated_at?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -12032,11 +12051,12 @@ export namespace Prisma {
     booking_reference?: boolean
     total_amount?: boolean
     booking_status?: boolean
+    attendee_names?: boolean
     created_at?: boolean
     updated_at?: boolean
   }
 
-  export type BookingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "user_id" | "event_id" | "booking_reference" | "total_amount" | "booking_status" | "created_at" | "updated_at", ExtArgs["result"]["booking"]>
+  export type BookingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "user_id" | "event_id" | "booking_reference" | "total_amount" | "booking_status" | "attendee_names" | "created_at" | "updated_at", ExtArgs["result"]["booking"]>
   export type BookingInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     event?: boolean | EventDefaultArgs<ExtArgs>
@@ -12066,6 +12086,7 @@ export namespace Prisma {
       booking_reference: string
       total_amount: Prisma.Decimal
       booking_status: $Enums.BookingStatus
+      attendee_names: Prisma.JsonValue | null
       created_at: Date
       updated_at: Date
     }, ExtArgs["result"]["booking"]>
@@ -12500,6 +12521,7 @@ export namespace Prisma {
     readonly booking_reference: FieldRef<"Booking", 'String'>
     readonly total_amount: FieldRef<"Booking", 'Decimal'>
     readonly booking_status: FieldRef<"Booking", 'BookingStatus'>
+    readonly attendee_names: FieldRef<"Booking", 'Json'>
     readonly created_at: FieldRef<"Booking", 'DateTime'>
     readonly updated_at: FieldRef<"Booking", 'DateTime'>
   }
@@ -12968,6 +12990,9 @@ export namespace Prisma {
     id: number | null
     booking_id: number | null
     seat_id: number | null
+    attendee_name: string | null
+    qr_code_data: string | null
+    scanned_at: Date | null
     created_at: Date | null
   }
 
@@ -12975,6 +13000,9 @@ export namespace Prisma {
     id: number | null
     booking_id: number | null
     seat_id: number | null
+    attendee_name: string | null
+    qr_code_data: string | null
+    scanned_at: Date | null
     created_at: Date | null
   }
 
@@ -12982,6 +13010,9 @@ export namespace Prisma {
     id: number
     booking_id: number
     seat_id: number
+    attendee_name: number
+    qr_code_data: number
+    scanned_at: number
     created_at: number
     _all: number
   }
@@ -13003,6 +13034,9 @@ export namespace Prisma {
     id?: true
     booking_id?: true
     seat_id?: true
+    attendee_name?: true
+    qr_code_data?: true
+    scanned_at?: true
     created_at?: true
   }
 
@@ -13010,6 +13044,9 @@ export namespace Prisma {
     id?: true
     booking_id?: true
     seat_id?: true
+    attendee_name?: true
+    qr_code_data?: true
+    scanned_at?: true
     created_at?: true
   }
 
@@ -13017,6 +13054,9 @@ export namespace Prisma {
     id?: true
     booking_id?: true
     seat_id?: true
+    attendee_name?: true
+    qr_code_data?: true
+    scanned_at?: true
     created_at?: true
     _all?: true
   }
@@ -13111,6 +13151,9 @@ export namespace Prisma {
     id: number
     booking_id: number
     seat_id: number
+    attendee_name: string | null
+    qr_code_data: string | null
+    scanned_at: Date | null
     created_at: Date
     _count: BookedSeatCountAggregateOutputType | null
     _avg: BookedSeatAvgAggregateOutputType | null
@@ -13137,6 +13180,9 @@ export namespace Prisma {
     id?: boolean
     booking_id?: boolean
     seat_id?: boolean
+    attendee_name?: boolean
+    qr_code_data?: boolean
+    scanned_at?: boolean
     created_at?: boolean
     booking?: boolean | BookingDefaultArgs<ExtArgs>
     seat?: boolean | SeatDefaultArgs<ExtArgs>
@@ -13146,6 +13192,9 @@ export namespace Prisma {
     id?: boolean
     booking_id?: boolean
     seat_id?: boolean
+    attendee_name?: boolean
+    qr_code_data?: boolean
+    scanned_at?: boolean
     created_at?: boolean
     booking?: boolean | BookingDefaultArgs<ExtArgs>
     seat?: boolean | SeatDefaultArgs<ExtArgs>
@@ -13155,6 +13204,9 @@ export namespace Prisma {
     id?: boolean
     booking_id?: boolean
     seat_id?: boolean
+    attendee_name?: boolean
+    qr_code_data?: boolean
+    scanned_at?: boolean
     created_at?: boolean
     booking?: boolean | BookingDefaultArgs<ExtArgs>
     seat?: boolean | SeatDefaultArgs<ExtArgs>
@@ -13164,10 +13216,13 @@ export namespace Prisma {
     id?: boolean
     booking_id?: boolean
     seat_id?: boolean
+    attendee_name?: boolean
+    qr_code_data?: boolean
+    scanned_at?: boolean
     created_at?: boolean
   }
 
-  export type BookedSeatOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "booking_id" | "seat_id" | "created_at", ExtArgs["result"]["bookedSeat"]>
+  export type BookedSeatOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "booking_id" | "seat_id" | "attendee_name" | "qr_code_data" | "scanned_at" | "created_at", ExtArgs["result"]["bookedSeat"]>
   export type BookedSeatInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     booking?: boolean | BookingDefaultArgs<ExtArgs>
     seat?: boolean | SeatDefaultArgs<ExtArgs>
@@ -13191,6 +13246,9 @@ export namespace Prisma {
       id: number
       booking_id: number
       seat_id: number
+      attendee_name: string | null
+      qr_code_data: string | null
+      scanned_at: Date | null
       created_at: Date
     }, ExtArgs["result"]["bookedSeat"]>
     composites: {}
@@ -13620,6 +13678,9 @@ export namespace Prisma {
     readonly id: FieldRef<"BookedSeat", 'Int'>
     readonly booking_id: FieldRef<"BookedSeat", 'Int'>
     readonly seat_id: FieldRef<"BookedSeat", 'Int'>
+    readonly attendee_name: FieldRef<"BookedSeat", 'String'>
+    readonly qr_code_data: FieldRef<"BookedSeat", 'String'>
+    readonly scanned_at: FieldRef<"BookedSeat", 'DateTime'>
     readonly created_at: FieldRef<"BookedSeat", 'DateTime'>
   }
     
@@ -17569,6 +17630,7 @@ export namespace Prisma {
     booking_reference: 'booking_reference',
     total_amount: 'total_amount',
     booking_status: 'booking_status',
+    attendee_names: 'attendee_names',
     created_at: 'created_at',
     updated_at: 'updated_at'
   };
@@ -17580,6 +17642,9 @@ export namespace Prisma {
     id: 'id',
     booking_id: 'booking_id',
     seat_id: 'seat_id',
+    attendee_name: 'attendee_name',
+    qr_code_data: 'qr_code_data',
+    scanned_at: 'scanned_at',
     created_at: 'created_at'
   };
 
@@ -17650,6 +17715,14 @@ export namespace Prisma {
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+  export const NullableJsonNullValueInput: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull
+  };
+
+  export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
   export const QueryMode: {
     default: 'default',
     insensitive: 'insensitive'
@@ -17664,6 +17737,15 @@ export namespace Prisma {
   };
 
   export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+  export const JsonNullValueFilter: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull,
+    AnyNull: typeof AnyNull
+  };
+
+  export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
   /**
@@ -17773,6 +17855,20 @@ export namespace Prisma {
    * Reference to a field of type 'BookingStatus[]'
    */
   export type ListEnumBookingStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BookingStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -18476,6 +18572,7 @@ export namespace Prisma {
     booking_reference?: StringFilter<"Booking"> | string
     total_amount?: DecimalFilter<"Booking"> | Decimal | DecimalJsLike | number | string
     booking_status?: EnumBookingStatusFilter<"Booking"> | $Enums.BookingStatus
+    attendee_names?: JsonNullableFilter<"Booking">
     created_at?: DateTimeFilter<"Booking"> | Date | string
     updated_at?: DateTimeFilter<"Booking"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -18490,6 +18587,7 @@ export namespace Prisma {
     booking_reference?: SortOrder
     total_amount?: SortOrder
     booking_status?: SortOrder
+    attendee_names?: SortOrderInput | SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
     user?: UserOrderByWithRelationInput
@@ -18507,6 +18605,7 @@ export namespace Prisma {
     event_id?: IntFilter<"Booking"> | number
     total_amount?: DecimalFilter<"Booking"> | Decimal | DecimalJsLike | number | string
     booking_status?: EnumBookingStatusFilter<"Booking"> | $Enums.BookingStatus
+    attendee_names?: JsonNullableFilter<"Booking">
     created_at?: DateTimeFilter<"Booking"> | Date | string
     updated_at?: DateTimeFilter<"Booking"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -18521,6 +18620,7 @@ export namespace Prisma {
     booking_reference?: SortOrder
     total_amount?: SortOrder
     booking_status?: SortOrder
+    attendee_names?: SortOrderInput | SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
     _count?: BookingCountOrderByAggregateInput
@@ -18540,6 +18640,7 @@ export namespace Prisma {
     booking_reference?: StringWithAggregatesFilter<"Booking"> | string
     total_amount?: DecimalWithAggregatesFilter<"Booking"> | Decimal | DecimalJsLike | number | string
     booking_status?: EnumBookingStatusWithAggregatesFilter<"Booking"> | $Enums.BookingStatus
+    attendee_names?: JsonNullableWithAggregatesFilter<"Booking">
     created_at?: DateTimeWithAggregatesFilter<"Booking"> | Date | string
     updated_at?: DateTimeWithAggregatesFilter<"Booking"> | Date | string
   }
@@ -18551,6 +18652,9 @@ export namespace Prisma {
     id?: IntFilter<"BookedSeat"> | number
     booking_id?: IntFilter<"BookedSeat"> | number
     seat_id?: IntFilter<"BookedSeat"> | number
+    attendee_name?: StringNullableFilter<"BookedSeat"> | string | null
+    qr_code_data?: StringNullableFilter<"BookedSeat"> | string | null
+    scanned_at?: DateTimeNullableFilter<"BookedSeat"> | Date | string | null
     created_at?: DateTimeFilter<"BookedSeat"> | Date | string
     booking?: XOR<BookingScalarRelationFilter, BookingWhereInput>
     seat?: XOR<SeatScalarRelationFilter, SeatWhereInput>
@@ -18560,6 +18664,9 @@ export namespace Prisma {
     id?: SortOrder
     booking_id?: SortOrder
     seat_id?: SortOrder
+    attendee_name?: SortOrderInput | SortOrder
+    qr_code_data?: SortOrderInput | SortOrder
+    scanned_at?: SortOrderInput | SortOrder
     created_at?: SortOrder
     booking?: BookingOrderByWithRelationInput
     seat?: SeatOrderByWithRelationInput
@@ -18573,6 +18680,9 @@ export namespace Prisma {
     NOT?: BookedSeatWhereInput | BookedSeatWhereInput[]
     booking_id?: IntFilter<"BookedSeat"> | number
     seat_id?: IntFilter<"BookedSeat"> | number
+    attendee_name?: StringNullableFilter<"BookedSeat"> | string | null
+    qr_code_data?: StringNullableFilter<"BookedSeat"> | string | null
+    scanned_at?: DateTimeNullableFilter<"BookedSeat"> | Date | string | null
     created_at?: DateTimeFilter<"BookedSeat"> | Date | string
     booking?: XOR<BookingScalarRelationFilter, BookingWhereInput>
     seat?: XOR<SeatScalarRelationFilter, SeatWhereInput>
@@ -18582,6 +18692,9 @@ export namespace Prisma {
     id?: SortOrder
     booking_id?: SortOrder
     seat_id?: SortOrder
+    attendee_name?: SortOrderInput | SortOrder
+    qr_code_data?: SortOrderInput | SortOrder
+    scanned_at?: SortOrderInput | SortOrder
     created_at?: SortOrder
     _count?: BookedSeatCountOrderByAggregateInput
     _avg?: BookedSeatAvgOrderByAggregateInput
@@ -18597,6 +18710,9 @@ export namespace Prisma {
     id?: IntWithAggregatesFilter<"BookedSeat"> | number
     booking_id?: IntWithAggregatesFilter<"BookedSeat"> | number
     seat_id?: IntWithAggregatesFilter<"BookedSeat"> | number
+    attendee_name?: StringNullableWithAggregatesFilter<"BookedSeat"> | string | null
+    qr_code_data?: StringNullableWithAggregatesFilter<"BookedSeat"> | string | null
+    scanned_at?: DateTimeNullableWithAggregatesFilter<"BookedSeat"> | Date | string | null
     created_at?: DateTimeWithAggregatesFilter<"BookedSeat"> | Date | string
   }
 
@@ -19608,6 +19724,7 @@ export namespace Prisma {
     booking_reference: string
     total_amount: Decimal | DecimalJsLike | number | string
     booking_status?: $Enums.BookingStatus
+    attendee_names?: NullableJsonNullValueInput | InputJsonValue
     created_at?: Date | string
     updated_at?: Date | string
     user: UserCreateNestedOneWithoutBookingsInput
@@ -19622,6 +19739,7 @@ export namespace Prisma {
     booking_reference: string
     total_amount: Decimal | DecimalJsLike | number | string
     booking_status?: $Enums.BookingStatus
+    attendee_names?: NullableJsonNullValueInput | InputJsonValue
     created_at?: Date | string
     updated_at?: Date | string
     booked_seats?: BookedSeatUncheckedCreateNestedManyWithoutBookingInput
@@ -19631,6 +19749,7 @@ export namespace Prisma {
     booking_reference?: StringFieldUpdateOperationsInput | string
     total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     booking_status?: EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
+    attendee_names?: NullableJsonNullValueInput | InputJsonValue
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutBookingsNestedInput
@@ -19645,6 +19764,7 @@ export namespace Prisma {
     booking_reference?: StringFieldUpdateOperationsInput | string
     total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     booking_status?: EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
+    attendee_names?: NullableJsonNullValueInput | InputJsonValue
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     booked_seats?: BookedSeatUncheckedUpdateManyWithoutBookingNestedInput
@@ -19657,6 +19777,7 @@ export namespace Prisma {
     booking_reference: string
     total_amount: Decimal | DecimalJsLike | number | string
     booking_status?: $Enums.BookingStatus
+    attendee_names?: NullableJsonNullValueInput | InputJsonValue
     created_at?: Date | string
     updated_at?: Date | string
   }
@@ -19665,6 +19786,7 @@ export namespace Prisma {
     booking_reference?: StringFieldUpdateOperationsInput | string
     total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     booking_status?: EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
+    attendee_names?: NullableJsonNullValueInput | InputJsonValue
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -19676,11 +19798,15 @@ export namespace Prisma {
     booking_reference?: StringFieldUpdateOperationsInput | string
     total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     booking_status?: EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
+    attendee_names?: NullableJsonNullValueInput | InputJsonValue
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type BookedSeatCreateInput = {
+    attendee_name?: string | null
+    qr_code_data?: string | null
+    scanned_at?: Date | string | null
     created_at?: Date | string
     booking: BookingCreateNestedOneWithoutBooked_seatsInput
     seat: SeatCreateNestedOneWithoutBooked_seatsInput
@@ -19690,10 +19816,16 @@ export namespace Prisma {
     id?: number
     booking_id: number
     seat_id: number
+    attendee_name?: string | null
+    qr_code_data?: string | null
+    scanned_at?: Date | string | null
     created_at?: Date | string
   }
 
   export type BookedSeatUpdateInput = {
+    attendee_name?: NullableStringFieldUpdateOperationsInput | string | null
+    qr_code_data?: NullableStringFieldUpdateOperationsInput | string | null
+    scanned_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     booking?: BookingUpdateOneRequiredWithoutBooked_seatsNestedInput
     seat?: SeatUpdateOneRequiredWithoutBooked_seatsNestedInput
@@ -19703,6 +19835,9 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     booking_id?: IntFieldUpdateOperationsInput | number
     seat_id?: IntFieldUpdateOperationsInput | number
+    attendee_name?: NullableStringFieldUpdateOperationsInput | string | null
+    qr_code_data?: NullableStringFieldUpdateOperationsInput | string | null
+    scanned_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -19710,10 +19845,16 @@ export namespace Prisma {
     id?: number
     booking_id: number
     seat_id: number
+    attendee_name?: string | null
+    qr_code_data?: string | null
+    scanned_at?: Date | string | null
     created_at?: Date | string
   }
 
   export type BookedSeatUpdateManyMutationInput = {
+    attendee_name?: NullableStringFieldUpdateOperationsInput | string | null
+    qr_code_data?: NullableStringFieldUpdateOperationsInput | string | null
+    scanned_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -19721,6 +19862,9 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     booking_id?: IntFieldUpdateOperationsInput | number
     seat_id?: IntFieldUpdateOperationsInput | number
+    attendee_name?: NullableStringFieldUpdateOperationsInput | string | null
+    qr_code_data?: NullableStringFieldUpdateOperationsInput | string | null
+    scanned_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -20767,6 +20911,29 @@ export namespace Prisma {
     notIn?: $Enums.BookingStatus[] | ListEnumBookingStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumBookingStatusFilter<$PrismaModel> | $Enums.BookingStatus
   }
+  export type JsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type UserScalarRelationFilter = {
     is?: UserWhereInput
@@ -20785,6 +20952,7 @@ export namespace Prisma {
     booking_reference?: SortOrder
     total_amount?: SortOrder
     booking_status?: SortOrder
+    attendee_names?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
   }
@@ -20834,6 +21002,43 @@ export namespace Prisma {
     _min?: NestedEnumBookingStatusFilter<$PrismaModel>
     _max?: NestedEnumBookingStatusFilter<$PrismaModel>
   }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
+  }
+
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
 
   export type BookingScalarRelationFilter = {
     is?: BookingWhereInput
@@ -20854,6 +21059,9 @@ export namespace Prisma {
     id?: SortOrder
     booking_id?: SortOrder
     seat_id?: SortOrder
+    attendee_name?: SortOrder
+    qr_code_data?: SortOrder
+    scanned_at?: SortOrder
     created_at?: SortOrder
   }
 
@@ -20867,6 +21075,9 @@ export namespace Prisma {
     id?: SortOrder
     booking_id?: SortOrder
     seat_id?: SortOrder
+    attendee_name?: SortOrder
+    qr_code_data?: SortOrder
+    scanned_at?: SortOrder
     created_at?: SortOrder
   }
 
@@ -20874,6 +21085,9 @@ export namespace Prisma {
     id?: SortOrder
     booking_id?: SortOrder
     seat_id?: SortOrder
+    attendee_name?: SortOrder
+    qr_code_data?: SortOrder
+    scanned_at?: SortOrder
     created_at?: SortOrder
   }
 
@@ -20883,7 +21097,7 @@ export namespace Prisma {
     seat_id?: SortOrder
   }
 
-  export type DateTimeNullableFilter<$PrismaModel = never> = {
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
     notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
@@ -20891,7 +21105,10 @@ export namespace Prisma {
     lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type NewsArticleCountOrderByAggregateInput = {
@@ -20948,20 +21165,6 @@ export namespace Prisma {
 
   export type NewsArticleSumOrderByAggregateInput = {
     id?: SortOrder
-  }
-
-  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type AboutPageCountOrderByAggregateInput = {
@@ -21698,6 +21901,10 @@ export namespace Prisma {
     connect?: SeatWhereUniqueInput
   }
 
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
+  }
+
   export type BookingUpdateOneRequiredWithoutBooked_seatsNestedInput = {
     create?: XOR<BookingCreateWithoutBooked_seatsInput, BookingUncheckedCreateWithoutBooked_seatsInput>
     connectOrCreate?: BookingCreateOrConnectWithoutBooked_seatsInput
@@ -21712,10 +21919,6 @@ export namespace Prisma {
     upsert?: SeatUpsertWithoutBooked_seatsInput
     connect?: SeatWhereUniqueInput
     update?: XOR<XOR<SeatUpdateToOneWithWhereWithoutBooked_seatsInput, SeatUpdateWithoutBooked_seatsInput>, SeatUncheckedUpdateWithoutBooked_seatsInput>
-  }
-
-  export type NullableDateTimeFieldUpdateOperationsInput = {
-    set?: Date | string | null
   }
 
   export type NestedIntFilter<$PrismaModel = never> = {
@@ -21971,6 +22174,29 @@ export namespace Prisma {
     _min?: NestedEnumBookingStatusFilter<$PrismaModel>
     _max?: NestedEnumBookingStatusFilter<$PrismaModel>
   }
+  export type NestedJsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
@@ -22001,6 +22227,7 @@ export namespace Prisma {
     booking_reference: string
     total_amount: Decimal | DecimalJsLike | number | string
     booking_status?: $Enums.BookingStatus
+    attendee_names?: NullableJsonNullValueInput | InputJsonValue
     created_at?: Date | string
     updated_at?: Date | string
     event: EventCreateNestedOneWithoutBookingsInput
@@ -22013,6 +22240,7 @@ export namespace Prisma {
     booking_reference: string
     total_amount: Decimal | DecimalJsLike | number | string
     booking_status?: $Enums.BookingStatus
+    attendee_names?: NullableJsonNullValueInput | InputJsonValue
     created_at?: Date | string
     updated_at?: Date | string
     booked_seats?: BookedSeatUncheckedCreateNestedManyWithoutBookingInput
@@ -22054,6 +22282,7 @@ export namespace Prisma {
     booking_reference?: StringFilter<"Booking"> | string
     total_amount?: DecimalFilter<"Booking"> | Decimal | DecimalJsLike | number | string
     booking_status?: EnumBookingStatusFilter<"Booking"> | $Enums.BookingStatus
+    attendee_names?: JsonNullableFilter<"Booking">
     created_at?: DateTimeFilter<"Booking"> | Date | string
     updated_at?: DateTimeFilter<"Booking"> | Date | string
   }
@@ -22716,6 +22945,9 @@ export namespace Prisma {
   }
 
   export type BookedSeatCreateWithoutSeatInput = {
+    attendee_name?: string | null
+    qr_code_data?: string | null
+    scanned_at?: Date | string | null
     created_at?: Date | string
     booking: BookingCreateNestedOneWithoutBooked_seatsInput
   }
@@ -22723,6 +22955,9 @@ export namespace Prisma {
   export type BookedSeatUncheckedCreateWithoutSeatInput = {
     id?: number
     booking_id: number
+    attendee_name?: string | null
+    qr_code_data?: string | null
+    scanned_at?: Date | string | null
     created_at?: Date | string
   }
 
@@ -22785,6 +23020,9 @@ export namespace Prisma {
     id?: IntFilter<"BookedSeat"> | number
     booking_id?: IntFilter<"BookedSeat"> | number
     seat_id?: IntFilter<"BookedSeat"> | number
+    attendee_name?: StringNullableFilter<"BookedSeat"> | string | null
+    qr_code_data?: StringNullableFilter<"BookedSeat"> | string | null
+    scanned_at?: DateTimeNullableFilter<"BookedSeat"> | Date | string | null
     created_at?: DateTimeFilter<"BookedSeat"> | Date | string
   }
 
@@ -22860,6 +23098,7 @@ export namespace Prisma {
     booking_reference: string
     total_amount: Decimal | DecimalJsLike | number | string
     booking_status?: $Enums.BookingStatus
+    attendee_names?: NullableJsonNullValueInput | InputJsonValue
     created_at?: Date | string
     updated_at?: Date | string
     user: UserCreateNestedOneWithoutBookingsInput
@@ -22872,6 +23111,7 @@ export namespace Prisma {
     booking_reference: string
     total_amount: Decimal | DecimalJsLike | number | string
     booking_status?: $Enums.BookingStatus
+    attendee_names?: NullableJsonNullValueInput | InputJsonValue
     created_at?: Date | string
     updated_at?: Date | string
     booked_seats?: BookedSeatUncheckedCreateNestedManyWithoutBookingInput
@@ -23076,6 +23316,9 @@ export namespace Prisma {
   }
 
   export type BookedSeatCreateWithoutBookingInput = {
+    attendee_name?: string | null
+    qr_code_data?: string | null
+    scanned_at?: Date | string | null
     created_at?: Date | string
     seat: SeatCreateNestedOneWithoutBooked_seatsInput
   }
@@ -23083,6 +23326,9 @@ export namespace Prisma {
   export type BookedSeatUncheckedCreateWithoutBookingInput = {
     id?: number
     seat_id: number
+    attendee_name?: string | null
+    qr_code_data?: string | null
+    scanned_at?: Date | string | null
     created_at?: Date | string
   }
 
@@ -23220,6 +23466,7 @@ export namespace Prisma {
     booking_reference: string
     total_amount: Decimal | DecimalJsLike | number | string
     booking_status?: $Enums.BookingStatus
+    attendee_names?: NullableJsonNullValueInput | InputJsonValue
     created_at?: Date | string
     updated_at?: Date | string
     user: UserCreateNestedOneWithoutBookingsInput
@@ -23233,6 +23480,7 @@ export namespace Prisma {
     booking_reference: string
     total_amount: Decimal | DecimalJsLike | number | string
     booking_status?: $Enums.BookingStatus
+    attendee_names?: NullableJsonNullValueInput | InputJsonValue
     created_at?: Date | string
     updated_at?: Date | string
   }
@@ -23281,6 +23529,7 @@ export namespace Prisma {
     booking_reference?: StringFieldUpdateOperationsInput | string
     total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     booking_status?: EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
+    attendee_names?: NullableJsonNullValueInput | InputJsonValue
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutBookingsNestedInput
@@ -23294,6 +23543,7 @@ export namespace Prisma {
     booking_reference?: StringFieldUpdateOperationsInput | string
     total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     booking_status?: EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
+    attendee_names?: NullableJsonNullValueInput | InputJsonValue
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -23334,6 +23584,7 @@ export namespace Prisma {
     booking_reference: string
     total_amount: Decimal | DecimalJsLike | number | string
     booking_status?: $Enums.BookingStatus
+    attendee_names?: NullableJsonNullValueInput | InputJsonValue
     created_at?: Date | string
     updated_at?: Date | string
   }
@@ -23342,6 +23593,7 @@ export namespace Prisma {
     booking_reference?: StringFieldUpdateOperationsInput | string
     total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     booking_status?: EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
+    attendee_names?: NullableJsonNullValueInput | InputJsonValue
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     event?: EventUpdateOneRequiredWithoutBookingsNestedInput
@@ -23354,6 +23606,7 @@ export namespace Prisma {
     booking_reference?: StringFieldUpdateOperationsInput | string
     total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     booking_status?: EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
+    attendee_names?: NullableJsonNullValueInput | InputJsonValue
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     booked_seats?: BookedSeatUncheckedUpdateManyWithoutBookingNestedInput
@@ -23365,6 +23618,7 @@ export namespace Prisma {
     booking_reference?: StringFieldUpdateOperationsInput | string
     total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     booking_status?: EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
+    attendee_names?: NullableJsonNullValueInput | InputJsonValue
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -23710,10 +23964,16 @@ export namespace Prisma {
   export type BookedSeatCreateManySeatInput = {
     id?: number
     booking_id: number
+    attendee_name?: string | null
+    qr_code_data?: string | null
+    scanned_at?: Date | string | null
     created_at?: Date | string
   }
 
   export type BookedSeatUpdateWithoutSeatInput = {
+    attendee_name?: NullableStringFieldUpdateOperationsInput | string | null
+    qr_code_data?: NullableStringFieldUpdateOperationsInput | string | null
+    scanned_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     booking?: BookingUpdateOneRequiredWithoutBooked_seatsNestedInput
   }
@@ -23721,12 +23981,18 @@ export namespace Prisma {
   export type BookedSeatUncheckedUpdateWithoutSeatInput = {
     id?: IntFieldUpdateOperationsInput | number
     booking_id?: IntFieldUpdateOperationsInput | number
+    attendee_name?: NullableStringFieldUpdateOperationsInput | string | null
+    qr_code_data?: NullableStringFieldUpdateOperationsInput | string | null
+    scanned_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type BookedSeatUncheckedUpdateManyWithoutSeatInput = {
     id?: IntFieldUpdateOperationsInput | number
     booking_id?: IntFieldUpdateOperationsInput | number
+    attendee_name?: NullableStringFieldUpdateOperationsInput | string | null
+    qr_code_data?: NullableStringFieldUpdateOperationsInput | string | null
+    scanned_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -23736,6 +24002,7 @@ export namespace Prisma {
     booking_reference: string
     total_amount: Decimal | DecimalJsLike | number | string
     booking_status?: $Enums.BookingStatus
+    attendee_names?: NullableJsonNullValueInput | InputJsonValue
     created_at?: Date | string
     updated_at?: Date | string
   }
@@ -23744,6 +24011,7 @@ export namespace Prisma {
     booking_reference?: StringFieldUpdateOperationsInput | string
     total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     booking_status?: EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
+    attendee_names?: NullableJsonNullValueInput | InputJsonValue
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutBookingsNestedInput
@@ -23756,6 +24024,7 @@ export namespace Prisma {
     booking_reference?: StringFieldUpdateOperationsInput | string
     total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     booking_status?: EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
+    attendee_names?: NullableJsonNullValueInput | InputJsonValue
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     booked_seats?: BookedSeatUncheckedUpdateManyWithoutBookingNestedInput
@@ -23767,6 +24036,7 @@ export namespace Prisma {
     booking_reference?: StringFieldUpdateOperationsInput | string
     total_amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     booking_status?: EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
+    attendee_names?: NullableJsonNullValueInput | InputJsonValue
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -23774,10 +24044,16 @@ export namespace Prisma {
   export type BookedSeatCreateManyBookingInput = {
     id?: number
     seat_id: number
+    attendee_name?: string | null
+    qr_code_data?: string | null
+    scanned_at?: Date | string | null
     created_at?: Date | string
   }
 
   export type BookedSeatUpdateWithoutBookingInput = {
+    attendee_name?: NullableStringFieldUpdateOperationsInput | string | null
+    qr_code_data?: NullableStringFieldUpdateOperationsInput | string | null
+    scanned_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     seat?: SeatUpdateOneRequiredWithoutBooked_seatsNestedInput
   }
@@ -23785,12 +24061,18 @@ export namespace Prisma {
   export type BookedSeatUncheckedUpdateWithoutBookingInput = {
     id?: IntFieldUpdateOperationsInput | number
     seat_id?: IntFieldUpdateOperationsInput | number
+    attendee_name?: NullableStringFieldUpdateOperationsInput | string | null
+    qr_code_data?: NullableStringFieldUpdateOperationsInput | string | null
+    scanned_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type BookedSeatUncheckedUpdateManyWithoutBookingInput = {
     id?: IntFieldUpdateOperationsInput | number
     seat_id?: IntFieldUpdateOperationsInput | number
+    attendee_name?: NullableStringFieldUpdateOperationsInput | string | null
+    qr_code_data?: NullableStringFieldUpdateOperationsInput | string | null
+    scanned_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 

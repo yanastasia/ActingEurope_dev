@@ -210,7 +210,7 @@ export default function PerformancesPage() {
                     </Link>
                   </Button>
                   <Button variant="outline" asChild>
-                    <Link href="/tickets-coming-soon">
+                    <Link href="/tickets">
                       Book Tickets
                     </Link>
                   </Button>

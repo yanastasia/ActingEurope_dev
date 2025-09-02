@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { isAdmin } from '@/lib/auth';
+import { sendTicketEmail } from '@/lib/email-service';
+import { buildQrPayload } from '@/lib/tickets/qr';
 
 // Generate unique booking reference
 function generateBookingReference(): string {
@@ -76,7 +78,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { userId, eventId, selectedSeats, totalAmount } = body;
+    const { userId, eventId, selectedSeats, totalAmount, attendee_names, customerEmail, customerName } = body;
 
     // Validate required fields
     if (!userId || !eventId || !selectedSeats || !totalAmount) {
@@ -89,6 +91,14 @@ export async function POST(request: NextRequest) {
     if (!Array.isArray(selectedSeats) || selectedSeats.length === 0) {
       return NextResponse.json(
         { error: 'selectedSeats must be a non-empty array' },
+        { status: 400 }
+      );
+    }
+
+    // Validate attendee names
+    if (!attendee_names || !Array.isArray(attendee_names) || attendee_names.length !== selectedSeats.length) {
+      return NextResponse.json(
+        { error: 'attendee_names must be an array with one name per selected seat' },
         { status: 400 }
       );
     }
@@ -158,16 +168,26 @@ export async function POST(request: NextRequest) {
           event_id: eventId,
           booking_reference: generateBookingReference(),
           total_amount: totalAmount,
-          booking_status: 'pending'
+          booking_status: 'pending',
+          attendee_names: attendee_names
         }
       });
 
-      // Create booked seats
+      // Create booked seats with attendee names and QR codes
+      const bookedSeatsData = selectedSeats.map((seat, index) => {
+        const attendeeName = attendee_names[index]?.fullName || attendee_names[index];
+        const qrPayload = buildQrPayload(booking.booking_reference, seat.id.toString(), eventId);
+        
+        return {
+          bookingId: booking.id,
+          seatId: seat.id,
+          attendee_name: attendeeName,
+          qr_code_data: qrPayload
+        };
+      });
+
       const bookedSeats = await tx.bookedSeat.createMany({
-        data: selectedSeats.map(seat => ({
-          booking_id: booking.id,
-          seat_id: seat.id
-        }))
+        data: bookedSeatsData
       });
 
       // Update seat availability
@@ -183,12 +203,13 @@ export async function POST(request: NextRequest) {
       return { booking, bookedSeats };
     });
 
-    // Fetch complete booking data to return
+    // Fetch complete booking data for email
     const completeBooking = await prisma.booking.findUnique({
       where: { id: result.booking.id },
       include: {
         event: {
           select: {
+            id: true,
             title: true,
             event_date: true,
             event_time: true,
@@ -202,18 +223,25 @@ export async function POST(request: NextRequest) {
         booked_seats: {
           include: {
             seat: {
-              include: {
-                venueSection: {
-                  select: {
-                    section_name: true
-                  }
-                }
+              select: {
+                row_number: true,
+                seat_number: true
               }
             }
           }
         }
       }
     });
+
+    // Send ticket email if customer email is provided
+    if (customerEmail && completeBooking) {
+      try {
+        await sendTicketEmail(completeBooking.id.toString());
+      } catch (emailError) {
+        console.error('Failed to send ticket email:', emailError);
+        // Don't fail the booking if email fails
+      }
+    }
 
     return NextResponse.json({
       success: true,

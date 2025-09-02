@@ -19,6 +19,14 @@ interface Venue {
   name: string
   description: string
   rows: VenueRow[]
+  sections?: VenueSection[]
+}
+
+interface VenueSection {
+  id: string
+  sectionName: string
+  sectionType: string
+  rows: VenueRow[]
 }
 
 interface VenueRow {
@@ -45,56 +53,72 @@ export default function SeatSelection({ venueId, onSeatsSelected, isUserAdmin = 
   useEffect(() => {
     const loadVenue = async () => {
       try {
-        // Create a default venue structure for now
-        // TODO: Replace with actual venue API call when available
-        const defaultVenue: Venue = {
-          id: venueId.toString(),
-          name: "Main Theatre",
-          description: "Main theatre venue",
-          rows: [
-            { 
-              rowNumber: 1, 
-              seats: Array.from({ length: 10 }, (_, i) => ({ 
-                seatNumber: i + 1, 
-                isAccessible: i === 0 || i === 9, // First and last seats are accessible
-                isBooked: false 
-              }))
-            },
-            { 
-              rowNumber: 2, 
-              seats: Array.from({ length: 10 }, (_, i) => ({ 
-                seatNumber: i + 1, 
-                isAccessible: i === 0 || i === 9,
-                isBooked: false 
-              }))
-            },
-            { 
-              rowNumber: 3, 
-              seats: Array.from({ length: 10 }, (_, i) => ({ 
-                seatNumber: i + 1, 
-                isAccessible: i === 0 || i === 9,
-                isBooked: false 
-              }))
-            },
-            { 
-              rowNumber: 4, 
-              seats: Array.from({ length: 10 }, (_, i) => ({ 
-                seatNumber: i + 1, 
-                isAccessible: i === 0 || i === 9,
-                isBooked: false 
-              }))
-            },
-            { 
-              rowNumber: 5, 
-              seats: Array.from({ length: 10 }, (_, i) => ({ 
-                seatNumber: i + 1, 
-                isAccessible: i === 0 || i === 9,
-                isBooked: false 
-              }))
-            }
-          ]
+        // Fetch venue data from API
+        const response = await fetch(`/api/venues/${venueId}`)
+        if (response.ok) {
+          const venueData = await response.json()
+          
+          // Transform API response to match our Venue interface
+          const transformedVenue: Venue = {
+            id: venueData.id,
+            name: venueData.name,
+            description: venueData.description || "",
+            rows: venueData.sections?.[0]?.rows || [],
+            sections: venueData.sections || []
+          }
+          
+          setVenue(transformedVenue)
+        } else {
+          // Fallback to default venue if API fails
+          const defaultVenue: Venue = {
+            id: venueId.toString(),
+            name: "Main Theatre",
+            description: "Main theatre venue",
+            rows: [
+              { 
+                rowNumber: 1, 
+                seats: Array.from({ length: 10 }, (_, i) => ({ 
+                  seatNumber: i + 1, 
+                  isAccessible: i === 0 || i === 9,
+                  isBooked: false 
+                }))
+              },
+              { 
+                rowNumber: 2, 
+                seats: Array.from({ length: 10 }, (_, i) => ({ 
+                  seatNumber: i + 1, 
+                  isAccessible: i === 0 || i === 9,
+                  isBooked: false 
+                }))
+              },
+              { 
+                rowNumber: 3, 
+                seats: Array.from({ length: 10 }, (_, i) => ({ 
+                  seatNumber: i + 1, 
+                  isAccessible: i === 0 || i === 9,
+                  isBooked: false 
+                }))
+              },
+              { 
+                rowNumber: 4, 
+                seats: Array.from({ length: 10 }, (_, i) => ({ 
+                  seatNumber: i + 1, 
+                  isAccessible: i === 0 || i === 9,
+                  isBooked: false 
+                }))
+              },
+              { 
+                rowNumber: 5, 
+                seats: Array.from({ length: 10 }, (_, i) => ({ 
+                  seatNumber: i + 1, 
+                  isAccessible: i === 0 || i === 9,
+                  isBooked: false 
+                }))
+              }
+            ]
+          }
+          setVenue(defaultVenue)
         }
-        setVenue(defaultVenue)
       } catch (error) {
         console.error("Error loading venue:", error)
       } finally {
@@ -110,7 +134,7 @@ export default function SeatSelection({ venueId, onSeatsSelected, isUserAdmin = 
     if (selectedSeats.includes(seatId)) {
       setSelectedSeats(selectedSeats.filter((seat) => seat !== seatId))
     } else {
-      if (!isUserAdmin && selectedSeats.length >= 5) {
+      if (!isUserAdmin && selectedSeats.length >= 2) {
         toast({
           title: t("maxSeatsReached"),
           description: t("maxSeatsReachedDesc"),
@@ -157,9 +181,9 @@ export default function SeatSelection({ venueId, onSeatsSelected, isUserAdmin = 
           // Skip rows with 0 seats
           if (!row.seats || row.seats.length === 0) {
             return (
-              <div key={row.rowNumber} className="flex items-center">
-                <div className="mr-2 w-6 text-center font-medium">{row.rowNumber}</div>
-                <div className="flex flex-1 justify-center">
+              <div key={row.rowNumber} className="flex items-center justify-center">
+                <div className="mr-4 w-8 text-right font-medium flex-shrink-0">{row.rowNumber}</div>
+                <div className="flex justify-center">
                   <div className="text-sm text-muted-foreground italic">No seats in this row</div>
                 </div>
               </div>
@@ -167,9 +191,9 @@ export default function SeatSelection({ venueId, onSeatsSelected, isUserAdmin = 
           }
 
           return (
-            <div key={row.rowNumber} className="flex items-center">
-              <div className="mr-2 w-6 text-center font-medium">{row.rowNumber}</div>
-              <div className="flex flex-1 justify-center gap-1">
+            <div key={row.rowNumber} className="flex items-center justify-center">
+              <div className="mr-4 w-8 text-right font-medium flex-shrink-0">{row.rowNumber}</div>
+              <div className="flex justify-center gap-1 max-w-fit">
                 {row.seats.map((seat) => {
                   const seatId = `${row.rowNumber}-${seat.seatNumber}`
                   const isSelected = selectedSeats.includes(seatId)
@@ -250,32 +274,64 @@ export default function SeatSelection({ venueId, onSeatsSelected, isUserAdmin = 
     )
   }
 
-  // Split rows into sections (for demonstration purposes)
-  // In a real app, you might have actual sections defined in your venue data
-  const sections = [
-    {
-      id: "1",
-      name: venue.name === "Main Stage" ? t("regularSeating") : t("mainSeating"),
-      type: "regular",
-      rows: venue.rows,
-    },
-  ]
+  // Use actual sections from venue data or create default section
+  const sections = venue.sections && venue.sections.length > 0 
+    ? venue.sections.map(section => ({
+        id: section.id,
+        name: section.sectionName || section.sectionType,
+        type: section.sectionType,
+        rows: section.rows || [],
+      }))
+    : [
+        {
+          id: "1",
+          name: venue.name === "Main Stage" ? t("regularSeating") : t("mainSeating"),
+          type: "regular",
+          rows: venue.rows,
+        },
+      ]
 
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <div className="mb-2 text-lg font-semibold text-secondary-blue">{t("selectYourSeats")}</div>
         <div className="mb-2 text-sm font-medium">{venue.name}</div>
         <p className="text-sm text-muted-foreground">
           {t("selectedSeats")}: {selectedSeats.length > 0 ? selectedSeats.join(", ") : t("none")}
-          {isUserAdmin && <span className="ml-2 text-primary-gold">(Admin: Unlimited seats)</span>}
+          {isUserAdmin ? (
+            <span className="ml-2 text-primary-gold">(Admin: Unlimited seats)</span>
+          ) : (
+            <span className="ml-2 text-gray-600">({selectedSeats.length}/2 seats)</span>
+          )}
         </p>
       </div>
 
+      {/* Confirm Selection Button - moved to top right */}
+       <div className="flex justify-end mb-2">
+         <Button onClick={handleConfirm}>{t("confirmSelection")}</Button>
+       </div>
+
       <div className="mx-auto max-w-4xl">
         {/* Stage */}
-        <div className="mb-8 rounded-md bg-primary-gold/20 p-2 text-center text-sm font-medium text-secondary-blue">
-          {t("stage")}
+        <div className="mb-6 mx-auto max-w-xs rounded-md bg-primary-gold/20 border border-primary-gold/30 p-3 text-center">
+          <div className="text-sm font-medium text-secondary-blue">
+            {t("stage")}
+          </div>
+        </div>
+
+        {/* Legend */}
+        <div className="mb-6 flex justify-center gap-4 text-xs">
+          <div className="flex items-center">
+            <div className="mr-1 h-4 w-4 rounded-sm bg-muted"></div>
+            <span>{t("available")}</span>
+          </div>
+          <div className="flex items-center">
+            <div className="mr-1 h-4 w-4 rounded-sm bg-primary-gold"></div>
+            <span>{t("selected")}</span>
+          </div>
+          <div className="flex items-center">
+            <div className="mr-1 h-4 w-4 rounded-sm bg-gray-200"></div>
+            <span>{t("unavailable")}</span>
+          </div>
         </div>
 
         {sections.length > 1 ? (
@@ -287,7 +343,7 @@ export default function SeatSelection({ venueId, onSeatsSelected, isUserAdmin = 
                 </TabsTrigger>
               ))}
             </TabsList>
-
+            
             {sections.map((section) => (
               <TabsContent key={section.id} value={section.id.toString()}>
                 <div className="mb-4 text-center">
@@ -306,25 +362,8 @@ export default function SeatSelection({ venueId, onSeatsSelected, isUserAdmin = 
           </div>
         )}
 
-        {/* Legend */}
-        <div className="mb-6 flex justify-center gap-4 text-xs mt-6">
-          <div className="flex items-center">
-            <div className="mr-1 h-4 w-4 rounded-sm bg-muted"></div>
-            <span>{t("available")}</span>
-          </div>
-          <div className="flex items-center">
-            <div className="mr-1 h-4 w-4 rounded-sm bg-primary-gold"></div>
-            <span>{t("selected")}</span>
-          </div>
-          <div className="flex items-center">
-            <div className="mr-1 h-4 w-4 rounded-sm bg-gray-200"></div>
-            <span>{t("unavailable")}</span>
-          </div>
-        </div>
 
-        <div className="flex justify-center">
-          <Button onClick={handleConfirm}>{t("confirmSelection")}</Button>
-        </div>
+
       </div>
       {isUserAdmin && (
         <div className="mt-4 rounded-md bg-muted p-3 text-sm">

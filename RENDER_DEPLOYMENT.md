@@ -53,6 +53,7 @@ This guide will help you deploy the ActingEurope application on Render.com using
    DIRECT_URL=your-supabase-direct-connection-string
    JWT_SECRET=your-generated-secret-key
    NEXT_PUBLIC_APP_URL=https://your-app-name.onrender.com
+   QR_SECRET_KEY=your-qr-verification-secret-key
    ```
 
    **Important**: Replace the connection strings with the actual URLs from your Supabase project dashboard.
@@ -109,13 +110,16 @@ This guide will help you deploy the ActingEurope application on Render.com using
 - `JWT_SECRET`: Random secret for authentication
 - `NEXT_PUBLIC_APP_URL`: Your app's URL on Render
 - `NODE_ENV`: Set to "production"
+- `QR_SECRET_KEY`: Secret key for QR code verification (generate a secure random string)
 
 ### Optional Variables
-- `SMTP_HOST`: SMTP server for emails
+- `SMTP_HOST`: SMTP server for emails (required for ticket delivery)
 - `SMTP_PORT`: SMTP port (usually 587)
 - `SMTP_USER`: SMTP username
 - `SMTP_PASS`: SMTP password
 - `EMAIL_FROM`: From email address
+- `POSTMARK_API_TOKEN`: Postmark API token for enhanced email delivery
+- `POSTMARK_FROM_EMAIL`: Verified sender email for Postmark
 
 ## Database Schema Overview
 
@@ -130,8 +134,9 @@ The application includes these main data entities with multilingual support and 
 - **venue_sections**: Seating sections within venues
 - **seats**: Individual seats for booking
 - **events**: Performances, workshops, and discussions
-- **bookings**: User ticket bookings
-- **booked_seats**: Seat reservations
+- **bookings**: User ticket bookings with QR code generation
+- **booked_seats**: Seat reservations with unique QR codes for verification
+- **booking_attendees**: Individual attendee information for multi-ticket bookings
 - **news_articles**: News and announcements with automatic multilingual creation
 - **about_pages**: Dynamic about page content with multi-language support
 - **contact_pages**: Dynamic contact page content with multi-language support

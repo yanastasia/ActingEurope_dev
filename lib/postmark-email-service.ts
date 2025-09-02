@@ -1,7 +1,7 @@
 "use server"
 
 import { ServerClient } from "postmark"
-import { generatePDF } from "./pdf-generator"
+import { generateTicketPdfBuffer } from "./pdf/pdf-generator"
 
 // Initialize Postmark client
 const postmarkClient = new ServerClient(process.env.POSTMARK_SERVER_TOKEN || process.env.EMAIL_SERVER_USER || "")
@@ -124,8 +124,24 @@ export async function sendTicketEmailWithTemplate(ticketData: {
   seats: string
   bookingReference: string
 }) {
-  // Generate PDF ticket
-  const pdfBuffer = await generatePDF(ticketData)
+  // Generate PDF ticket - using first ticket for now (this function may need refactoring for multiple tickets)
+  const ctx = {
+    bookingReference: ticketData.bookingReference,
+    event: {
+      id: 'temp-id', // This would need to come from ticketData
+      title: ticketData.eventTitle,
+      date: ticketData.eventDate,
+      time: ticketData.eventTime,
+      venueName: ticketData.venue
+    }
+  };
+  const seat = {
+    seatId: 'temp-seat-id', // This would need to come from ticketData
+    row: 'TBD',
+    number: 'TBD',
+    attendeeName: ticketData.userName
+  };
+  const { buffer: pdfBuffer } = await generateTicketPdfBuffer(ctx, seat)
   
   // Convert PDF buffer to base64 for Postmark attachment
   const pdfBase64 = pdfBuffer.toString('base64')

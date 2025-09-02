@@ -6,6 +6,53 @@ All notable changes to the Acting Europe project will be documented in this file
 
 ### Added
 
+#### QR Code Ticket System
+- **QR Code Generation**: Implemented unique QR codes for each individual ticket
+  - Each ticket gets a unique QR code containing booking reference, seat, attendee, and event ID
+  - QR codes generated using the `qrcode` library with configurable error correction
+  - QR data includes encrypted booking information for secure verification
+  - Integration with PDF ticket generation for seamless user experience
+
+- **Multi-Ticket Booking System**: Enhanced booking flow to support multiple attendees
+  - Collect individual attendee names for each selected seat
+  - Generate separate PDF tickets for each attendee with personalized information
+  - Smart email delivery with multiple PDF attachments for group bookings
+  - Updated booking form UI to dynamically collect attendee information
+  - Enhanced database schema with `attendee_names` and `qr_code_data` fields
+
+- **QR Code Verification API**: Complete ticket validation system
+  - `POST /api/verify-qr` endpoint for real-time QR code verification
+  - `GET /api/verify-qr` endpoint for booking status checks
+  - Comprehensive validation including booking status, seat matching, attendee verification
+  - Event date validation to prevent early or expired ticket usage
+  - Secure verification process with detailed error handling
+
+- **Enhanced PDF Ticket Generation**: Individual tickets with QR codes
+  - Separate PDF generation for each attendee using PDFKit
+  - QR code integration directly into ticket design
+  - Personalized ticket information (attendee name, seat, QR code)
+  - Improved filename structure: `ticket-{bookingRef}-{seat}-{attendee}.pdf`
+  - Professional ticket layout with all necessary event information
+
+- **Smart Email System**: Multi-ticket email delivery
+  - Enhanced email templates to handle single and multiple ticket scenarios
+  - Conditional messaging based on number of attendees
+  - Visual indicators for multi-ticket bookings with clear instructions
+  - Updated email service to attach multiple PDF files efficiently
+  - Booking reference and attendee list display in email content
+
+#### Database Enhancements
+- **Booking Schema Updates**: Extended booking model for QR functionality
+  - Added `attendee_names` field (String array) for multiple attendee support
+  - Added `qr_code_data` field (String array) for storing QR information
+  - Maintained backward compatibility with existing booking data
+  - Database migration scripts for seamless schema updates
+
+#### Dependencies
+- **QR Code Library**: Added `qrcode` package for QR code generation
+- **Type Definitions**: Added `@types/uuid` for better TypeScript support
+- **UUID Integration**: Enhanced UUID usage for unique ticket identification
+
 #### Email System Improvements
 - **Postmark Integration**: Implemented Postmark email service for verification emails
   - Custom email verification service with template support

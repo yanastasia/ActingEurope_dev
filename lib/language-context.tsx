@@ -90,6 +90,7 @@ const translations = {
 
     // Authentication
     welcomeBack: "Welcome Back",
+    back: "Back",
     joinActingEurope: "Join Acting Europe",
     signInToAccount: "Sign in to access your Acting Europe account",
     enterCredentials: "Enter your credentials to access your account",
@@ -213,12 +214,21 @@ const translations = {
     genre: "Genre",
     currency: "",
     time: "Time",
+    at: "at",
     venue: "Venue",
     director: "Director",
     cast: "Cast",
     company: "Theatre",
     eventDetails: "Event Details",
     castAndCrew: "Cast & Crew",
+    
+    // Performance Titles
+    "No Man's Land": "No Man's Land",
+    "Waiting Artists": "Waiting Artists",
+    "Aivar or Lutenitsa": "Aivar or Lutenitsa",
+    "Don Juan": "Don Juan",
+    "Oh My God": "Oh My God",
+    "Ignorance": "Ignorance",
     backToParticipants: "Back to Participants",
     theatreInformation: "Theatre Information",
     next: "Next",
@@ -248,6 +258,8 @@ const translations = {
     availablePerformances: "Available Performances",
     perTicket: "per ticket",
     yourDetails: "Your Details",
+    bookingError: "Booking Error",
+    failedToCompleteBooking: "Failed to complete booking",
     firstName: "First Name",
     lastName: "Last Name",
     phone: "Phone",
@@ -563,6 +575,15 @@ const translations = {
     company: "Театър",
     eventDetails: "Детайли за събитието",
     castAndCrew: "Актьорски състав и екип",
+    
+    // Performance Titles
+    "No Man's Land": "Ничия земя",
+    "Waiting Artists": "Чакащи артисти",
+    "Aivar or Lutenitsa": "Айвар или лютеница",
+    "Don Juan": "Дон Жуан",
+    "Oh My God": "Боже мой",
+    "Ignorance": "Неведение",
+    
     backToParticipants: "Назад към участниците",
     theatreInformation: "Информация за театъра",
     theatreTags: "Тагове на театъра",
@@ -598,6 +619,8 @@ const translations = {
     availablePerformances: "Налични постановки",
     perTicket: "на билет",
     yourDetails: "Вашите данни",
+    bookingError: "Грешка при резервация",
+    failedToCompleteBooking: "Неуспешно завършване на резервацията",
     firstName: "Име",
     lastName: "Фамилия",
     phone: "Телефон",
@@ -1011,6 +1034,7 @@ const translations = {
     readMore: "Прочитај повеќе",
     date: "Датум",
     time: "Време",
+    at: "во",
     venue: "Место",
     duration: "Времетраење",
     performanceLanguage: "Јазик на претставата",
@@ -1021,6 +1045,15 @@ const translations = {
     company: "Театар",
     eventDetails: "Детали за настанот",
     castAndCrew: "Актерски состав и екипа",
+    
+    // Performance Titles
+    "No Man's Land": "Ничија земја",
+    "Waiting Artists": "Чекачки актери",
+    "Aivar or Lutenitsa": "Ајвар или лутеница",
+    "Don Juan": "Дон Жуан",
+    "Oh My God": "Боже мој",
+    "Ignorance": "Незнаење",
+    
     backToParticipants: "Назад кон учесниците",
     theatreInformation: "Информации за театарот",
     theatreTags: "Тагови на театарот",
@@ -1470,6 +1503,7 @@ const translations = {
     readMore: "Прочитај више",
     date: "Датум",
     time: "Време",
+    at: "у",
     venue: "Место",
     duration: "Трајање",
     performanceLanguage: "Језик представе",
@@ -1480,6 +1514,15 @@ const translations = {
     company: "Позориште",
     eventDetails: "Детаљи догађаја",
     castAndCrew: "Глумачка постава и екипа",
+    
+    // Performance Titles
+    "No Man's Land": "Ничија земља",
+    "Waiting Artists": "Чекајући глумци",
+    "Aivar or Lutenitsa": "Ајвар или лутеница",
+    "Don Juan": "Дон Жуан",
+    "Oh My God": "Боже мој",
+    "Ignorance": "Незнање",
+    
     backToParticipants: "Назад на учеснике",
     theatreInformation: "Информације о позоришту",
     theatreTags: "Тагови позоришта",

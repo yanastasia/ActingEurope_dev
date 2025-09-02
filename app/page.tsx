@@ -228,7 +228,7 @@ export default function Home() {
                                   className="bg-secondary-blue border-2 border-white text-white hover:bg-secondary-blue/90 font-semibold px-8 py-3 transform transition-transform hover:scale-105"
                                   asChild
                                 >
-                                  <Link href="/tickets-coming-soon">{t("bookTickets")}</Link>
+                                  <Link href="/tickets">{t("bookTickets")}</Link>
                                 </Button>
                               </div>
                             </div>
@@ -316,7 +316,7 @@ export default function Home() {
           <div className="grid gap-6 md:grid-cols-3">
             <QuickLinkCard title={t("latestNews")} href="/news" icon={Newspaper} description={t("latestNewsDesc")} />
             <QuickLinkCard title={t("program")} href="/program" icon={Calendar} description={t("programDesc")} />
-            <QuickLinkCard title={t("bookTickets")} href="/tickets-coming-soon" icon={Ticket} description={t("bookTicketsDesc")} />
+            <QuickLinkCard title={t("bookTickets")} href="/tickets" icon={Ticket} description={t("bookTicketsDesc")} />
           </div>
         </div>
       </section>

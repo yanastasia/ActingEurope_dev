@@ -168,6 +168,7 @@ model Booking {
   booking_reference String     @unique @db.VarChar(50)
   total_amount    Decimal    @db.Decimal(10, 2)
   booking_status  BookingStatus @default(pending)
+  attendee_names  Json?      // [{ seatId: string, fullName: string }] (source of truth)
   created_at      DateTime   @default(now())
   updated_at      DateTime   @updatedAt
   user            User       @relation(fields: [user_id], references: [id])
@@ -184,14 +185,19 @@ enum BookingStatus {
 }
 
 model BookedSeat {
-  id         Int      @id @default(autoincrement())
-  booking_id Int
-  seat_id    Int
-  created_at DateTime @default(now())
-  booking    Booking  @relation(fields: [booking_id], references: [id], onDelete: Cascade)
-  seat       Seat     @relation(fields: [seat_id], references: [id])
+  id            Int       @id @default(autoincrement())
+  booking_id    Int
+  seat_id       Int
+  attendee_name String?   // denormalized for quick access
+  qr_code_data  String?   // the exact QR payload string we generate
+  scanned_at    DateTime? // set when validated at venue
+  created_at    DateTime  @default(now())
+  booking       Booking   @relation(fields: [booking_id], references: [id], onDelete: Cascade)
+  seat          Seat      @relation(fields: [seat_id], references: [id])
 
   @@unique([booking_id, seat_id], name: "unique_booked_seat")
+  @@index([booking_id])
+  @@index([seat_id])
   @@map("booked_seats")
 }
 

@@ -60,6 +60,19 @@ async function main() {
     },
   })
 
+  // Add Scanner user for ticket verification
+  const scannerUser = await prisma.user.create({
+    data: {
+      email: 'tickets@actingeurope.eu',
+      password_hash: '$2b$12$Ej3ti9MpuMgHRZgIxmwpCumP2QTZMcpzisMpvRw37W/x5SpROknvG', // bcrypt hash for ActingEurope2025!
+      first_name: 'Scanner',
+      last_name: 'System',
+      is_admin: false,
+      email_notifications: false,
+      marketing_preferences: false,
+    },
+  })
+
   // Seed Theatres
   console.log('🎭 Seeding theatres...')
   const theatreMap = new Map()

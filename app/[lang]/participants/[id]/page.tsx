@@ -259,7 +259,7 @@ export default function TheatrePage({ params }: ParticipantPageProps) {
                   <Link href={`/${resolvedParams.lang}/program`}>{t('viewFestivalProgram')}</Link>
                 </Button>
                 <Button variant="outline" className="w-full" asChild>
-                  <Link href="/tickets-coming-soon">{t('bookTickets')}</Link>
+                  <Link href="/tickets">{t('bookTickets')}</Link>
                 </Button>
               </div>
             </CardContent>

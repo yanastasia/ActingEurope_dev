@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('❌ Error syncing theatre photos:', error);
     return NextResponse.json(
-      { error: 'Failed to sync theatre photos', details: error.message },
+      { error: 'Failed to sync theatre photos', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
@@ -161,7 +161,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('❌ Error checking sync status:', error);
     return NextResponse.json(
-      { error: 'Failed to check sync status', details: error.message },
+      { error: 'Failed to check sync status', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }

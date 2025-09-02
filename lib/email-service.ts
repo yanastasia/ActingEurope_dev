@@ -7,7 +7,9 @@ import VerificationEmail from "@/emails/verification-email"
 import TicketEmail from "@/emails/ticket-email"
 import ReminderEmail from "@/emails/reminder-email"
 import WelcomeEmail from "@/emails/welcome-email"
-import { generatePDF } from "./pdf-generator"
+import { generateTicketPdfBuffer } from "./pdf/pdf-generator"
+import { sanitize } from "./util/sanitize"
+import { prisma } from "./prisma"
 
 // Configure email transporter with rate limiting and retry logic
 const transporter = nodemailer.createTransport({
@@ -128,46 +130,104 @@ export async function sendVerificationEmail(email: string, verificationToken: st
   }
 }
 
-export async function sendTicketEmail(email: string, ticketData: any) {
-  // Generate PDF ticket
-  const pdfBuffer = await generatePDF(ticketData)
+export async function sendTicketEmail(bookingId: string) {
+  const booking = await prisma.booking.findUnique({
+    where: { id: parseInt(bookingId) },
+    include: {
+      user: { select: { email: true } },
+      event: { select: { id: true, title: true, event_date: true, event_time: true, venue: true } },
+      booked_seats: {
+        include: { seat: { select: { id: true, row_number: true, seat_number: true } } }
+      }
+    }
+  });
+  if (!booking) throw new Error("Booking not found");
 
-  const emailHtml = await render(
-    TicketEmail({
-      name: ticketData.customerName,
-      eventTitle: ticketData.title,
-      eventDate: ticketData.date,
-      eventTime: ticketData.time,
-      venue: ticketData.venue,
-      seats: ticketData.seats.join(", "),
-    }),
-  )
+  // Type assertion to help TypeScript understand the included relations
+  const bookingWithRelations = booking as typeof booking & {
+    user: { email: string };
+    event: { id: number; title: string; event_date: Date; event_time: string; venue: any };
+    booked_seats: Array<{ seat: { id: number; row_number: number; seat_number: number } }>;
+  };
 
-  const mailOptions = {
-    from: process.env.EMAIL_FROM,
-    to: email,
-    subject: `Your tickets for ${ticketData.title}`,
-    html: emailHtml,
-    attachments: [
-      {
-        filename: `ticket-${ticketData.bookingReference}.pdf`,
-        content: pdfBuffer,
-        contentType: "application/pdf",
-      },
-    ],
+  const attendeeBySeat: Record<string, string> = {};
+  const arr = JSON.parse(booking.attendee_names as string) as Array<{ seatId: string; fullName: string }>;
+  arr.forEach((x) => { attendeeBySeat[x.seatId] = x.fullName; });
+
+  const eventId = bookingWithRelations.event.id.toString();
+  const ctx = {
+    bookingReference: booking.booking_reference,
+    event: {
+      id: eventId,
+      title: bookingWithRelations.event.title,
+      date: bookingWithRelations.event.event_date.toISOString().split('T')[0], // format as YYYY-MM-DD
+      time: bookingWithRelations.event.event_time,
+      venueName: bookingWithRelations.event.venue?.name ?? "Venue"
+    }
+  };
+
+  const attachments: { filename: string; content: Buffer }[] = [];
+
+  for (const bs of bookingWithRelations.booked_seats) {
+    const attendeeName = attendeeBySeat[bs.seat_id.toString()] || bs.attendee_name || "Attendee";
+    const seatLabel = `Row ${bs.seat.row_number}, Seat ${bs.seat.seat_number}`;
+    const { buffer, qrPayload } = await generateTicketPdfBuffer(ctx, {
+      seatId: bs.seat.id.toString(),
+      row: bs.seat.row_number,
+      number: bs.seat.seat_number,
+      attendeeName
+    });
+
+    // persist payload + attendee name
+    await prisma.bookedSeat.update({
+      where: { id: bs.id },
+      data: { attendee_name: attendeeName, qr_code_data: qrPayload }
+    });
+
+    attachments.push({
+      filename: `ticket-${booking.booking_reference}-${sanitize(attendeeName)}.pdf`,
+      content: buffer
+    });
   }
 
+  const html = await render(
+    TicketEmail({
+      bookingReference: booking.booking_reference,
+      eventTitle: ctx.event.title,
+      date: ctx.event.date,
+      time: ctx.event.time,
+      venue: ctx.event.venueName,
+      tickets: bookingWithRelations.booked_seats.map((bs) => ({
+         attendeeName: attendeeBySeat[bs.seat_id.toString()] || bs.attendee_name || "Attendee",
+        seatLabel: `Row ${bs.seat.row_number}, Seat ${bs.seat.seat_number}`
+      }))
+    })
+  );
+
+  const subject = `Your tickets for ${ctx.event.title} — ${attachments.length} ticket(s)`;
+
+  const mailOptions = {
+    to: bookingWithRelations.user.email, // user email from booking relation
+    from: process.env.EMAIL_FROM!,
+    subject,
+    html,
+    attachments
+  };
+
   if (isDevelopment) {
-    console.log("Development mode: Ticket email would be sent with:", mailOptions)
-    return { success: true }
+    console.log("Development mode: Ticket email would be sent with:", {
+      ...mailOptions,
+      attachments: attachments.map(att => ({ filename: att.filename, contentType: "application/pdf" }))
+    });
+    return { success: true };
   }
 
   try {
-    await transporter.sendMail(mailOptions)
-    return { success: true }
+    await transporter.sendMail(mailOptions);
+    return { success: true };
   } catch (error) {
-    console.error("Failed to send ticket email:", error)
-    return { success: false, error }
+    console.error("Failed to send ticket email:", error);
+    return { success: false, error };
   }
 }
 

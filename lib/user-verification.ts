@@ -34,7 +34,7 @@ try {
     }
 
     // Send ticket email
-    const result = await sendTicketEmail(bookingData.email, ticketData)
+    const result = await sendTicketEmail(bookingData.id.toString())
 
     if (!result.success) {
       return { success: false, message: "Failed to send ticket email" }

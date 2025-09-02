@@ -26,9 +26,13 @@ Acting Europe is a modern web application designed to connect theatre enthusiast
 
 ### 🎫 Booking System
 - **Seat Selection**: Interactive venue maps with real-time availability
+- **Multi-Ticket Booking**: Support for multiple tickets with individual attendee names
+- **QR Code Integration**: Unique QR codes for each ticket with verification system
 - **Accessibility Support**: Special seating for users with disabilities
 - **Booking Management**: Complete booking lifecycle from selection to confirmation
-- **PDF Ticket Generation**: Automated ticket generation and email delivery
+- **PDF Ticket Generation**: Individual PDF tickets for each attendee with QR codes
+- **Email Delivery**: Smart email system with multiple PDF attachments for group bookings
+- **Ticket Verification**: QR code scanning and validation system for event entry
 - **Payment Integration**: Secure booking process with status tracking
 
 ### 👤 User Management
@@ -76,7 +80,9 @@ Acting Europe is a modern web application designed to connect theatre enthusiast
 - **Database**: PostgreSQL with Prisma ORM 6.10.1
 - **Authentication**: Supabase authentication with SSR-compatible session management
 - **Email Service**: Postmark for email verification with template support, Nodemailer for other transactional emails
-- **PDF Generation**: PDFKit for ticket generation
+- **PDF Generation**: PDFKit for individual ticket generation with QR code integration
+- **QR Code Generation**: QRCode library for unique ticket verification codes
+- **Ticket Verification**: Custom API endpoints for QR code validation
 - **File Handling**: Next.js built-in file upload
 - **Data Synchronization**: Automated performance data sync between development and production
 
@@ -191,6 +197,11 @@ ActingEurope_dev/
    EMAIL_SERVER_PASSWORD="your-email-password"
    EMAIL_FROM="Your App <noreply@yourdomain.com>"
    
+   # QR Code Configuration (Optional)
+   QR_CODE_ERROR_CORRECTION="M"
+   QR_CODE_TYPE="png"
+   QR_CODE_MARGIN="4"
+   
    # Security
    JWT_SECRET="your-jwt-secret-key"
    ```
@@ -298,7 +309,7 @@ The application uses a comprehensive PostgreSQL schema with the following main e
 - **Theatres**: Theatre information and profiles with multilingual support and translation grouping
 - **Venues**: Physical locations with seating configurations
 - **Events**: Performances, workshops, and discussions
-- **Bookings**: Ticket reservations and seat assignments
+- **Bookings**: Ticket reservations with attendee names, seat assignments, and QR code data
 - **News Articles**: Content management for announcements with automatic multilingual creation
 - **About Pages**: Dynamic about page content with multi-language support
 - **Contact Pages**: Dynamic contact page content with multi-language support
@@ -324,6 +335,12 @@ For detailed schema information, see `prisma/schema.prisma`.
 - `GET /api/events/[id]` - Get event details
 - `POST /api/events` - Create event (admin)
 - `PUT /api/events/[id]` - Update event (admin)
+
+### Booking & Ticket Management
+- `POST /api/events/[id]/book` - Create booking with attendee names
+- `GET /api/bookings/[id]` - Get booking details
+- `POST /api/verify-qr` - Verify QR code for ticket validation
+- `GET /api/verify-qr?bookingReference=[ref]` - Check booking verification status
 
 ### Venue Management
 - `GET /api/venues` - List all venues
