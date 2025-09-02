@@ -49,6 +49,7 @@ export async function middleware(request: NextRequest) {
     '/bookings',
     '/dashboard',
     '/admin',
+    '/scanner',
     '/api/bookings',
     '/api/profile',
   ]
@@ -74,8 +75,17 @@ export async function middleware(request: NextRequest) {
   // Redirect authenticated users away from auth routes
   if (isAuthRoute && user) {
     // Check if user is admin based on email
-    const isAdmin = user.email?.endsWith('@actingeurope.eu') || user.email?.endsWith('@admin.actingeurope.eu')
-    const redirectUrl = isAdmin ? '/admin' : '/profile'
+    const isAdmin = user.email === 'admin@actingeurope.eu'
+    // Check if user is scanner based on email
+    const isScanner = user.email === 'tickets@actingeurope.eu'
+    
+    let redirectUrl = '/profile' // default for regular users
+    if (isAdmin) {
+      redirectUrl = '/admin'
+    } else if (isScanner) {
+      redirectUrl = '/scanner'
+    }
+    
     return NextResponse.redirect(new URL(redirectUrl, request.url))
   }
 

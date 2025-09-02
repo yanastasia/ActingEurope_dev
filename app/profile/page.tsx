@@ -13,7 +13,8 @@ import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/lib/language-context"
 import { useAuth } from "@/components/providers/supabase-auth-provider"
 import TicketCard from "@/components/tickets/TicketCard"
-import { Calendar, Clock, MapPin, Ticket, Settings, User } from "lucide-react"
+import { isScanner } from "@/lib/auth"
+import { Calendar, Clock, MapPin, Ticket, Settings, User, Scan } from "lucide-react"
 
 interface UserProfile {
   email: string
@@ -215,6 +216,17 @@ export default function ProfilePage() {
                   <Settings className="mr-2 h-4 w-4" />
                   {t("accountSettings")}
                 </Button>
+                
+                {isScanner() && (
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() => router.push("/scanner")}
+                  >
+                    <Scan className="mr-2 h-4 w-4" />
+                    Scanner Interface
+                  </Button>
+                )}
               </nav>
             </CardContent>
           </Card>

@@ -9,13 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, LogOut, Scan, CheckCircle, XCircle, Clock, Users } from "lucide-react";
-import { 
-  isScannerAuthenticated, 
-  logoutScanner, 
-  getScannerSessionToken, 
-  validateScannerSession,
-  getScannerDeviceId 
-} from "@/lib/scanner-auth";
+import { useAuth } from "@/components/providers/supabase-auth-provider";
+import { isScannerEmail } from "@/lib/auth";
+import CameraScanner from "@/components/scanner/CameraScanner";
 
 interface CheckInResult {
   ok: boolean;
@@ -47,18 +43,15 @@ export default function ScannerPage() {
   const inputRef = useRef<HTMLInputElement>(null);
   const verifyInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const { user, loading, signOut } = useAuth();
 
   useEffect(() => {
     // Validate scanner session on mount
     const validateSession = async () => {
-      if (!isScannerAuthenticated()) {
-        router.push("/scanner/login");
-        return;
-      }
-
-      const isValid = await validateScannerSession();
-      if (!isValid) {
-        router.push("/scanner/login");
+      if (loading) return; // Wait for auth to load
+      
+      if (!user || !user.email || !isScannerEmail(user.email)) {
+        router.push("/auth/login?redirectTo=/scanner");
         return;
       }
 
@@ -71,7 +64,7 @@ export default function ScannerPage() {
     };
 
     validateSession();
-  }, [router]);
+  }, [user, loading, router]);
 
   const updateStats = (newScan: CheckInResult) => {
     setStats(prev => ({
@@ -89,28 +82,26 @@ export default function ScannerPage() {
     setResult(null);
 
     try {
-      const token = getScannerSessionToken();
-      if (!token) {
-        router.push("/scanner/login");
+      if (!user || !user.email || !isScannerEmail(user.email)) {
+        router.push("/auth/login?redirectTo=/scanner");
         return;
       }
 
-      const endpoint = isVerifyOnly ? "/api/tickets/verify" : "/api/tickets/check-in";
+      const endpoint = isVerifyOnly ? "/api/verify-qr" : "/api/verify-qr";
       const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
         },
-        body: JSON.stringify({ payload }),
+        body: JSON.stringify({ qrPayload: payload }),
       });
 
       const data = await response.json();
       
       if (response.status === 401) {
         // Session expired or invalid
-        logoutScanner();
-        router.push("/scanner/login");
+        await signOut();
+        router.push("/auth/login?redirectTo=/scanner");
         return;
       }
 
@@ -139,9 +130,9 @@ export default function ScannerPage() {
     }
   };
 
-  const handleLogout = () => {
-    logoutScanner();
-    router.push("/scanner/login");
+  const handleLogout = async () => {
+    await signOut();
+    router.push("/auth/login");
   };
 
   if (isValidating) {
@@ -162,7 +153,7 @@ export default function ScannerPage() {
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Ticket Scanner</h1>
-            <p className="text-gray-600">Device ID: {getScannerDeviceId()}</p>
+            <p className="text-gray-600">Scanner User: {user?.email}</p>
           </div>
           <Button onClick={handleLogout} variant="outline">
             <LogOut className="mr-2 h-4 w-4" />
@@ -202,11 +193,13 @@ export default function ScannerPage() {
           </Card>
         </div>
 
-        <Tabs defaultValue="scan" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="scan">Check-in Scan</TabsTrigger>
-            <TabsTrigger value="verify">Verify Only</TabsTrigger>
-            <TabsTrigger value="history">Scan History</TabsTrigger>
+        <Tabs defaultValue="scan" className="w-full">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="scan">Check-in</TabsTrigger>
+            <TabsTrigger value="camera">Camera Check-in</TabsTrigger>
+            <TabsTrigger value="verify">Verify</TabsTrigger>
+            <TabsTrigger value="camera-verify">Camera Verify</TabsTrigger>
+            <TabsTrigger value="history">History</TabsTrigger>
           </TabsList>
 
           <TabsContent value="scan">
@@ -214,7 +207,7 @@ export default function ScannerPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Scan className="h-5 w-5" />
-                  Ticket Check-in Scanner
+                  Handheld Scanner Check-in
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -234,6 +227,10 @@ export default function ScannerPage() {
                     }}
                     disabled={isLoading}
                   />
+                </div>
+                <div className="text-xs text-gray-500">
+                  <p>• Use handheld QR scanner or paste ticket data</p>
+                  <p>• Press Enter to process the scan</p>
                 </div>
 
                 {isLoading && (
@@ -279,10 +276,60 @@ export default function ScannerPage() {
             </Card>
           </TabsContent>
 
+          <TabsContent value="camera">
+            <div className="space-y-4">
+              <CameraScanner 
+                onScan={(qrData) => handleScan(qrData)}
+                isLoading={isLoading}
+                disabled={false}
+              />
+              
+              {isLoading && (
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                  <span>Processing scan...</span>
+                </div>
+              )}
+
+              {result && (
+                <Alert variant={result.ok ? "default" : "destructive"}>
+                  <AlertDescription>
+                    {result.ok ? (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <span className="font-semibold">
+                            {result.first_scan ? "✅ Check-in Successful" : "⚠️ Already Checked In"}
+                          </span>
+                        </div>
+                        <div className="text-sm space-y-1">
+                          <div><strong>Booking:</strong> {result.bookingReference}</div>
+                          <div><strong>Attendee:</strong> {result.attendeeName || "N/A"}</div>
+                          <div><strong>Seat:</strong> Row {result.seat?.row}, Seat {result.seat?.number}</div>
+                          <div><strong>Event:</strong> {result.event?.title}</div>
+                          <div><strong>Date:</strong> {result.event?.date} at {result.event?.time}</div>
+                          <div><strong>Venue:</strong> {result.event?.venue}</div>
+                          {result.scanned_at && (
+                            <div><strong>Previously scanned:</strong> {new Date(result.scanned_at).toLocaleString()}</div>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <XCircle className="h-4 w-4 text-red-600" />
+                        <span>{result.reason}</span>
+                      </div>
+                    )}
+                  </AlertDescription>
+                </Alert>
+              )}
+            </div>
+          </TabsContent>
+
           <TabsContent value="verify">
             <Card>
               <CardHeader>
-                <CardTitle>Verify Ticket (No Check-in)</CardTitle>
+                <CardTitle>Handheld Scanner Verify (No Check-in)</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -301,6 +348,10 @@ export default function ScannerPage() {
                     }}
                     disabled={isLoading}
                   />
+                </div>
+                <div className="text-xs text-gray-500">
+                  <p>• Use handheld QR scanner or paste ticket data</p>
+                  <p>• Press Enter to verify without checking in</p>
                 </div>
 
                 {isLoading && (
@@ -339,6 +390,53 @@ export default function ScannerPage() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="camera-verify">
+            <div className="space-y-4">
+              <CameraScanner 
+                onScan={(qrData) => handleScan(qrData, true)}
+                isLoading={isLoading}
+                disabled={false}
+                title="Camera Verify (No Check-in)"
+                description="Use your device camera to verify tickets without checking them in"
+              />
+              
+              {isLoading && (
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                  <span>Verifying ticket...</span>
+                </div>
+              )}
+
+              {result && (
+                <Alert variant={result.ok ? "default" : "destructive"}>
+                  <AlertDescription>
+                    {result.ok ? (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <span className="font-semibold">✅ Valid Ticket</span>
+                        </div>
+                        <div className="text-sm space-y-1">
+                          <div><strong>Booking:</strong> {result.bookingReference}</div>
+                          <div><strong>Attendee:</strong> {result.attendeeName || "N/A"}</div>
+                          <div><strong>Seat:</strong> Row {result.seat?.row}, Seat {result.seat?.number}</div>
+                          <div><strong>Event:</strong> {result.event?.title}</div>
+                          <div><strong>Date:</strong> {result.event?.date} at {result.event?.time}</div>
+                          <div><strong>Venue:</strong> {result.event?.venue}</div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <XCircle className="h-4 w-4 text-red-600" />
+                        <span>{result.reason}</span>
+                      </div>
+                    )}
+                  </AlertDescription>
+                </Alert>
+              )}
+            </div>
           </TabsContent>
 
           <TabsContent value="history">

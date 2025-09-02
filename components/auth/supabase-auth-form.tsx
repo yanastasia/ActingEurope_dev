@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from "@/hooks/use-toast"
 import { clientAuth } from "@/lib/supabase-client"
 import { useLanguage } from "@/lib/language-context"
-import { isAdminEmail, setAuthenticated } from "@/lib/auth"
+import { isAdminEmail, isScannerEmail, setAuthenticated } from "@/lib/auth"
 
 interface SupabaseAuthFormProps {
   type: "login" | "signup"
@@ -122,11 +122,13 @@ export function SupabaseAuthForm({ type }: SupabaseAuthFormProps) {
         if (data.session) {
           // Set authentication state for login
           const isAdminUser = isAdminEmail(formData.email)
-          const userRole = isAdminUser ? "admin" : "user"
+          const isScannerUser = isScannerEmail(formData.email)
+          const userRole = isAdminUser ? "admin" : isScannerUser ? "scanner" : "user"
           
           console.log('Login Debug:', {
             email: formData.email,
             isAdminUser,
+            isScannerUser,
             userRole,
             sessionUser: data.session.user.email
           })
@@ -148,9 +150,15 @@ export function SupabaseAuthForm({ type }: SupabaseAuthFormProps) {
             window.dispatchEvent(new CustomEvent('user-logged-in'))
             const adminRedirect = redirectTo && redirectTo.startsWith('/admin') ? redirectTo : '/admin'
             router.push(adminRedirect)
+          } else if (isScannerUser) {
+            console.log('Redirecting scanner user to /scanner')
+            // Dispatch custom event for scanner page
+            window.dispatchEvent(new CustomEvent('user-logged-in'))
+            const scannerRedirect = redirectTo && redirectTo.startsWith('/scanner') ? redirectTo : '/scanner'
+            router.push(scannerRedirect)
           } else {
             console.log('Redirecting regular user to /', { redirectTo })
-            const userRedirect = redirectTo && !redirectTo.startsWith('/admin') ? redirectTo : '/'
+            const userRedirect = redirectTo && !redirectTo.startsWith('/admin') && !redirectTo.startsWith('/scanner') ? redirectTo : '/'
             router.push(userRedirect)
           }
         }

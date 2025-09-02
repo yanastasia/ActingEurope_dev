@@ -166,7 +166,7 @@ export async function sendTicketEmail(bookingId: string) {
     }
   };
 
-  const attachments: { filename: string; content: Buffer }[] = [];
+  const attachments: { Name: string; Content: string; ContentType: string; ContentID: string | null }[] = [];
 
   for (const bs of bookingWithRelations.booked_seats) {
     const attendeeName = attendeeBySeat[bs.seat_id.toString()] || bs.attendee_name || "Attendee";
@@ -185,8 +185,10 @@ export async function sendTicketEmail(bookingId: string) {
     });
 
     attachments.push({
-      filename: `ticket-${booking.booking_reference}-${sanitize(attendeeName)}.pdf`,
-      content: buffer
+      Name: `ticket-${booking.booking_reference}-${sanitize(attendeeName)}.pdf`,
+      Content: buffer.toString('base64'),
+      ContentType: 'application/pdf',
+      ContentID: null
     });
   }
 
@@ -206,28 +208,34 @@ export async function sendTicketEmail(bookingId: string) {
 
   const subject = `Your tickets for ${ctx.event.title} — ${attachments.length} ticket(s)`;
 
-  const mailOptions = {
-    to: bookingWithRelations.user.email, // user email from booking relation
-    from: process.env.EMAIL_FROM!,
-    subject,
-    html,
-    attachments
-  };
-
   if (isDevelopment) {
     console.log("Development mode: Ticket email would be sent with:", {
-      ...mailOptions,
-      attachments: attachments.map(att => ({ filename: att.filename, contentType: "application/pdf" }))
+      to: bookingWithRelations.user.email,
+      subject,
+      attachments: attachments.map(att => ({ filename: att.Name, contentType: att.ContentType }))
     });
     return { success: true };
   }
 
+  if (!postmarkClient) {
+    throw new Error('Postmark client not initialized. Check POSTMARK_SERVER_TOKEN.');
+  }
+
   try {
-    await transporter.sendMail(mailOptions);
-    return { success: true };
-  } catch (error) {
-    console.error("Failed to send ticket email:", error);
-    return { success: false, error };
+    const result = await postmarkClient.sendEmail({
+      From: process.env.EMAIL_FROM || 'info@actingeurope.eu',
+      To: bookingWithRelations.user.email,
+      Subject: subject,
+      HtmlBody: html,
+      Attachments: attachments,
+      MessageStream: 'outbound' // Use dedicated message stream for tickets
+    });
+    
+    console.log('Postmark ticket email sent successfully:', result.MessageID);
+    return { success: true, messageId: result.MessageID };
+  } catch (error: any) {
+    console.error("Failed to send ticket email via Postmark:", error);
+    return { success: false, error: error.message };
   }
 }
 

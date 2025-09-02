@@ -10,6 +10,7 @@ async function makeRequest(url, method = 'GET', data = null) {
     method,
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': 'Bearer super_admin',
     },
   };
 

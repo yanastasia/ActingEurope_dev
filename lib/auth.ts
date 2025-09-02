@@ -1,8 +1,13 @@
 // Simple auth utility functions for the Acting Europe application
 
-// Check if an email belongs to an admin (ends with @admin.com)
+// Check if an email belongs to an admin (specifically admin@actingeurope.eu)
 export function isAdminEmail(email: string): boolean {
-  return email.toLowerCase().endsWith("@actingeurope.eu")
+  return email.toLowerCase() === "admin@actingeurope.eu"
+}
+
+// Check if an email belongs to the scanner user
+export function isScannerEmail(email: string): boolean {
+  return email.toLowerCase() === "tickets@actingeurope.eu"
 }
 
 // Check if user is authenticated
@@ -16,6 +21,13 @@ export function isAdmin(): boolean {
   if (typeof window === "undefined") return false
   const userRole = localStorage.getItem("actingEurope_userRole")
   return userRole === "admin" || userRole === "super_admin"
+}
+
+// Check if user is a scanner
+export function isScanner(): boolean {
+  if (typeof window === "undefined") return false
+  const userRole = localStorage.getItem("actingEurope_userRole")
+  return userRole === "scanner"
 }
 
 // Set user authentication

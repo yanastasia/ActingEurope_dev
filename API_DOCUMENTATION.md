@@ -23,64 +23,29 @@ Authorization: Bearer <your-jwt-token>
 
 ### Scanner Authentication
 
-Ticket scanning endpoints require special scanner authentication using the tickets@actingeurope.eu account. This system supports multiple devices logged in simultaneously.
+Scanner functionality is now integrated into the regular authentication system. Users with the `tickets@actingeurope.eu` email can access scanner features through the standard login process.
 
-#### Scanner Login
+#### Scanner Access
 
-**POST** `/api/auth/scanner-login`
+1. **Regular Login**: Use the standard `/auth/login` page with `tickets@actingeurope.eu` credentials
+2. **Automatic Redirection**: Scanner users are automatically redirected to `/scanner` after login
+3. **Profile Access**: Scanner users can access the scanner interface from their profile page
+4. **Role-Based Access**: Scanner functionality is available only to users with the "scanner" role
 
-Authenticate a scanner device with the tickets@actingeurope.eu account.
+#### Authentication Flow
 
-##### Request Body
+1. Navigate to `/auth/login`
+2. Enter `tickets@actingeurope.eu` and password
+3. System detects scanner user and assigns "scanner" role
+4. User is redirected to `/scanner` interface
+5. Scanner interface is accessible from user profile
 
-```json
-{
-  "email": "tickets@actingeurope.eu",
-  "password": "scanner-password",
-  "deviceId": "scanner_1234567890_abc123def"
-}
-```
+#### Legacy Scanner Endpoints
 
-##### Response
-
-```json
-{
-  "success": true,
-  "sessionToken": "jwt-session-token",
-  "deviceId": "scanner_1234567890_abc123def",
-  "email": "tickets@actingeurope.eu"
-}
-```
-
-#### Scanner Session Validation
-
-**POST** `/api/auth/validate-scanner`
-
-Validate an active scanner session.
-
-##### Headers
-
-```
-Authorization: Bearer <scanner-session-token>
-```
-
-##### Request Body
-
-```json
-{
-  "deviceId": "scanner_1234567890_abc123def"
-}
-```
-
-##### Response
-
-```json
-{
-  "valid": true,
-  "email": "tickets@actingeurope.eu",
-  "deviceId": "scanner_1234567890_abc123def"
-}
-```
+**Note**: The following endpoints are deprecated but maintained for backward compatibility:
+- `/api/auth/scanner-login` (deprecated - use regular login)
+- `/api/auth/validate-scanner` (deprecated - use regular auth validation)
+- `/scanner/login` (deprecated - use `/auth/login`)
 
 ## Booking Endpoints
 
@@ -214,19 +179,17 @@ Retrieve details of a specific booking.
 
 ## Ticket Verification Endpoints
 
-**Note:** All ticket verification endpoints require scanner authentication. Include the scanner session token in the Authorization header.
+**Note:** Ticket verification endpoints are accessible through the integrated scanner interface at `/scanner`. Scanner users (tickets@actingeurope.eu) can access these features after logging in through the regular authentication system.
 
-### Verify Ticket (No Check-in)
+### QR Code Verification
 
-**POST** `/api/tickets/verify`
+**POST** `/api/verify-qr`
 
-Verify a ticket's validity without marking it as checked in. Useful for pre-validation.
+Verify a QR code payload for ticket validation. This endpoint is used by the scanner interface.
 
-#### Headers
+#### Authentication
 
-```
-Authorization: Bearer <scanner-session-token>
-```
+Requires regular user authentication with scanner role (tickets@actingeurope.eu).
 
 #### Request Body
 
@@ -272,22 +235,19 @@ Authorization: Bearer <scanner-session-token>
 ```json
 {
   "ok": false,
-  "reason": "Scanner authentication required",
-  "error": "Missing authorization header"
+  "reason": "Authentication required",
+  "error": "Please log in with scanner credentials"
 }
 ```
 
-### Check-in Ticket
+### Legacy Ticket Endpoints
 
-**POST** `/api/tickets/check-in`
+**Note:** The following endpoints are deprecated but maintained for backward compatibility:
 
-Verify a ticket and mark it as checked in. This is the main endpoint for ticket scanning at events.
+**POST** `/api/tickets/check-in` (deprecated)
+**POST** `/api/tickets/verify` (deprecated)
 
-#### Headers
-
-```
-Authorization: Bearer <scanner-session-token>
-```
+Use `/api/verify-qr` instead for all QR code verification needs.
 
 #### Request Body
 

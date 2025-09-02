@@ -7,7 +7,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Menu, User, LogOut, Shield } from "lucide-react"
+import { Menu, User, LogOut, Shield, Scan } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,7 +19,7 @@ import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/components/providers/supabase-auth-provider"
 import LanguageSwitcher from "@/components/language-switcher"
 import { useLanguage } from "@/lib/language-context"
-import { isAdminEmail } from "@/lib/auth"
+import { isAdminEmail, isScannerEmail } from "@/lib/auth"
 
 export default function Navigation() {
   const pathname = usePathname()
@@ -41,6 +41,8 @@ export default function Navigation() {
 
   // Check if user is admin based on email domain
   const userIsAdmin = user?.email ? isAdminEmail(user.email) : false
+  // Check if user is scanner based on email
+  const userIsScanner = user?.email ? isScannerEmail(user.email) : false
 
   const handleLogout = async () => {
     try {
@@ -150,6 +152,16 @@ export default function Navigation() {
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onSelect={() => navigateToProfile()}>{t("myProfile")}</DropdownMenuItem>
                   <DropdownMenuItem onSelect={() => navigateToProfile("tickets")}>{t("myTickets")}</DropdownMenuItem>
+
+                  {userIsScanner && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onSelect={() => router.push("/scanner")} className="text-blue-600">
+                        <Scan className="mr-2 h-4 w-4" />
+                        <span>Scanner Interface</span>
+                      </DropdownMenuItem>
+                    </>
+                  )}
 
                   {userIsAdmin && (
                     <>
