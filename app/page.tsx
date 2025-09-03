@@ -69,14 +69,10 @@ export default function Home() {
     const fetchEvents = async () => {
       try {
         const response = await fetch(`/api/events?language=${language}`)
-        console.log('Response status:', response.status, response.statusText)
         if (!response.ok) {
-          const errorText = await response.text()
-          console.error('API Error Response:', errorText)
-          throw new Error(`Failed to fetch events: ${response.status} ${response.statusText}`)
+          throw new Error('Failed to fetch events')
         }
         const events = await response.json()
-        console.log('Events received:', events.length, 'events')
         setEvents(events) // Store original events for translation group lookup
         
         // Format events for the frontend
