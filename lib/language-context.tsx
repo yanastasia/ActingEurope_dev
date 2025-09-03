@@ -237,6 +237,7 @@ const translations = {
     save: "Save",
     delete: "Delete",
     edit: "Edit",
+    back: "Back",
 
     // Seat Selection
     selectSeats: "Select Seats",

@@ -17,10 +17,10 @@ export default function TicketReservationPage() {
         {/* Back button */}
         <Button
           variant="ghost"
-          onClick={() => router.back()}
-          className="mb-6 text-gray-600 hover:text-gray-800"
+          onClick={() => router.push('/')}
+          className="mb-8 text-gray-600 hover:text-gray-800"
         >
-          <ArrowLeft className="w-4 h-4 mr-2" />
+          <ArrowLeft className="mr-2 h-4 w-4" />
           {t('back')}
         </Button>
 
