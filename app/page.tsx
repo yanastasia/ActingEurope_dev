@@ -363,19 +363,20 @@ export default function Home() {
       <section className="py-12 md:py-16">
         <div className="container mx-auto px-4">
           <h2 className="mb-12 text-center text-3xl font-bold text-secondary-blue">{t("ourPartners")}</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 md:gap-8 items-center justify-items-center">
-            {[1, 2, 3, 4, 5].map((i) => {
-              const partnerImages = ['ec.png', 'Kyustendil_logo.png', 'SAB_logo_site_2017-500x500.png', 'bgnmk.png', 'bgrs.png'];
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 sm:gap-8 md:gap-6 lg:gap-8 items-center justify-items-center">
+            {[1, 2, 3, 4, 5, 6].map((i) => {
+              const partnerImages = ['bgnmk.png', 'Kyustendil_logo.png', 'ec.png', 'SAB_logo_site_2017-500x500.png', 'bgrs.png', 'MT_logo.gif'];
               const partnerLinks = [
                 'https://bulgaria.representation.ec.europa.eu/index_bg',
                 'https://www.kyustendil.bg/index.php?lang=bg',
                 'https://uba.bg/en/home-page/',
                 'https://ipa-bgmk.mrrb.bg/en',
-                'https://ipa-bgrs.mrrb.bg/en'
+                'https://ipa-bgrs.mrrb.bg/en',
+                '#'
               ];
               return (
                 <Link key={i} href={partnerLinks[i-1]} target="_blank" rel="noopener noreferrer" className="block">
-                  <div className="h-16 w-32 sm:h-20 sm:w-40 md:h-24 md:w-48 grayscale transition-all hover:grayscale-0 hover:scale-105">
+                  <div className="h-10 w-20 sm:h-12 sm:w-24 md:h-14 md:w-28 lg:h-16 lg:w-32 xl:h-20 xl:w-40 grayscale transition-all hover:grayscale-0 hover:scale-105">
                     <Image
                       src={`/${partnerImages[i-1]}`}
                       alt={`Partner ${i}`}
