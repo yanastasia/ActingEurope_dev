@@ -88,8 +88,6 @@ jspm_packages/
 
 # Prisma generated files
 /lib/generated/prisma
-/lib/prisma-client/*.dll.node
-/lib/prisma-client/query_engine-*
 
 # Temporary files
 .tmp/
@@ -118,4 +116,63 @@ Thumbs.db
 .turbo
 
 # Database JSON files
-app/api/database-json/
+app/admin/database-backup/
+
+# Sensitive files and configurations
+# Remove .env.example from tracking as it contains real credentials
+.env.example
+
+# Database backup files with sensitive data
+render_backup.sql
+*.sql
+
+# Seeding scripts with hardcoded tokens
+seed-specific-tables.js
+seed-via-api.js
+cleanup-duplicates.js
+seed-backup-improved.js
+seed-corrected.js
+seed-final.js
+seed-from-backup.js
+seed-via-backup-api.js
+minimal-seed.js
+complete-seed.js
+
+# Test files with sensitive data
+test-template-variables.js
+test-postmark-variables.js
+tests/email/test-*.js
+tests/email/check-*.js
+tests/email/send-*.js
+tests/email/debug-*.js
+tests/email/delete-*.js
+tests/general/test-*.js
+
+# Fix and utility scripts with credentials
+fix-39-simple.js
+check-*.js
+create-*.js
+fix-*.js
+update-*.ps1
+build-*.ps1
+repair-*.js
+reset-*.js
+align-*.js
+add-*.js
+direct-*.js
+final-*.js
+
+# Documentation with sensitive information
+RENDER_DEPLOYMENT.md
+SMTP_TESTING_GUIDE.md
+
+# Theatre and performance data files
+theatres.json
+theatres_updated.json
+
+# Any backup files
+*.backup
+*.bak
+
+# Deployment configuration
+render.yaml
