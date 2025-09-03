@@ -32,16 +32,7 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
   
-  // Debug logging
-  if (request.nextUrl.pathname.startsWith('/admin')) {
-    console.log('Middleware Debug:', {
-      pathname: request.nextUrl.pathname,
-      hasUser: !!user,
-      hasSession: !!session,
-      userEmail: user?.email,
-      cookies: request.cookies.getAll().map(c => c.name)
-    })
-  }
+  // Debug logging removed to prevent EvalError in edge runtime
 
   // Protected routes that require authentication
   const protectedRoutes = [

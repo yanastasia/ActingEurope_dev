@@ -49,9 +49,6 @@
     "@react-email/render": "^1.2.1",
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.56.0",
-    "@types/bcryptjs": "^2.4.6",
-    "@types/jsonwebtoken": "^9.0.10",
-    "@types/qrcode": "^1.5.5",
     "@types/uuid": "^10.0.0",
     "@zxing/browser": "^0.1.5",
     "@zxing/library": "^0.21.3",
@@ -91,9 +88,12 @@
     "seed": "tsx prisma/seed.ts"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22",
     "@types/nodemailer": "^6.4.17",
     "@types/pdfkit": "^0.17.2",
+    "@types/qrcode": "^1.5.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "postcss": "^8.5",

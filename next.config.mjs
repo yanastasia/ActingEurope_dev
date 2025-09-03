@@ -10,7 +10,10 @@ const nextConfig = {
   experimental: { serverActions: { allowedOrigins: [] } },
 
   webpack: (config, { isServer }) => {
-    config.cache = false;
+    // Re-enable webpack caching for proper CSS processing
+    config.cache = {
+      type: 'filesystem'
+    };
     
     // Completely disable file system watching and scanning
     config.watchOptions = {
