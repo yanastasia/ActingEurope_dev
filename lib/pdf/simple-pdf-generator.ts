@@ -71,7 +71,6 @@ export async function generateSimpleTicketPdf(ctx: TicketContext, seat: SeatInfo
     .text(`Attendee: ${seat.attendeeName}`)
     .text(`Seat: Row ${seat.row || 'N/A'}, Number ${seat.number || 'N/A'}`)
     .text(`Category: ${seat.category || 'Standard'}`)
-    .text(`Price: €${seat.price || 0}`)
     .text(`Booking Reference: ${ctx.bookingReference}`);
   
   doc.moveDown();

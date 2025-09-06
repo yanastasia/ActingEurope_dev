@@ -21,6 +21,7 @@ function setFontForLanguage(doc: jsPDF, isCyrillic: boolean = false, style: stri
 export interface TicketContext {
   bookingReference: string;
   event: {
+    id: string;
     title: string;
     date: string;
     time: string;
@@ -36,6 +37,7 @@ export interface SeatInfo {
   price: number;
   category: string;
   attendeeName: string;
+  attendeeEmail: string;
 }
 
 export async function generateBrandedTicketPdf(
@@ -59,7 +61,7 @@ export async function generateBrandedTicketPdf(
 
   // Generate QR code data
   const qrPayload = buildQrPayload({
-    eventId: ctx.eventId,
+    eventId: ctx.event.id || 'unknown',
     seatId: seat.id,
     attendeeEmail: seat.attendeeEmail,
     bookingId: ctx.bookingReference
@@ -120,7 +122,6 @@ export async function generateBrandedTicketPdf(
   doc.text(`Row: ${seat.row}`, 20, 160);
   doc.text(`Seat: ${seat.number}`, 20, 170);
   doc.text(`Category: ${seat.category}`, 20, 180);
-  doc.text(`Price: €${seat.price.toFixed(2)}`, 20, 190);
   
   // Attendee information
   doc.setFontSize(18);
@@ -150,86 +151,6 @@ export async function generateBrandedTicketPdf(
   doc.setFont('helvetica', 'normal');
   doc.text('Please present this ticket at the venue entrance', 105, 280, { align: 'center' });
   doc.text('For support, contact: info@actingeurope.com', 105, 287, { align: 'center' });
-
-  // Add new page for Bulgarian version
-  doc.addPage();
-
-  // Header with branding (Bulgarian page)
-  doc.setFillColor(primaryColor);
-  doc.rect(0, 0, 210, 40, 'F');
-  
-  // Acting Europe logo/title in Bulgarian
-  doc.setTextColor('#FFFFFF');
-  doc.setFontSize(24);
-  setFontForLanguage(doc, false, 'bold'); // Keep English text in Helvetica
-  doc.text('ACTING EUROPE', 105, 20, { align: 'center' });
-  
-  doc.setFontSize(12);
-  setFontForLanguage(doc, true, 'normal'); // Use Times for Bulgarian text
-  doc.text('Театрален билет', 105, 30, { align: 'center' });
-
-  // Ticket content area (Bulgarian)
-  doc.setFillColor(lightGray);
-  doc.rect(10, 50, 190, 180, 'F');
-  
-  // Event information in Bulgarian
-  doc.setTextColor(textColor);
-  doc.setFontSize(18);
-  setFontForLanguage(doc, true, 'bold'); // Use Times for Bulgarian text
-  doc.text('ДЕТАЙЛИ ЗА СЪБИТИЕТО', 20, 70);
-  
-  doc.setFontSize(14);
-  setFontForLanguage(doc, true, 'normal'); // Use Times for Bulgarian text
-  doc.text(`Заглавие: ${ctx.event.title}`, 20, 85);
-  doc.text(`Дата: ${ctx.event.date}`, 20, 95);
-  doc.text(`Час: ${ctx.event.time}`, 20, 105);
-  doc.text(`Място: ${ctx.event.venueName}`, 20, 115);
-  
-  if (ctx.event.venueAddress) {
-    doc.text(`Адрес: ${ctx.event.venueAddress}`, 20, 125);
-  }
-
-  // Seat information in Bulgarian
-  doc.setFontSize(18);
-  setFontForLanguage(doc, true, 'bold'); // Use Times for Bulgarian text
-  doc.text('ДЕТАЙЛИ ЗА МЯСТОТО', 20, 145);
-  
-  doc.setFontSize(14);
-  setFontForLanguage(doc, true, 'normal'); // Use Times for Bulgarian text
-  doc.text(`Ред: ${seat.row}`, 20, 160);
-  doc.text(`Място: ${seat.number}`, 20, 170);
-  doc.text(`Категория: ${seat.category}`, 20, 180);
-  doc.text(`Цена: €${seat.price.toFixed(2)}`, 20, 190);
-  
-  // Attendee information in Bulgarian
-  doc.setFontSize(18);
-  setFontForLanguage(doc, true, 'bold'); // Use Times for Bulgarian text
-  doc.text('ПОСЕТИТЕЛ', 20, 210);
-  
-  doc.setFontSize(14);
-  setFontForLanguage(doc, true, 'normal'); // Use Times for Bulgarian text
-  doc.text(`Име: ${seat.attendeeName}`, 20, 225);
-
-  // QR Code (same as first page)
-  doc.addImage(qrCodeDataUrl, 'PNG', 140, 140, 50, 50);
-  doc.setFontSize(10);
-  setFontForLanguage(doc, true, 'normal'); // Use Times for Bulgarian text
-  doc.text('Сканирайте за проверка', 165, 200, { align: 'center' });
-
-  // Booking reference in Bulgarian
-  doc.setFillColor(accentColor);
-  doc.rect(10, 250, 190, 20, 'F');
-  doc.setTextColor('#FFFFFF');
-  doc.setFontSize(12);
-  setFontForLanguage(doc, true, 'bold'); // Use Times for Bulgarian text
-  doc.text(`Референция за резервация: ${ctx.bookingReference}`, 105, 262, { align: 'center' });
-
-  // Footer in Bulgarian
-  doc.setTextColor(textColor);
-  doc.setFontSize(8);
-  setFontForLanguage(doc, true, 'normal'); // Use Times for Bulgarian text
-  doc.text('Моля, представете този билет на входа на залата', 105, 280, { align: 'center' });
-  doc.text('За поддръжка, свържете се с: info@actingeurope.com', 105, 287, { align: 'center' });
 
   // Convert to buffer
   const pdfBuffer = Buffer.from(doc.output('arraybuffer'));

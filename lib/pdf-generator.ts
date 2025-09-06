@@ -174,7 +174,7 @@ export async function generatePDF(ticketData: TicketData): Promise<Buffer> {
         doc.fillColor(accentColor).text('www.actingeurope.com', 50, 780, { align: 'center', width: 495 })
       };
 
-      // Generate individual tickets (2 pages each - English and Bulgarian)
+      // Generate individual tickets (English only)
       for (let i = 0; i < ticketData.tickets.length; i++) {
         const ticket = ticketData.tickets[i]
         
@@ -184,12 +184,6 @@ export async function generatePDF(ticketData: TicketData): Promise<Buffer> {
 
         // Create English page
         await createTicketPage(ticket, 'en')
-        
-        // Add new page for Bulgarian version
-        doc.addPage()
-        
-        // Create Bulgarian page
-        await createTicketPage(ticket, 'bg')
       }
 
       // Finalize the PDF

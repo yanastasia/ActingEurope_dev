@@ -55,7 +55,6 @@ ${ctx.event.address ? `ADDRESS: ${ctx.event.address}` : ''}
 ATTENDEE: ${seat.attendeeName}
 SEAT: Row ${seat.row || 'N/A'}, Number ${seat.number || 'N/A'}
 CATEGORY: ${seat.category || 'Standard'}
-PRICE: €${seat.price || 0}
 BOOKING REF: ${ctx.bookingReference}
 
 ───────────────────────────────────────────────────────────────
