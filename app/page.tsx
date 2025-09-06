@@ -20,30 +20,47 @@ const fixCompanyName = (name: string): string => {
     .replace(/ОСАУК "39 мајмуна"/g, 'ОСАУК „36 мајмуна"')
 }
 
+interface EventData {
+  id: number;
+  title: string;
+  company: string[];
+  date: string;
+  time: string;
+  venue: string;
+  imageUrl?: string;
+  genre?: string;
+  language?: string;
+  duration?: string;
+  isFeatured: boolean;
+  translationGroup?: string;
+  contentLanguage: string;
+}
+
+interface FormattedPerformance {
+  id: string;
+  title: string;
+  company: string[];
+  date: string;
+  time: string;
+  venue: string;
+  imageUrl: string;
+  genre?: string;
+  language?: string;
+  duration?: string;
+  featured: boolean;
+  translationGroup?: string;
+  contentLanguage: string;
+}
+
 export default function Home() {
   const { t, language } = useLanguage()
-  const [featuredPerformance, setFeaturedPerformance] = useState<any | null>(null)
-  const [featuredPerformances, setFeaturedPerformances] = useState<any[]>([])
-  const [allSlides, setAllSlides] = useState<any[]>([])
-  const [currentSlide, setCurrentSlide] = useState(0)
-  const [events, setEvents] = useState<any[]>([])
+  const [featuredPerformance, setFeaturedPerformance] = useState<FormattedPerformance | null>(null)
 
-  // Function to generate booking URL - always use English version for translation groups
-  const getBookingUrl = (event: any) => {
-    // If event has a translation group, find the English version
-    if (event.translationGroup) {
-      const englishEvent = events.find((e: any) => 
-        e.translationGroup === event.translationGroup && 
-        e.contentLanguage === 'en'
-      )
-      if (englishEvent) {
-        return `/events/${englishEvent.id}/seat-selection`
-      }
-    }
-    // Extract original ID from formatted ID (remove 'performance-' prefix)
-    const originalId = event.id.replace('performance-', '')
-    return `/events/${originalId}/seat-selection`
-  }
+  const [allSlides, setAllSlides] = useState<FormattedPerformance[]>([])
+  const [currentSlide, setCurrentSlide] = useState(0)
+
+
+
 
   // Auto-advance slider functionality
   useEffect(() => {
@@ -73,10 +90,10 @@ export default function Home() {
           throw new Error('Failed to fetch events')
         }
         const events = await response.json()
-        setEvents(events) // Store original events for translation group lookup
+
         
         // Format events for the frontend
-        const formattedPerformances = events.map((event: any) => ({
+        const formattedPerformances = events.map((event: EventData) => ({
           id: `performance-${event.id}`,
           title: event.title,
           company: event.company,
@@ -88,7 +105,6 @@ export default function Home() {
           language: event.language,
           duration: event.duration,
           featured: event.isFeatured,
-          price: event.price,
           type: "performance",
           synopsis: event.description,
           director: event.director,
@@ -108,7 +124,7 @@ export default function Home() {
         // Combine hero slide with performance slides
         const combinedSlides = [heroSlide, ...formattedPerformances];
 
-        setFeaturedPerformances(formattedPerformances);
+
         setAllSlides(combinedSlides);
 
         // Set single featured performance for the existing section (if needed)
@@ -119,7 +135,7 @@ export default function Home() {
       } catch (error) {
         console.error('Error fetching events:', error)
         // Fallback to empty state
-        setFeaturedPerformances([])
+
         setAllSlides([{
           id: "hero",
           type: "hero",

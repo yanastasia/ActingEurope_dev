@@ -14,9 +14,9 @@ interface PerformanceCardProps {
   time: string
   venue: string
   imageUrl: string
-  genre: string
-  language: string
-  duration: string
+  genre?: string
+  language?: string
+  duration?: string
   featured?: boolean
   synopsis?: string
   director?: string
@@ -80,15 +80,21 @@ export default function PerformanceCard({
       </CardHeader>
       <CardContent className="p-4 pt-0">
         <div className="mb-4 flex flex-wrap gap-2">
-          <Badge variant="outline" className="bg-muted/50">
-            {genre}
-          </Badge>
-          <Badge variant="outline" className="bg-muted/50">
-            {language}
-          </Badge>
-          <Badge variant="outline" className="bg-muted/50">
-            {duration}
-          </Badge>
+          {genre && (
+            <Badge variant="outline" className="bg-muted/50">
+              {genre}
+            </Badge>
+          )}
+          {language && (
+            <Badge variant="outline" className="bg-muted/50">
+              {language}
+            </Badge>
+          )}
+          {duration && (
+            <Badge variant="outline" className="bg-muted/50">
+              {duration}
+            </Badge>
+          )}
         </div>
         <div className="space-y-2 text-sm">
           <div className="flex items-center gap-2">

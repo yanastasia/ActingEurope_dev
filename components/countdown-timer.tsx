@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { useLanguage } from "@/lib/language-context"
 
@@ -14,7 +14,7 @@ interface TimeLeft {
 export default function CountdownTimer() {
   const { t } = useLanguage()
   // Set festival date to September 18, 2025 at 19:00
-  const festivalDate = new Date("2025-09-18T19:00:00")
+  const festivalDate = useMemo(() => new Date("2025-09-18T19:00:00"), [])
 
   const [timeLeft, setTimeLeft] = useState<TimeLeft>({
     days: 0,
@@ -45,7 +45,7 @@ export default function CountdownTimer() {
 
     // Clean up interval on component unmount
     return () => clearInterval(timer)
-  }, []) // Empty dependency array since festivalDate is created once and doesn't change
+  }, [festivalDate]) // Include festivalDate in dependencies
 
   return (
     <Card className="border-primary-gold/20 bg-white shadow-md">

@@ -227,7 +227,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     }
 
     // Handle venue - use provided venueId directly
-    let finalVenueId: number | undefined = venueId ? parseInt(venueId) : undefined
+    const finalVenueId: number | undefined = venueId ? parseInt(venueId) : undefined
 
     console.log('🚀 About to call updateEvent with eventId:', eventId)
     console.log('🔍 updateEvent function type:', typeof updateEvent);

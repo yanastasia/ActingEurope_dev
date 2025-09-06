@@ -39,12 +39,13 @@ interface Performance {
 }
 
 interface PerformancesPageProps {
-  params: {
+  params: Promise<{
     lang: Language
-  }
+  }>
 }
 
-export default function PerformancesPage({ params }: PerformancesPageProps) {
+export default async function PerformancesPage({ params }: PerformancesPageProps) {
+  const { lang } = await params
   const router = useRouter()
   const { t, language } = useLanguage()
   const [performances, setPerformances] = useState<Performance[]>([])
@@ -58,7 +59,7 @@ export default function PerformancesPage({ params }: PerformancesPageProps) {
     // Fetch performances from API
     const fetchPerformances = async () => {
       try {
-        const response = await fetch(`/api/events?language=${params.lang}`)
+        const response = await fetch(`/api/events?language=${lang}`)
         if (response.ok) {
           const data = await response.json()
           setPerformances(data)
@@ -72,7 +73,7 @@ export default function PerformancesPage({ params }: PerformancesPageProps) {
     }
 
     fetchPerformances()
-  }, [params.lang])
+  }, [lang])
 
   useEffect(() => {
     // Filter performances based on search and filters
@@ -208,7 +209,7 @@ export default function PerformancesPage({ params }: PerformancesPageProps) {
                 </div>
                 <div className="flex gap-2">
                   <Button asChild className="flex-1">
-                    <Link href={`/${params.lang}/performances/${performance.id}`}>
+                    <Link href={`/${lang}/performances/${performance.id}`}>
                       {t('viewDetails')}
                     </Link>
                   </Button>

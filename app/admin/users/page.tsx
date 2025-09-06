@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { isAdmin, isAuthenticated } from '@/lib/auth';
 import { Input } from '@/components/ui/input';
@@ -24,7 +24,7 @@ const UserManagementPage = () => {
   const [newUserRole, setNewUserRole] = useState<'admin' | 'seller' | 'client'>('client');
   const router = useRouter();
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       const userRole = localStorage.getItem("actingEurope_userRole");
       console.log('Client-side User Role from localStorage:', userRole);
@@ -48,7 +48,7 @@ const UserManagementPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (!isAuthenticated() || !isAdmin()) {

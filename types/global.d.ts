@@ -1,3 +1,3 @@
-interface CustomEvent<T = any> extends Event {
+interface CustomEvent<T = unknown> extends Event {
   readonly detail: T;
 }

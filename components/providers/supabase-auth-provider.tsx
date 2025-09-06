@@ -139,7 +139,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return () => {
       subscription.unsubscribe()
     }
-  }, [])
+  }, [router])
 
   const signOut = async () => {
     try {

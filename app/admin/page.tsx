@@ -845,7 +845,7 @@ export default function AdminPage() {
     const venueToEdit = venues.find((venue) => venue.id === id)
     if (venueToEdit) {
       // Ensure the venue has sections for editing
-      let venueWithSections = { ...venueToEdit }
+      const venueWithSections = { ...venueToEdit }
       
       // Handle backward compatibility - convert old rows structure to sections
       if ('rows' in venueToEdit && (venueToEdit as any).rows && !venueToEdit.sections) {

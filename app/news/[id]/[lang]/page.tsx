@@ -67,7 +67,7 @@ export default function NewsArticlePage() {
     if (id && lang) {
       fetchArticle();
     }
-  }, [id, lang]);
+  }, [id, lang, t]);
 
   if (loading) {
     return (

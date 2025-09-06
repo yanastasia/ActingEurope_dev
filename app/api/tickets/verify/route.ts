@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
 
   // Type assertion to help TypeScript understand the included relations
   const bookingWithRelations = booking as typeof booking & {
-    event: { title: string; event_date: Date; event_time: string; venue: any };
+    event: { title: string; event_date: Date; event_time: string; venue: { id: number; name: string; description: string | null; address: string | null; city: string | null; capacity: number; image_url: string | null } };
     booked_seats: Array<{ id: number; attendee_name: string | null; scanned_at: Date | null; seat: { row_number: number; seat_number: number } }>;
   };
 

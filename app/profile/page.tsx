@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -24,6 +24,27 @@ interface UserProfile {
   phone: string
   emailNotifications: boolean
   marketingPreferences: boolean
+}
+
+interface BookingData {
+  id: number;
+  event: {
+    title: string;
+    event_date: string;
+    event_time?: string;
+    venue?: { name: string };
+  };
+  booked_seats: Array<{
+    id: number;
+    attendee_name: string;
+    qr_code_data: string;
+    seat: {
+      row_number: number;
+      seat_number: number;
+    };
+  }>;
+  booking_reference: string;
+  total_amount: number;
 }
 
 interface BookedTicket {
@@ -59,7 +80,7 @@ export default function ProfilePage() {
   const [enlargedQR, setEnlargedQR] = useState<string | null>(null)
   const [currentTicketIndex, setCurrentTicketIndex] = useState<{[key: string]: number}>({})
 
-  const fetchUserBookings = async () => {
+  const fetchUserBookings = useCallback(async () => {
     if (!user?.id) return;
     
     setLoadingBookings(true)
@@ -71,14 +92,14 @@ export default function ProfilePage() {
       }
       const bookings = await response.json()
       
-      const formattedTickets: BookedTicket[] = bookings.map((booking: any) => ({
+      const formattedTickets: BookedTicket[] = (bookings as BookingData[]).map((booking) => ({
         id: booking.id.toString(),
         eventTitle: booking.event.title,
         date: new Date(booking.event.event_date).toLocaleDateString(),
         time: booking.event.event_time ? 
           new Date(booking.event.event_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : 'TBA',
         venue: booking.event.venue?.name || 'TBA',
-        seats: booking.booked_seats.map((seat: any) => ({
+        seats: booking.booked_seats.map((seat) => ({
           id: seat.id.toString(),
           row_number: seat.seat.row_number,
           seat_number: seat.seat.seat_number,
@@ -86,8 +107,8 @@ export default function ProfilePage() {
           qr_code_data: seat.qr_code_data
         })),
         bookingReference: booking.booking_reference,
-        eventId: booking.event_id,
-        totalAmount: parseFloat(booking.total_amount)
+        eventId: booking.id,
+        totalAmount: booking.total_amount
       }))
       
       setBookedTickets(formattedTickets)
@@ -101,7 +122,7 @@ export default function ProfilePage() {
     } finally {
       setLoadingBookings(false)
     }
-  }
+  }, [user, toast])
 
   useEffect(() => {
     // Check authentication
@@ -126,7 +147,7 @@ export default function ProfilePage() {
     if (!authLoading) {
       setIsLoading(false)
     }
-  }, [router, user, authLoading])
+  }, [router, user, authLoading, fetchUserBookings])
 
   const handleSaveProfile = async () => {
     setIsSaving(true)

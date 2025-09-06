@@ -1,0 +1,16 @@
+node_modules
+.next
+dist
+coverage
+# Prisma generated client + types
+lib/prisma-client/**
+# Any generated db files, if applicable
+lib/db.js
+# Build artifacts
+**/*.min.js
+# TypeScript declaration files
+**/*.d.ts
+# Temporary files
+temp/**
+# Build info
+tsconfig.tsbuildinfo

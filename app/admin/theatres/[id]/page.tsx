@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { useRouter, useParams } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -78,19 +78,7 @@ export default function EditTheatrePage() {
   const [newTag, setNewTag] = useState("")
   const [uploadingImages, setUploadingImages] = useState<File[]>([])
 
-  useEffect(() => {
-    const checkAdminAndFetch = async () => {
-      const adminStatus = await isAdmin()
-      if (!adminStatus) {
-        router.push("/auth/login")
-        return
-      }
-      await fetchTheatre()
-    }
-    checkAdminAndFetch()
-  }, [params.id, router])
-
-  const fetchTheatre = async () => {
+  const fetchTheatre = useCallback(async () => {
     try {
       const response = await fetch(`/api/theatres/${params.id}`)
       if (!response.ok) {
@@ -115,13 +103,25 @@ export default function EditTheatrePage() {
       console.error("Error fetching theatre:", error)
       toast({
         title: "Error",
-        description: "Failed to load theatre data",
+        description: "Failed to fetch theatre data",
         variant: "destructive"
       })
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [params.id, toast])
+
+  useEffect(() => {
+    const checkAdminAndFetch = async () => {
+      const admin = await isAdmin()
+      if (!admin) {
+        router.push("/auth/login")
+        return
+      }
+      await fetchTheatre()
+    }
+    checkAdminAndFetch()
+  }, [params.id, router, fetchTheatre])
 
   const handleInputChange = (field: string, value: string | number) => {
     setFormData(prev => ({ ...prev, [field]: value }))

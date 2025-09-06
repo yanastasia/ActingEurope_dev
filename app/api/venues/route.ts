@@ -25,13 +25,32 @@ export async function GET() {
       }
     })
 
+    // Define interfaces for type safety
+    interface VenueWithSections {
+      id: number;
+      name: string;
+      description: string | null;
+      capacity: number;
+      sections: Array<{
+        id: number;
+        section_name: string;
+        section_type: string;
+        seats: Array<{
+          id: number;
+          row_number: number;
+          seat_number: number;
+          is_accessible: boolean;
+        }>;
+      }>;
+    }
+
     // Transform the data to match the expected format
-    const transformedVenues = venues.map((venue: any) => ({
+    const transformedVenues = (venues as VenueWithSections[]).map((venue) => ({
       id: venue.id.toString(),
       name: venue.name,
       description: venue.description,
       capacity: venue.capacity,
-      sections: venue.sections.map((section: any) => ({
+      sections: venue.sections.map((section) => ({
         id: section.id.toString(),
         sectionName: section.section_name,
         sectionType: section.section_type,
@@ -56,7 +75,7 @@ export async function GET() {
         const staticVenues = await getVenues();
         
         // Transform static venues to match the expected API format
-        const transformedVenues = staticVenues.map((venue: any) => ({
+        const transformedVenues = (staticVenues as any[]).map((venue) => ({
           id: venue.id.toString(),
           name: venue.name,
           description: venue.description,
@@ -81,10 +100,16 @@ export async function GET() {
 }
 
 // Helper function to group seats by row (for database data)
-function groupSeatsByRow(seats: any[]) {
-  const rowMap = new Map<number, { rowNumber: number; seats: any[] }>()
+interface SeatData {
+  row_number: number;
+  seat_number: number;
+  is_accessible: boolean;
+}
+
+function groupSeatsByRow(seats: SeatData[]) {
+  const rowMap = new Map<number, { rowNumber: number; seats: Array<{ seatNumber: number; isAccessible: boolean }> }>()
   
-  seats.forEach((seat: any) => {
+  seats.forEach((seat) => {
     if (!rowMap.has(seat.row_number)) {
       rowMap.set(seat.row_number, {
         rowNumber: seat.row_number,
@@ -102,10 +127,15 @@ function groupSeatsByRow(seats: any[]) {
 }
 
 // Helper function to group seats by rows (for static data)
-function groupSeatsByRows(seats: any[]) {
-  const rowMap = new Map<number, { rowNumber: number; seats: any[] }>()
+interface StaticSeatData {
+  rowNumber: number;
+  seatNumber: number;
+}
+
+function groupSeatsByRows(seats: StaticSeatData[]) {
+  const rowMap = new Map<number, { rowNumber: number; seats: Array<{ seatNumber: number; isAccessible: boolean }> }>()
   
-  seats.forEach((seat: any) => {
+  seats.forEach((seat) => {
     if (!rowMap.has(seat.rowNumber)) {
       rowMap.set(seat.rowNumber, {
         rowNumber: seat.rowNumber,

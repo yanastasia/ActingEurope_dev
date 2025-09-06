@@ -50,7 +50,14 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 }
 
 // Helper function to group seats by row
-function groupSeatsByRow(seats: any[]) {
+interface SeatData {
+  id: number;
+  row_number: number;
+  seat_number: number;
+  is_accessible: boolean;
+}
+
+function groupSeatsByRow(seats: SeatData[]) {
   const rowMap = new Map()
   
   seats.forEach(seat => {

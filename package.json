@@ -7,6 +7,8 @@
     "build": "prisma generate && pnpm exec next build",
     "start": "next start",
     "lint": "next lint",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "typecheck": "tsc --noEmit",
     "build:windows": "powershell -ExecutionPolicy Bypass -File .\\build-alternative.ps1",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",

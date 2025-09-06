@@ -17,7 +17,7 @@ import {
 import { useLanguage } from "@/lib/language-context"
 
 // Helper function to translate subtitle languages
-const translateSubtitleLanguages = (subtitles: string, t: any) => {
+const translateSubtitleLanguages = (subtitles: string, t: (key: string) => string) => {
   if (!subtitles) return '';
   
   const languageMap: { [key: string]: string } = {
@@ -34,9 +34,28 @@ const translateSubtitleLanguages = (subtitles: string, t: any) => {
   }).join(', ');
 };
 
+interface Performance {
+  id: number;
+  title: string;
+  company: string[] | string;
+  date: string;
+  time: string;
+  venue: string;
+  description?: string;
+  price: number;
+  imageUrl?: string;
+  genre?: string;
+  language?: string;
+  duration?: string;
+  director?: string;
+  cast: string[];
+  subtitles?: string;
+  theatreName?: string;
+}
+
 export default function PerformancePage({ params }: { params: Promise<{ id: string }> }) {
   const { language, setLanguage, t } = useLanguage()
-  const [performance, setPerformance] = useState<any>(null)
+  const [performance, setPerformance] = useState<Performance | null>(null)
   const [loading, setLoading] = useState(true)
   const [id, setId] = useState<string>('')
 
@@ -138,7 +157,7 @@ export default function PerformancePage({ params }: { params: Promise<{ id: stri
 
           <h1 className="mb-2 text-3xl font-bold text-secondary-blue md:text-4xl">{performance.title}</h1>
           <p className="mb-4 text-xl text-muted-foreground">
-            {fixCompanyName(t(performance.theatreName) || performance.theatreName || (Array.isArray(performance.company) ? performance.company.map((comp: string) => fixCompanyName(t(comp) || comp)).join(' & ') : fixCompanyName(t(performance.company) || performance.company)))}
+            {fixCompanyName((Array.isArray(performance.company) ? performance.company.map((comp: string) => fixCompanyName(t(comp) || comp)).join(' & ') : fixCompanyName(t(performance.company) || performance.company)))}
           </p>
 
           <div className="mb-6 flex flex-wrap gap-2">

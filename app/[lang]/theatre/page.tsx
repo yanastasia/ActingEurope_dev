@@ -35,15 +35,15 @@ interface Theatre {
 }
 
 interface TheatrePageProps {
-  params: {
+  params: Promise<{
     lang: string
-  }
+  }>
 }
 
 const supportedLanguages = ['en', 'bg', 'mk', 'sr']
 
-export default function TheatrePage({ params }: TheatrePageProps) {
-  const { lang } = params
+export default async function TheatrePage({ params }: TheatrePageProps) {
+  const { lang } = await params
   
   // Validate language parameter
   if (!supportedLanguages.includes(lang)) {

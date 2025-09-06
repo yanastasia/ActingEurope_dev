@@ -1,15 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { isAdmin } from '../../../lib/auth';
 import { useToast } from '../../../hooks/use-toast';
-import { useLanguage } from '../../../lib/language-context';
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '../../../components/ui/card';
@@ -82,7 +81,7 @@ const AdminTheatresPage = () => {
     founded_year: '',
     content_language: 'en',
     translation_group: '',
-    images: [] as any[],
+    images: [] as TheatreImage[],
     tags: [] as string[]
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -94,7 +93,26 @@ const AdminTheatresPage = () => {
   const [theatresWithoutGroups, setTheatresWithoutGroups] = useState<Theatre[]>([]);
   const router = useRouter();
   const { toast } = useToast();
-  const { t } = useLanguage();
+
+  const fetchTheatres = useCallback(async () => {
+    try {
+      // Fetch all theatres for admin interface
+      const response = await fetch('/api/theatres?admin=true');
+      if (response.ok) {
+        const data = await response.json();
+        setTheatres(data);
+      } else {
+        throw new Error('Failed to fetch theatres');
+      }
+    } catch (error) {
+      console.error('Error fetching theatres:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch theatres',
+        variant: 'destructive',
+      });
+    }
+  }, [toast]);
 
   useEffect(() => {
     const checkAuthAndFetch = async () => {
@@ -140,27 +158,7 @@ const AdminTheatresPage = () => {
     };
     
     checkAuthAndFetch();
-  }, [router]);
-
-  const fetchTheatres = async () => {
-    try {
-      // Fetch all theatres for admin interface
-      const response = await fetch('/api/theatres?admin=true');
-      if (response.ok) {
-        const data = await response.json();
-        setTheatres(data);
-      } else {
-        throw new Error('Failed to fetch theatres');
-      }
-    } catch (error) {
-      console.error('Error fetching theatres:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch theatres',
-        variant: 'destructive',
-      });
-    }
-  };
+  }, [router, fetchTheatres]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -756,7 +754,7 @@ const AdminTheatresPage = () => {
                 </div>
                 {imagePreview && (
                   <div className="mt-4 relative">
-                    <img src={imagePreview} alt="Preview" className="w-32 h-32 object-cover rounded" />
+                    <Image src={imagePreview} alt="Preview" width={128} height={128} className="object-cover rounded" />
                     <Button
                       type="button"
                       variant="destructive"

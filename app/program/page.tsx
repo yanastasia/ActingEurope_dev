@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Calendar, Filter, MapPin } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -74,7 +74,7 @@ export default function ProgramPage() {
     return '/register-to-book'
   }
 
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     try {
       const response = await fetch(`/api/events?language=${language}&t=${Date.now()}`, {
         cache: 'no-store',
@@ -88,14 +88,33 @@ export default function ProgramPage() {
       }
       const eventsData = await response.json()
       
-      const mappedPerformances: Event[] = eventsData.map((event: any) => ({
+      interface EventData {
+        id: number;
+        title: string;
+        eventType: string;
+        date: string;
+        time: string;
+        venue: string;
+        company?: string;
+        theatreName?: string;
+        description: string;
+        imageUrl: string;
+        posterUrl: string;
+        isFeatured: boolean;
+        genre?: string;
+        language?: string;
+        duration?: string;
+        translationGroup?: string;
+      }
+
+      const mappedPerformances: Event[] = (eventsData as EventData[]).map((event) => ({
         id: `performance-${event.id}`,
         title: event.title,
         eventType: event.eventType as "performance" | "workshop" | "discussion",
         date: event.date,
         time: event.time,
         venue: event.venue,
-        company: event.theatreName || event.company,
+        company: event.theatreName || event.company || '',
         description: event.description,
         imageUrl: event.imageUrl,
         posterUrl: event.posterUrl,
@@ -115,11 +134,11 @@ export default function ProgramPage() {
       console.error('Error fetching events:', error)
       setEvents([])
     }
-  }
+  }, [language])
 
   useEffect(() => {
     fetchEvents()
-  }, [language])
+  }, [fetchEvents])
 
   const filteredEvents = events.filter((event) => {
     return (
