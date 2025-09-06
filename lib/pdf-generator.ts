@@ -1,6 +1,7 @@
 import PDFDocument from "pdfkit"
 import QRCode from "qrcode"
 import { v4 as uuidv4 } from "uuid"
+import { translations } from './translations'
 
 interface TicketInfo {
   title: string
@@ -25,11 +26,10 @@ interface TicketData {
 export async function generatePDF(ticketData: TicketData): Promise<Buffer> {
   return new Promise(async (resolve, reject) => {
     try {
-      // Create a document with explicit font settings to avoid font loading issues
+      // Create a document
       const doc = new PDFDocument({
         size: "A4",
         margin: 50,
-        font: 'Helvetica', // Use built-in font
         info: {
           Title: `Tickets - ${ticketData.title}`,
           Author: "Acting Europe Festival",
@@ -42,45 +42,90 @@ export async function generatePDF(ticketData: TicketData): Promise<Buffer> {
       doc.on("end", () => resolve(Buffer.concat(chunks)))
       doc.on("error", reject)
 
-      // Generate individual tickets
-      for (let i = 0; i < ticketData.tickets.length; i++) {
-        const ticket = ticketData.tickets[i]
+      // Helper function to get display text for bilingual content
+      const getDisplayText = (text: string, language: string): string => {
+        if (!text) return '';
         
-        if (i > 0) {
-          doc.addPage()
+        // Check if it's a bilingual format (e.g., "English / Bulgarian")
+        if (text.includes(' / ')) {
+          const parts = text.split(' / ');
+          if (parts.length === 2) {
+            return language === 'en' ? parts[0] : parts[1];
+          }
         }
+        
+        // Check if it's a translation key
+        const translationObj = translations as Record<string, Record<string, string>>;
+        const translated = translationObj[text]?.[language];
+        if (translated) {
+          return translated;
+        }
+        
+        // Return original text
+        return text;
+      };
 
-        // Add festival logo
-        // doc.image('public/logo.png', 50, 45, { width: 150 })
+      // Helper function to create a ticket page with branding
+      const createTicketPage = async (ticket: TicketInfo, language: 'en' | 'bg') => {
+        // Acting Europe branding colors - Blue and Yellow
+        const primaryColor = '#021a4a'; // Deep blue
+        const accentColor = '#ffcc00'; // Bright yellow
+        
+        // Add branded header with background
+        doc.rect(0, 0, 595, 80).fillColor(primaryColor).fill();
+        doc.fontSize(28).fillColor('#ffffff').text("ACTING EUROPE", 50, 25, { align: "center", width: 495 })
+        doc.fontSize(16).fillColor(accentColor).text("Theatre Without Borders", 50, 55, { align: "center", width: 495 })
+        doc.moveDown(2)
 
-        // Add header
-        doc.font('Helvetica-Bold').fontSize(25).fillColor("#021a4a").text("ACTING EUROPE", { align: "center" })
-        doc.font('Helvetica').fontSize(16).fillColor("#021a4a").text("Theatre Without Borders", { align: "center" })
-        doc.moveDown()
+        // Add ticket information with branded styling
+        const eTicketText = language === 'en' ? 'E-TICKET' : 'Е-БИЛЕТ';
+        doc.rect(50, doc.y, 495, 40).fillColor(accentColor).fill();
+        doc.fontSize(22).fillColor(primaryColor).text(eTicketText, 50, doc.y + 10, { align: "center", width: 495 })
+        doc.moveDown(2)
 
-        // Add ticket information
-        doc.font('Helvetica-Bold').fontSize(20).fillColor("#000000").text("E-TICKET", { align: "center" })
-        doc.moveDown()
-
-        // Add a border around the ticket details
+        // Add a border around the ticket details with branded colors
         const startY = doc.y
-        doc.rect(50, startY, 495, 320).stroke()
+        doc.rect(50, startY, 495, 320).strokeColor(primaryColor).lineWidth(2).stroke()
 
-        // Add ticket details
-        doc
-          .font('Helvetica')
-          .fontSize(12)
-          .fillColor("#000000")
-          .text(`Event: ${ticket.title}`, 70, startY + 20)
-          .text(`Date: ${ticket.date}`, 70, startY + 50)
-          .text(`Time: ${ticket.time}`, 70, startY + 80)
-          .text(`Venue: ${ticket.venue}`, 70, startY + 110)
-          .text(`Seat: ${ticket.seat}`, 70, startY + 140)
-          .text(`Attendee: ${ticket.attendeeName}`, 70, startY + 170)
-          .text(`Booking Reference: ${ticket.bookingReference}`, 70, startY + 200)
-          .text(`Ticket ID: ${ticket.qrData}`, 70, startY + 230)
+        // Labels in the selected language
+        const labels = {
+          event: language === 'en' ? 'Event:' : 'Събитие:',
+          date: language === 'en' ? 'Date:' : 'Дата:',
+          time: language === 'en' ? 'Time:' : 'Час:',
+          venue: language === 'en' ? 'Venue:' : 'Място:',
+          seat: language === 'en' ? 'Seat:' : 'Място:',
+          attendee: language === 'en' ? 'Attendee:' : 'Посетител:',
+          booking: language === 'en' ? 'Booking Reference:' : 'Номер на резервация:',
+          ticketId: language === 'en' ? 'Ticket ID:' : 'ID на билет:'
+        };
 
-        // Generate and add QR code
+        // Add ticket details with branded colors
+        doc.fontSize(12).fillColor(primaryColor)
+        doc.text(`${labels.event}`, 70, startY + 20, { continued: true })
+        doc.fillColor('#333').text(` ${getDisplayText(ticket.title, language)}`)
+
+        doc.fillColor(primaryColor).text(`${labels.date}`, 70, startY + 50, { continued: true })
+        doc.fillColor('#333').text(` ${ticket.date}`)
+
+        doc.fillColor(primaryColor).text(`${labels.time}`, 70, startY + 80, { continued: true })
+        doc.fillColor('#333').text(` ${ticket.time}`)
+
+        doc.fillColor(primaryColor).text(`${labels.venue}`, 70, startY + 110, { continued: true })
+        doc.fillColor('#333').text(` ${getDisplayText(ticket.venue, language)}`)
+
+        doc.fillColor(primaryColor).text(`${labels.seat}`, 70, startY + 140, { continued: true })
+        doc.fillColor('#333').text(` ${ticket.seat}`)
+
+        doc.fillColor(primaryColor).text(`${labels.attendee}`, 70, startY + 170, { continued: true })
+        doc.fillColor('#333').text(` ${ticket.attendeeName}`)
+
+        doc.fillColor(primaryColor).text(`${labels.booking}`, 70, startY + 200, { continued: true })
+        doc.fillColor('#333').text(` ${ticket.bookingReference}`)
+
+        doc.fillColor(primaryColor).text(`${labels.ticketId}`, 70, startY + 230, { continued: true })
+        doc.fillColor('#333').text(` ${ticket.qrData}`)
+
+        // Generate and add QR code with branded border
         try {
           const qrCodeDataURL = await QRCode.toDataURL(ticket.qrData, {
             width: 150,
@@ -91,22 +136,60 @@ export async function generatePDF(ticketData: TicketData): Promise<Buffer> {
             }
           })
           
+          // Add QR code background with branding
+          doc.rect(340, startY + 10, 170, 170).fillColor('#f8f9fa').fill()
+          doc.rect(340, startY + 10, 170, 170).strokeColor(primaryColor).lineWidth(2).stroke()
+          
           // Convert data URL to buffer
           const qrBuffer = Buffer.from(qrCodeDataURL.split(',')[1], 'base64')
           doc.image(qrBuffer, 350, startY + 20, { width: 150, height: 150 })
         } catch (qrError) {
           console.error('QR Code generation failed:', qrError)
-          // Fallback to placeholder
+          // Fallback to placeholder with branding
+          doc.rect(340, startY + 10, 170, 170).fillColor('#f8f9fa').fill()
+          doc.rect(340, startY + 10, 170, 170).strokeColor(primaryColor).lineWidth(2).stroke()
           doc.rect(350, startY + 20, 150, 150).stroke()
-          doc.font('Helvetica').fontSize(10).text("QR Code", 350, startY + 180, { width: 150, align: "center" })
+          const qrText = language === 'en' ? 'QR Code' : 'QR Код';
+          doc.fontSize(10).text(qrText, 350, startY + 180, { width: 150, align: "center" })
         }
 
-        // Add footer
+        // Add instructions
+        const footerText1 = language === 'en' 
+          ? "Please present this ticket (printed or on your mobile device) at the venue entrance."
+          : "Моля, представете този билет (отпечатан или на мобилното си устройство) на входа на залата.";
+        const footerText2 = language === 'en'
+          ? "For assistance, contact: tickets@actingeurope.com"
+          : "За помощ се свържете с: tickets@actingeurope.com";
+        
         doc
-          .font('Helvetica')
           .fontSize(10)
-          .text("Please present this ticket (printed or on your mobile device) at the venue entrance.", 50, startY + 340)
-          .text("For assistance, contact: tickets@actingeurope.com", 50, startY + 360)
+          .fillColor(primaryColor)
+          .text(footerText1, 50, startY + 270, { width: 400 })
+          .text(footerText2, 50, startY + 290, { width: 400 })
+        
+        // Add branded footer
+        doc.rect(0, 750, 595, 50).fillColor(primaryColor).fill()
+        doc.fontSize(10).fillColor('#ffffff')
+        doc.text('© Acting Europe - Theatre Without Borders', 50, 765, { align: 'center', width: 495 })
+        doc.fillColor(accentColor).text('www.actingeurope.com', 50, 780, { align: 'center', width: 495 })
+      };
+
+      // Generate individual tickets (2 pages each - English and Bulgarian)
+      for (let i = 0; i < ticketData.tickets.length; i++) {
+        const ticket = ticketData.tickets[i]
+        
+        if (i > 0) {
+          doc.addPage()
+        }
+
+        // Create English page
+        await createTicketPage(ticket, 'en')
+        
+        // Add new page for Bulgarian version
+        doc.addPage()
+        
+        // Create Bulgarian page
+        await createTicketPage(ticket, 'bg')
       }
 
       // Finalize the PDF

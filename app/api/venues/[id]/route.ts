@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params
+    const { id } = await params
     
     const venue = await prisma.venue.findUnique({
       where: { id: parseInt(id) },
@@ -62,6 +62,7 @@ function groupSeatsByRow(seats: any[]) {
     }
     
     rowMap.get(seat.row_number).seats.push({
+      id: seat.id,
       seatNumber: seat.seat_number,
       isAccessible: seat.is_accessible
     })
@@ -70,8 +71,8 @@ function groupSeatsByRow(seats: any[]) {
   return Array.from(rowMap.values()).sort((a, b) => a.rowNumber - b.rowNumber)
 }
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
-  const { id } = params
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   let name, capacity, description, imageUrl, sections, rows
   
   try {
@@ -168,9 +169,9 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params
+    const { id } = await params
 
     // Delete the venue
     await prisma.venue.delete({

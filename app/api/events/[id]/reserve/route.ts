@@ -4,7 +4,7 @@ import { getServerSession, getServerUser } from '@/lib/supabase-server'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession()
@@ -17,7 +17,8 @@ export async function POST(
       )
     }
 
-    const eventId = parseInt(params.id)
+    const { id } = await params
+    const eventId = parseInt(id)
     
     if (isNaN(eventId)) {
       return NextResponse.json(
@@ -171,7 +172,7 @@ export async function POST(
         data: {
           user_id: dbUser.id,
           event_id: eventId,
-          booking_status: 'pending',
+          booking_status: 'confirmed',
           total_amount: Number(event.price) * seatIds.length,
           booking_reference: `BK-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
         }
@@ -183,6 +184,16 @@ export async function POST(
           booking_id: booking.id,
           seat_id: seatId
         }))
+      })
+
+      // Update seat availability
+      await tx.seat.updateMany({
+        where: {
+          id: { in: seatIds }
+        },
+        data: {
+          is_available: false
+        }
       })
 
       return { booking, bookedSeats }

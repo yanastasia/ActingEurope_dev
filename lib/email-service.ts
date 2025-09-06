@@ -3,13 +3,45 @@
 import nodemailer from "nodemailer"
 import { ServerClient } from "postmark"
 import { render } from "@react-email/render"
+import { format } from "date-fns"
 import VerificationEmail from "@/emails/verification-email"
 import TicketEmail from "@/emails/ticket-email"
 import ReminderEmail from "@/emails/reminder-email"
 import WelcomeEmail from "@/emails/welcome-email"
-import { generateTicketPdfBuffer } from "./pdf/pdf-generator"
+import { generateBrandedTicketPdf } from "./pdf/branded-pdf-generator";
+import { generateQRData } from './pdf-generator';
 import { sanitize } from "./util/sanitize"
 import { prisma } from "./prisma"
+import { translations } from "./translations"
+
+// Import translation function for server-side use
+function getTranslation(key: string, language: 'en' | 'bg' = 'bg'): string {
+  const langTranslations = {
+    en: {
+      'Main Stage': 'Main Stage',
+      'Chamber Stage': 'Chamber Stage',
+      'Cinema hall': 'Cinema hall',
+      'No Man\'s Land': 'No Man\'s Land',
+      'Waiting Artists': 'Waiting Artists',
+      'Aivar or Lutenitsa': 'Aivar or Lutenitsa',
+      'Don Juan': 'Don Juan',
+      'Oh My God': 'Oh My God',
+      'Ignorance': 'Ignorance',
+    },
+    bg: {
+      'Main Stage': 'Голяма зала',
+      'Chamber Stage': 'Камерна зала',
+      'Cinema hall': 'Кино зала',
+      'No Man\'s Land': 'Ничия земя',
+      'Waiting Artists': 'Чакащи артисти',
+      'Aivar or Lutenitsa': 'Айвар или лютеница',
+      'Don Juan': 'Дон Жуан',
+      'Oh My God': 'Боже мой',
+      'Ignorance': 'Неведение',
+    }
+  };
+  return langTranslations[language]?.[key as keyof typeof langTranslations.en] || key;
+}
 
 // Configure email transporter with rate limiting and retry logic
 const transporter = nodemailer.createTransport({
@@ -56,9 +88,14 @@ async function sendEmailWithRetry(mailOptions: any, maxRetries = 3) {
   return { success: false, error: new Error('Max retries exceeded') }
 }
 
-// Initialize Postmark client
+// Initialize Postmark clients
 const postmarkClient = process.env.POSTMARK_SERVER_TOKEN 
   ? new ServerClient(process.env.POSTMARK_SERVER_TOKEN)
+  : null;
+
+// Initialize dedicated Postmark client for ticket delivery
+const postmarkTicketClient = process.env.POSTMARK_TICKET_SERVER_TOKEN 
+  ? new ServerClient(process.env.POSTMARK_TICKET_SERVER_TOKEN)
   : null;
 
 // For testing/development, we'll log emails instead of sending them
@@ -151,8 +188,33 @@ export async function sendTicketEmail(bookingId: string) {
   };
 
   const attendeeBySeat: Record<string, string> = {};
-  const arr = JSON.parse(booking.attendee_names as string) as Array<{ seatId: string; fullName: string }>;
-  arr.forEach((x) => { attendeeBySeat[x.seatId] = x.fullName; });
+  // Handle attendee_names as either array or JSON string
+  let attendeeArray: Array<{ seatId: string; fullName: string }> | string[];
+  
+  if (typeof booking.attendee_names === 'string') {
+    try {
+      attendeeArray = JSON.parse(booking.attendee_names);
+    } catch (error) {
+      console.error('Failed to parse attendee_names as JSON:', error);
+      attendeeArray = [];
+    }
+  } else {
+    attendeeArray = booking.attendee_names as any;
+  }
+  
+  // Map attendees to seats
+  if (Array.isArray(attendeeArray)) {
+    attendeeArray.forEach((attendee, index) => {
+      const seatId = bookingWithRelations.booked_seats[index]?.seat.id.toString();
+      if (seatId) {
+        if (typeof attendee === 'object' && attendee.fullName) {
+          attendeeBySeat[seatId] = attendee.fullName;
+        } else if (typeof attendee === 'string') {
+          attendeeBySeat[seatId] = attendee;
+        }
+      }
+    });
+  }
 
   const eventId = bookingWithRelations.event.id.toString();
   const ctx = {
@@ -161,7 +223,8 @@ export async function sendTicketEmail(bookingId: string) {
       id: eventId,
       title: bookingWithRelations.event.title,
       date: bookingWithRelations.event.event_date.toISOString().split('T')[0], // format as YYYY-MM-DD
-      time: bookingWithRelations.event.event_time,
+      time: bookingWithRelations.event.event_time ? bookingWithRelations.event.event_time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }) : '19:00',
+      venueAddress: bookingWithRelations.event.venue?.address,
       venueName: bookingWithRelations.event.venue?.name ?? "Venue"
     }
   };
@@ -171,12 +234,33 @@ export async function sendTicketEmail(bookingId: string) {
   for (const bs of bookingWithRelations.booked_seats) {
     const attendeeName = attendeeBySeat[bs.seat_id.toString()] || bs.attendee_name || "Attendee";
     const seatLabel = `Row ${bs.seat.row_number}, Seat ${bs.seat.seat_number}`;
-    const { buffer, qrPayload } = await generateTicketPdfBuffer(ctx, {
-      seatId: bs.seat.id.toString(),
-      row: bs.seat.row_number,
-      number: bs.seat.seat_number,
-      attendeeName
+    const qrPayload = generateQRData({
+      bookingReference: booking.booking_reference,
+      seat: seatLabel,
+      attendee: attendeeName,
+      eventId: eventId
     });
+    
+    const { buffer } = await generateBrandedTicketPdf(
+      {
+        bookingReference: booking.booking_reference,
+        event: {
+          title: booking.event.title,
+          date: format(new Date(booking.event.event_date), "dd MMM yyyy"),
+          time: booking.event.event_time ? (typeof booking.event.event_time === 'string' ? booking.event.event_time : booking.event.event_time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })) : '19:00',
+          venueName: booking.event.venue.name,
+          venueAddress: booking.event.venue.address || undefined,
+        },
+      },
+      {
+        id: bs.seat.id,
+        row: bs.seat.row_number,
+        number: bs.seat.seat_number,
+        price: 0,
+        category: 'Standard',
+        attendeeName: attendeeName,
+      }
+    );
 
     // persist payload + attendee name
     await prisma.bookedSeat.update({
@@ -192,21 +276,202 @@ export async function sendTicketEmail(bookingId: string) {
     });
   }
 
-  const html = await render(
-    TicketEmail({
-      bookingReference: booking.booking_reference,
-      eventTitle: ctx.event.title,
-      date: ctx.event.date,
-      time: ctx.event.time,
-      venue: ctx.event.venueName,
-      tickets: bookingWithRelations.booked_seats.map((bs) => ({
-         attendeeName: attendeeBySeat[bs.seat_id.toString()] || bs.attendee_name || "Attendee",
-        seatLabel: `Row ${bs.seat.row_number}, Seat ${bs.seat.seat_number}`
-      }))
-    })
-  );
+  // Extract single names from potentially combined format (e.g., "No Man's Land / No Man's Land" -> "No Man's Land")
+  const extractSingleName = (name: string): string => {
+    if (!name) return name;
+    // If name contains " / ", take the first part
+    return name.includes(' / ') ? name.split(' / ')[0].trim() : name;
+  };
 
-  const subject = `Your tickets for ${ctx.event.title} — ${attachments.length} ticket(s)`;
+  const eventTitleEn = extractSingleName(ctx.event.title);
+  const eventTitleBg = getTranslation(eventTitleEn, 'bg');
+  const venueNameEn = extractSingleName(ctx.event.venueName);
+  const venueNameBg = getTranslation(venueNameEn, 'bg');
+
+  // Create bilingual HTML template with proper language context
+  const attendeeSeats = bookingWithRelations.booked_seats.map((bs) => ({
+    attendeeName: attendeeBySeat[bs.seat_id.toString()] || bs.attendee_name || "Attendee",
+    seatLabelEn: `Row ${bs.seat.row_number}, Seat ${bs.seat.seat_number}`,
+    seatLabelBg: `Ред ${bs.seat.row_number}, Място ${bs.seat.seat_number}`
+  }));
+  
+  const seatLabelsEn = attendeeSeats.map(seat => seat.seatLabelEn).join("; ");
+  const seatLabelsBg = attendeeSeats.map(seat => seat.seatLabelBg).join("; ");
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Tickets - ActingEurope | Вашите билети - ActingEurope</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .header {
+      background-color: #2c3e50;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      border-radius: 8px 8px 0 0;
+    }
+    .content {
+      background-color: #f8f9fa;
+      padding: 30px;
+      border-radius: 0 0 8px 8px;
+    }
+    .event-details {
+      background-color: #e9ecef;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 20px 0;
+    }
+    .detail-row {
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+    .detail-row:last-child {
+      margin-bottom: 0;
+    }
+    .booking-ref {
+      font-weight: 700;
+    }
+    .booking-ref-number {
+      color: #021a4a;
+      font-weight: 700;
+    }
+    .tickets-section {
+      margin: 20px 0;
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #021a4a;
+      margin-bottom: 15px;
+    }
+    .tickets-list {
+      background-color: #e9ecef;
+      padding: 15px;
+      border-radius: 4px;
+    }
+    .ticket-item {
+      background-color: white;
+      padding: 10px;
+      margin-bottom: 8px;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    .ticket-item:last-child {
+      margin-bottom: 0;
+    }
+    .attendee-name {
+      font-weight: 600;
+      color: #021a4a;
+    }
+    .button {
+      display: inline-block;
+      background: linear-gradient(135deg, #ffcc00 0%, #ffd700 100%);
+      color: #021a4a;
+      padding: 16px 32px;
+      text-decoration: none;
+      border-radius: 8px;
+      margin: 20px 0;
+      font-weight: 600;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(255, 204, 0, 0.3);
+    }
+    .button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(255, 204, 0, 0.4);
+    }
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 12px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <!-- English Version -->
+  <div class="header">
+    <h1>Your Tickets - Acting Europe</h1>
+  </div>
+  <div class="content">
+    <h2>Your tickets for ${eventTitleEn}</h2>
+    
+    <div class="event-details">
+      <div class="detail-row">
+        <strong>📅 Date & Time:</strong> ${ctx.event.date} at ${ctx.event.time}
+      </div>
+      <div class="detail-row">
+        <strong>📍 Venue:</strong> ${venueNameEn}${ctx.event.venueAddress ? `, ${ctx.event.venueAddress}` : ''}
+      </div>
+      <div class="detail-row">
+        <strong>🎫 Booking Reference:</strong> <span class="booking-ref-number">${booking.booking_reference}</span>
+      </div>
+    </div>
+
+    <div class="tickets-section">
+      <h3 class="section-title">🎭 Tickets in this order</h3>
+      <div class="tickets-list">
+        ${attendeeSeats.map(({ attendeeName, seatLabelEn }) => `<div class="ticket-item"><span class="attendee-name">${attendeeName}</span> — ${seatLabelEn}</div>`).join('')}
+      </div>
+    </div>
+
+    <p><strong>📱 Important:</strong> We attached a separate PDF file for each attendee. Each person should bring their own PDF or show it on a phone at the entrance.</p>
+    
+    <p><strong>💬 Need help?</strong> Having trouble opening attachments? Reply to this email and we will resend them.</p>
+    
+    <p>Best regards,<br>The Acting Europe Team</p>
+  </div>
+
+  <!-- Bulgarian Version -->
+  <div class="header" style="margin-top: 40px;">
+    <h1>Вашите билети - Acting Europe</h1>
+  </div>
+  <div class="content">
+    <h2>Вашите билети за ${eventTitleBg}</h2>
+    
+    <div class="event-details">
+      <div class="detail-row">
+        <strong>📅 Дата и час:</strong> ${ctx.event.date} в ${ctx.event.time}
+      </div>
+      <div class="detail-row">
+        <strong>📍 Място:</strong> ${venueNameBg}${ctx.event.venueAddress ? `, ${ctx.event.venueAddress}` : ''}
+      </div>
+      <div class="detail-row">
+        <strong>🎫 Референтен номер на резервацията:</strong> <span class="booking-ref-number">${booking.booking_reference}</span>
+      </div>
+    </div>
+
+    <div class="tickets-section">
+      <h3 class="section-title">🎭 Билети в тази поръчка</h3>
+      <div class="tickets-list">
+        ${attendeeSeats.map(({ attendeeName, seatLabelBg }) => `<div class="ticket-item"><span class="attendee-name">${attendeeName}</span> — ${seatLabelBg}</div>`).join('')}
+      </div>
+    </div>
+
+    <p><strong>📱 Важно:</strong> Приложихме отделен PDF файл за всеки участник. Всеки човек трябва да донесе своя PDF или да го покаже на телефона на входа.</p>
+    
+    <p><strong>💬 Нужда от помощ?</strong> Имате проблеми с отварянето на прикачените файлове? Отговорете на този имейл и ще ги изпратим отново.</p>
+    
+    <p>Всичко хубаво,<br>Екипът на Acting Europe</p>
+  </div>
+
+  <div class="footer">
+    <p>&copy; 2025 Acting Europe. Всички права запазени.</p>
+  </div>
+</body>
+</html>`;
+
+  const subject = `Your Tickets - ActingEurope | Вашите билети - ActingEurope`;
 
   if (isDevelopment) {
     console.log("Development mode: Ticket email would be sent with:", {
@@ -217,6 +482,51 @@ export async function sendTicketEmail(bookingId: string) {
     return { success: true };
   }
 
+  // Try using dedicated ticket delivery server with template first
+  if (postmarkTicketClient && process.env.POSTMARK_TICKET_TEMPLATE_ALIAS) {
+    try {
+      // Template data with correct variable names for Postmark template
+      const eventTitleEn = extractSingleName(ctx.event.title);
+      const eventTitleBg = getTranslation(eventTitleEn, 'bg');
+      const venueNameEn = extractSingleName(ctx.event.venueName);
+      const venueNameBg = getTranslation(venueNameEn, 'bg');
+      
+      const templateData = {
+        eventTitle_Value: eventTitleEn,
+        eventTitle_Value_bg: eventTitleBg,
+        date_Value: ctx.event.date instanceof Date ? ctx.event.date.toLocaleDateString() : String(ctx.event.date),
+        time_Value: ctx.event.time,
+        venue_Value: venueNameEn,
+        venue_Value_bg: venueNameBg,
+        bookingReference_Value: booking.booking_reference,
+        attendeeName_Value: bookingWithRelations.booked_seats.map((bs) => 
+          attendeeBySeat[bs.seat_id.toString()] || bs.attendee_name || "Attendee"
+        ).join(", "),
+        seatLabel_Value: bookingWithRelations.booked_seats.map((bs) => 
+          `Row ${bs.seat.row_number}, Seat ${bs.seat.seat_number}`
+        ).join("; "),
+        seatLabel_Value_bg: bookingWithRelations.booked_seats.map((bs) => 
+          `Ред ${bs.seat.row_number}, Място ${bs.seat.seat_number}`
+        ).join("; ")
+      };
+
+      const result = await postmarkTicketClient.sendEmailWithTemplate({
+        TemplateAlias: process.env.POSTMARK_TICKET_TEMPLATE_ALIAS,
+        To: bookingWithRelations.user.email,
+        From: process.env.POSTMARK_TICKET_FROM_EMAIL || 'tickets@actingeurope.eu',
+        TemplateModel: templateData,
+        Attachments: attachments,
+        MessageStream: 'outbound'
+      });
+      
+      console.log('Postmark ticket template email sent successfully:', result.MessageID);
+      return { success: true, messageId: result.MessageID };
+    } catch (error: any) {
+      console.error('Postmark ticket template failed, falling back to regular email:', error);
+    }
+  }
+
+  // Fallback to regular Postmark client
   if (!postmarkClient) {
     throw new Error('Postmark client not initialized. Check POSTMARK_SERVER_TOKEN.');
   }

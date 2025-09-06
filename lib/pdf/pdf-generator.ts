@@ -29,18 +29,25 @@ type SeatInfo = {
 };
 
 export async function generateTicketPdfBuffer(ctx: TicketContext, seat: SeatInfo) {
-  const doc = new PDFDocument({ size: "A4", margin: 48, font: 'Helvetica' });
+  const doc = new PDFDocument({ 
+    size: "A4", 
+    margin: 48
+  });
   const chunks: Buffer[] = [];
   doc.on("data", (d) => chunks.push(d));
+  
+  // Set font to avoid file loading issues
+  doc.font('Helvetica');
+  
   const primary = process.env.TICKET_BRAND_PRIMARY || "#021a4a";
   const accent = process.env.TICKET_BRAND_ACCENT || "#ffcc00";
 
   // Header
-  doc.font('Helvetica-Bold').fillColor(primary).fontSize(22).text("Acting Europe — Theatre Without Borders");
+  doc.fillColor(primary).fontSize(22).text("Acting Europe — Theatre Without Borders");
   doc.moveDown(0.25);
-  doc.font('Helvetica-Bold').fillColor("black").fontSize(16).text(ctx.event.title);
+  doc.fillColor("black").fontSize(16).text(ctx.event.title);
   doc.moveDown(0.25);
-  doc.font('Helvetica').text(`${ctx.event.date} at ${ctx.event.time}`);
+  doc.text(`${ctx.event.date} at ${ctx.event.time}`);
   doc.text(`${ctx.event.venueName}${ctx.event.address ? ", " + ctx.event.address : ""}`);
   doc.moveDown(0.75);
 
@@ -49,8 +56,8 @@ export async function generateTicketPdfBuffer(ctx: TicketContext, seat: SeatInfo
   doc.moveDown(0.75);
 
   // Attendee and seat
-  doc.font('Helvetica-Bold').fontSize(14).fillColor(primary).text("Ticket");
-  doc.font('Helvetica').fillColor("black").moveDown(0.25);
+  doc.fontSize(14).fillColor(primary).text("Ticket");
+  doc.fillColor("black").moveDown(0.25);
   doc.text(`Attendee: ${seat.attendeeName}`);
   doc.text(`Seat: Row ${seat.row}, Seat ${seat.number}`);
   doc.text(`Booking Ref: ${ctx.bookingReference}`);
@@ -68,7 +75,7 @@ export async function generateTicketPdfBuffer(ctx: TicketContext, seat: SeatInfo
 
   // Footer note
   doc.moveDown(10);
-  doc.font('Helvetica').fontSize(10).fillColor("#444").text(
+  doc.fontSize(10).fillColor("#444").text(
     "Please bring this ticket to the venue. QR code is required for entry. " +
       "If you have multiple tickets, each attendee should present their own PDF."
   );

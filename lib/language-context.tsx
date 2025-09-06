@@ -168,6 +168,14 @@ const translations = {
     noPastEvents: "No past events",
     noAttendedEvents: "You haven't attended any events yet.",
     saving: "Saving...",
+    upcomingTickets: "Upcoming Tickets",
+    loadingBookings: "Loading your bookings...",
+    eventDate: "Event Date",
+    eventTime: "Event Time",
+    eventVenue: "Venue",
+    ticketDetails: "Ticket Details",
+    bookingReference: "Booking Reference",
+    seatNumber: "Seat",
 
     // Email Verification Page
     emailVerification: "Email Verification",
@@ -255,6 +263,7 @@ const translations = {
     pleaseSelectSeats: "Please select at least one seat to continue",
 
     // Booking
+    loadingPerformances: "Loading performances...",
     availablePerformances: "Available Performances",
     perTicket: "per ticket",
     yourDetails: "Your Details",
@@ -271,6 +280,8 @@ const translations = {
     bookingDetails: "Booking Details",
     seats: "Seats",
     bookAnotherTicket: "Book Another Ticket",
+    backToTickets: "Back to Tickets",
+    bookAnother: "Book Another",
     downloadTicket: "Download Ticket",
     noPerformancesYet: "No performances available yet",
     noPerformancesYetDesc: "Please check back later or contact the administrator for more information.",
@@ -290,8 +301,29 @@ const translations = {
     emailSubmittedMessage: "We've added your email to our notification list. You'll be among the first to know when tickets become available!",
     backToHome: "Back to Home",
     
+    // Registration to Book Page
+    registerToBookTitle: "Registration Required",
+    registerToBookSubtitle: "Create an account to book tickets for Acting Europe – Theatre Without Borders 2025",
+    registrationRequiredTitle: "Account Required for Booking",
+    registrationRequiredMessage: "To ensure the best booking experience and secure your tickets, you need to be logged in or registered. Please create an account or sign in to your existing account.",
+    createAccountTitle: "Create Your Account",
+    createAccountMessage: "Join Acting Europe – Theatre Without Borders community and get access to exclusive content, early ticket releases, and personalized recommendations.",
+    alreadyHaveAccountTitle: "Already Have an Account?",
+    alreadyHaveAccountMessage: "Sign in to your existing account to continue with your ticket booking.",
+    whyRegisterTitle: "Why Register with Acting Europe?",
+    whyRegisterBenefit1: "Secure and fast ticket booking process",
+    whyRegisterBenefit2: "Early access to ticket releases and special offers",
+    whyRegisterBenefit3: "Personalized recommendations based on your preferences",
+    whyRegisterBenefit4: "Easy access to your booking history and tickets",
+    exploreWhileDeciding: "Take your time to explore while deciding:",
+    checkingAuthentication: "Checking authentication...",
+    
     // Performance page specific
     bookYourTickets: "Book Your Tickets",
+    attendeeNames: "Attendee Names",
+    enterAttendeeName: "Enter attendee name",
+    confirmBooking: "Confirm Booking",
+    processing: "Processing...",
     suitableForAges: "Suitable for ages 12+",
     addToCalendar: "Add to Calendar",
     needAssistance: "Need assistance?",
@@ -301,6 +333,34 @@ const translations = {
     workshops: "Workshops",
     workshopsComingSoon: "Workshops Coming Soon",
     workshopsComingSoonDesc: "Workshop registrations will be available soon. Please check back later.",
+
+    // Calendar view
+    eventsOn: "Events on",
+    eventNamesDisplayed: "Event names are displayed in their original language",
+    clickDateToView: "Click on a date to view events",
+    
+    // Month names
+    january: "January",
+    february: "February",
+    march: "March",
+    april: "April",
+    may: "May",
+    june: "June",
+    july: "July",
+    august: "August",
+    september: "September",
+    october: "October",
+    november: "November",
+    december: "December",
+    
+    // Day names
+    monday: "Mon",
+    tuesday: "Tue",
+    wednesday: "Wed",
+    thursday: "Thu",
+    friday: "Fri",
+    saturday: "Sat",
+    sunday: "Sun",
 
     // Forms
     missingInformation: "Missing Information",
@@ -415,6 +475,11 @@ const translations = {
     removeFromFavorites: "Remove from Favorites",
     addedToFavorites: "Added to favorites",
     removedFromFavorites: "Removed from favorites",
+    attendee: "Attendee",
+    row: "Row",
+    entryQRCode: "Entry QR Code",
+    presentQRCodeMessage: "Present this QR code at the venue",
+    arrivalMessage: "Please arrive 15 minutes before the show starts",
 
     // Program page
     filterEvents: "Filter Events",
@@ -441,6 +506,10 @@ const translations = {
     "National Theatre in Niš": "National Theatre in Niš",
     "OSAIK \"36 Monkeys\"": "OSAIK \"36 Monkeys\"",
     "Intimate Theatre Bitola": "Intimate Theatre Bitola",
+
+    // Event title translations
+    "Artists in waiting": "Artists in waiting",
+    "In the Dark": "In the Dark",
 
     // Event types
     performance: "Performance",
@@ -474,6 +543,7 @@ const translations = {
     ourInformation: "Our Information",
     address: "Address",
     addressText: "bul. \"Bulgaria\" 26А, 2500 Kyustendil, Bulgaria",
+    "Main Theatre Hall": "Main Theatre Hall",
     businessHours: "Business Hours",
     businessHoursText: "Monday - Friday: 9:00 AM - 5:00 PM",
     followUsContact: "Follow Us",
@@ -564,6 +634,7 @@ const translations = {
     readMore: "Прочети още",
     date: "Дата",
     time: "Час",
+    at: "в",
     venue: "Място",
     duration: "Продължителност",
     performanceLanguage: "Език на представлението",
@@ -616,6 +687,7 @@ const translations = {
     pleaseSelectSeats: "Моля, изберете поне едно място, за да продължите",
 
     // Booking
+    loadingPerformances: "Зареждане на постановки...",
     availablePerformances: "Налични постановки",
     perTicket: "на билет",
     yourDetails: "Вашите данни",
@@ -630,8 +702,11 @@ const translations = {
     bookingConfirmedDesc: "Вашите билети са резервирани успешно",
     bookingConfirmationEmail: "Имейл за потвърждение е изпратен на вашия имейл адрес с детайли за билетите.",
     bookingDetails: "Детайли на резервацията",
+    bookingReference: "Референция на резервацията",
     seats: "Места",
     bookAnotherTicket: "Резервирай друг билет",
+    backToTickets: "Обратно към билетите",
+    bookAnother: "Резервирай друг",
     downloadTicket: "Изтегли билет",
     noPerformancesYet: "Все още няма налични постановки",
     noPerformancesYetDesc: "Моля, проверете по–късно или се свържете с администратора за повече информация.",
@@ -653,6 +728,10 @@ const translations = {
     
     // Performance page specific
     bookYourTickets: "Резервирайте билетите си",
+    attendeeNames: "Имена на участниците",
+    enterAttendeeName: "Въведете име на участник",
+    confirmBooking: "Потвърдете резервацията",
+    processing: "Обработва се...",
     suitableForAges: "Подходящо за възраст 12+",
     addToCalendar: "Добави в календара",
     needAssistance: "Нуждаете се от помощ?",
@@ -663,11 +742,34 @@ const translations = {
     workshopsComingSoon: " Уъркшопите  предстоят скоро",
     workshopsComingSoonDesc: "Регистрациите за уъркшопите  ще бъдат налични скоро. Моля, проверете по–късно.",
 
-    // Forms
-    missingInformation: "Липсваща информация",
-    pleaseCompleteForm: "Моля, попълнете всички задължителни полета",
-
-    // Admin
+    // Calendar view
+    eventsOn: "Събития на",
+    eventNamesDisplayed: "Имената на събитията се показват на оригиналния им език",
+    clickDateToView: "Кликнете върху дата, за да видите събития",
+    
+    // Month names
+    january: "Януари",
+    february: "Февруари",
+    march: "Март",
+    april: "Април",
+    may: "Май",
+    june: "Юни",
+    july: "Юли",
+    august: "Август",
+    september: "Септември",
+    october: "Октомври",
+    november: "Ноември",
+    december: "Декември",
+    
+    // Day names
+    monday: "Пон",
+    tuesday: "Вто",
+    wednesday: "Сря",
+    thursday: "Чет",
+    friday: "Пет",
+    saturday: "Съб",
+    sunday: "Нед",
+    
     addEvent: "Добави събитие",
     eventAddedSuccess: "Събитието е добавено успешно",
 
@@ -739,6 +841,13 @@ const translations = {
     profile: "Профил",
     manageAccountAndBookings: "Управлявайте акаунта си и преглеждайте резервациите си",
     saving: "Запазване...",
+    upcomingTickets: "Предстоящи билети",
+    loadingBookings: "Зареждане на резервациите ви...",
+    eventDate: "Дата на събитието",
+    eventTime: "Час на събитието",
+    eventVenue: "Място",
+    ticketDetails: "Детайли за билета",
+    seatNumber: "Място",
     noPastEvents: "Няма минали събития",
     noPastEventsDesc: "Все още не сте присъствали на събития.",
     upcomingEventsDescription: "Вашите предстоящи резервации",
@@ -781,6 +890,11 @@ const translations = {
     removeFromFavorites: "Премахни от любими",
     addedToFavorites: "Добавено към любими",
     removedFromFavorites: "Премахнато от любими",
+    attendee: "Участник",
+    row: "Ред",
+    entryQRCode: "QR код за вход",
+    presentQRCodeMessage: "Покажете този QR код на входа на залата",
+    arrivalMessage: "Моля, пристигнете 15 минути преди началото на представлението",
 
     // Program page
     filterEvents: "Филтрирай събития",
@@ -807,6 +921,10 @@ const translations = {
     "National Theatre in Niš": "Народен театър в Ниш",
     "OSAIK \"36 Monkeys\"": "ОСАИК \"36 Маймуни\"",
     "Intimate Theatre Bitola": "Интимен театър Битоля",
+
+    // Event title translations
+    "Artists in waiting": "Артисти в очакване",
+    "In the Dark": "В неведение",
 
     // Event types
     performance: "Постановки",
@@ -841,6 +959,7 @@ const translations = {
     ourInformation: "Наша информация",
     address: "Адрес",
     addressText: "бул. \"България\" 26А, 2500 Кюстендил, България",
+    "Main Theatre Hall": "Голяма зала",
     businessHours: "Работно време",
     businessHoursText: "Понеделник - Петък: 9:00 - 17:00",
     followUsContact: "Последвайте ни",
@@ -947,6 +1066,24 @@ const translations = {
     linkCorrupted: "Връзката е повредена по време на предаването",
     trySigningUpAgain: "Опитайте да се регистрирате отново",
     signInInstead: "Влезте вместо това",
+    checkingAuthentication: "Проверка на удостоверяването...",
+    failedToCheckAuthentication: "Неуспешна проверка на удостоверяването",
+
+    // Registration to Book Page
+    registerToBookTitle: "Необходима е регистрация",
+    registerToBookSubtitle: "Създайте акаунт, за да резервирате билети за Acting Europe – Театър без граници 2025",
+    registrationRequiredTitle: "Необходим е акаунт за резервация",
+    registrationRequiredMessage: "За да осигурим най-доброто изживяване при резервация и да гарантираме билетите ви, трябва да влезете в акаунта си или да се регистрирате. Моля, създайте акаунт или влезте в съществуващия си акаунт.",
+    createAccountTitle: "Създайте вашия акаунт",
+    createAccountMessage: "Присъединете се към общността на Acting Europe – Театър без граници и получете достъп до ексклузивно съдържание, ранни издания на билети и персонализирани препоръки.",
+    alreadyHaveAccountTitle: "Вече имате акаунт?",
+    alreadyHaveAccountMessage: "Влезте в съществуващия си акаунт, за да продължите с резервацията на билети.",
+    whyRegisterTitle: "Защо да се регистрирате в Acting Europe?",
+    whyRegisterBenefit1: "Сигурен и бърз процес на резервация на билети",
+    whyRegisterBenefit2: "Ранен достъп до издания на билети и специални оферти",
+    whyRegisterBenefit3: "Персонализирани препоръки въз основа на вашите предпочитания",
+    whyRegisterBenefit4: "Лесен достъп до вашата история на резервации и билети",
+    exploreWhileDeciding: "Отделете време да разгледате, докато решавате:",
   },
   mk: {
     // Navigation
@@ -1085,6 +1222,7 @@ const translations = {
     pleaseSelectSeats: "Ве молиме изберете најмалку едно седиште за да продолжите",
 
     // Booking
+    loadingPerformances: "Се вчитуваат претстави...",
     availablePerformances: "Достапни претстави",
     perTicket: "по билет",
     yourDetails: "Вашите податоци",
@@ -1098,8 +1236,11 @@ const translations = {
     bookingConfirmedDesc: "Вашите билети се успешно резервирани",
     bookingConfirmationEmail: "Е–маил за потврдување е испратен на вашата адреса со деталите за билетите.",
     bookingDetails: "Детали за резервацијата",
-    seats: "Седишта",
+    bookingReference: "Референца на резервацијата",
+    seats: "Места",
     bookAnotherTicket: "Резервирај друг билет",
+    backToTickets: "Назад кон билетите",
+    bookAnother: "Резервирај друг",
     downloadTicket: "Преземи билет",
     noPerformancesYet: "Сè уште нема достапни претстави",
     noPerformancesYetDesc: "Ве молиме проверете подоцна или контактирајте го администраторот за повеќе информации.",
@@ -1119,8 +1260,30 @@ const translations = {
     emailSubmittedMessage: "Го додадовме вашиот е–маил во нашата листа за известувања. Ќе бидете меѓу првите кои ќе дознаат кога билетите стануваат достапни!",
     backToHome: "Назад кон почетната",
     
+    // Registration to Book Page
+    registerToBookTitle: "Потребна е регистрација",
+    registerToBookSubtitle: "Создајте сметка за да резервирате билети за Acting Europe – Театар без граници 2025",
+    registrationRequiredTitle: "Потребна е сметка за резервација",
+    registrationRequiredMessage: "За да обезбедиме најдобро искуство за резервација и да ги осигураме вашите билети, треба да бидете најавени или регистрирани. Ве молиме создајте сметка или најавете се во вашата постоечка сметка.",
+    createAccountTitle: "Создајте ја вашата сметка",
+    createAccountMessage: "Придружете се на заедницата на Acting Europe – Театар без граници и добијте пристап до ексклузивни содржини, рани издавања на билети и персонализирани препораки.",
+    createAccount: "Создај сметка",
+    alreadyHaveAccountTitle: "Веќе имате сметка?",
+    alreadyHaveAccountMessage: "Најавете се во вашата постоечка сметка за да продолжите со резервацијата на билети.",
+    whyRegisterTitle: "Зошто да се регистрирате во Acting Europe?",
+    whyRegisterBenefit1: "Безбеден и брз процес на резервација на билети",
+    whyRegisterBenefit2: "Ран пристап до издавања на билети и специјални понуди",
+    whyRegisterBenefit3: "Персонализирани препораки врз основа на вашите преференции",
+    whyRegisterBenefit4: "Лесен пристап до вашата историја на резервации и билети",
+    exploreWhileDeciding: "Земете си време да истражувате додека одлучувате:",
+    checkingAuthentication: "Проверка на автентификација...",
+    
     // Performance page specific
     bookYourTickets: "Резервирајте ги вашите билети",
+    attendeeNames: "Имиња на учесниците",
+    enterAttendeeName: "Внесете име на учесник",
+    confirmBooking: "Потврдете резервација",
+    processing: "Се обработува...",
     subtitles: "Титлови: ",
     suitableForAges: "Погодно за возраст 12+",
     addToCalendar: "Додај во календар",
@@ -1131,6 +1294,34 @@ const translations = {
     workshops: "Работилници",
     workshopsComingSoon: "Работилниците доаѓаат наскоро",
     workshopsComingSoonDesc: "Регистрациите за работилници ќе бидат достапни наскоро. Ве молиме проверете подоцна.",
+
+    // Calendar view
+    eventsOn: "Настани на",
+    eventNamesDisplayed: "Имињата на настаните се прикажани на нивниот оригинален јазик",
+    clickDateToView: "Кликнете на датум за да видите настани",
+    
+    // Month names
+    january: "Јануари",
+    february: "Февруари",
+    march: "Март",
+    april: "Април",
+    may: "Мај",
+    june: "Јуни",
+    july: "Јули",
+    august: "Август",
+    september: "Септември",
+    october: "Октомври",
+    november: "Ноември",
+    december: "Декември",
+    
+    // Day names
+    monday: "Пон",
+    tuesday: "Вто",
+    wednesday: "Сре",
+    thursday: "Чет",
+    friday: "Пет",
+    saturday: "Саб",
+    sunday: "Нед",
 
     // Forms
     missingInformation: "Недостасуваат информации",
@@ -1147,6 +1338,13 @@ const translations = {
     noPastEvents: "Нема минати настани",
     noAttendedEvents: "Сè уште не сте присуствувале на никакви настани.",
     saving: "Зачувување...",
+    upcomingTickets: "Претстојни билети",
+    loadingBookings: "Се вчитуваат вашите резервации...",
+    eventDate: "Датум на настанот",
+    eventTime: "Време на настанот",
+    eventVenue: "Место",
+    ticketDetails: "Детали за билетот",
+    seatNumber: "Место",
 
     // Language
     language: "Јазик",
@@ -1254,6 +1452,11 @@ const translations = {
     removeFromFavorites: "Отстрани од омилени",
     addedToFavorites: "Додадено во омилени",
     removedFromFavorites: "Отстрането од омилени",
+    attendee: "Учесник",
+    row: "Ред",
+    entryQRCode: "QR код за влез",
+    presentQRCodeMessage: "Покажете го овој QR код на влезот во салата",
+    arrivalMessage: "Ве молиме пристигнете 15 минути пред почетокот на претставата",
 
     // Program page
     filterEvents: "Филтрирај настани",
@@ -1327,7 +1530,6 @@ const translations = {
     createAccountToBook: "Создајте сметка за да резервирате билети и да добиете пристап до ексклузивна содржина",
     password: "Лозинка",
     confirmPassword: "Потврдете ја лозинката",
-    createAccount: "Создај сметка",
     signingIn: "Се најавувам...",
     creatingAccount: "Се создава сметка...",
     showPassword: "Прикажи лозинка",
@@ -1555,6 +1757,7 @@ const translations = {
     pleaseSelectSeats: "Молимо изаберите најмање једно седиште да наставите",
 
     // Booking
+    loadingPerformances: "Учитавање представа...",
     availablePerformances: "Доступне представе",
     perTicket: "по карти",
     yourDetails: "Ваши подаци",
@@ -1568,8 +1771,11 @@ const translations = {
     bookingConfirmedDesc: "Ваше карте су успешно резервисане",
     bookingConfirmationEmail: "Е–маил за потврду је послат на вашу адресу са детаљима о картама.",
     bookingDetails: "Детаљи резервације",
-    seats: "Седишта",
+    bookingReference: "Референца резервације",
+    seats: "Места",
     bookAnotherTicket: "Резервиши другу карту",
+    backToTickets: "Назад на карте",
+    bookAnother: "Резервиши другу",
     downloadTicket: "Преузми карту",
     noPerformancesYet: "Још увек нема доступних представа",
     noPerformancesYetDesc: "Молимо проверите касније или контактирајте администратора за више информација.",
@@ -1589,8 +1795,30 @@ const translations = {
     emailSubmittedMessage: "Додали смо ваш имејл у нашу листу за обавештења. Бићете међу првима који ће сазнати када карте постану доступне!",
     backToHome: "Назад на почетну",
     
+    // Registration to Book Page
+    registerToBookTitle: "Потребна је регистрација",
+    registerToBookSubtitle: "Направите налог да резервишете карте за Acting Europe – Позориште без граница 2025",
+    registrationRequiredTitle: "Потребан је налог за резервацију",
+    registrationRequiredMessage: "Да бисмо обезбедили најбоље искуство резервације и осигурали ваше карте, потребно је да направите налог или се пријавите у ваш постојећи налог.",
+    createAccountTitle: "Направите ваш налог",
+    createAccountMessage: "Придружите се заједници Acting Europe – Позориште без граница и добијте приступ ексклузивним садржајима, раним издањима карата и персонализованим препорукама.",
+    createAccount: "Направи налог",
+    alreadyHaveAccountTitle: "Већ имате налог?",
+    alreadyHaveAccountMessage: "Пријавите се у ваш постојећи налог да наставите са резервацијом карата.",
+    whyRegisterTitle: "Зашто се регистровати у Acting Europe?",
+    whyRegisterBenefit1: "Безбедан и брз процес резервације карата",
+    whyRegisterBenefit2: "Рани приступ издањима карата и специјалним понудама",
+    whyRegisterBenefit3: "Персонализоване препоруке на основу ваших преференција",
+    whyRegisterBenefit4: "Лак приступ вашој историји резервација и карата",
+    exploreWhileDeciding: "Узмите време да истражујете док одлучујете:",
+    checkingAuthentication: "Провера аутентификације...",
+    
     // Performance page specific
     bookYourTickets: "Резервишите ваше карте",
+    attendeeNames: "Имена учесника",
+    enterAttendeeName: "Унесите име учесника",
+    confirmBooking: "Потврдите резервацију",
+    processing: "Обрађује се...",
     subtitles: "Титлови: ",
     suitableForAges: "Погодно за узраст 12+",
     addToCalendar: "Додај у календар",
@@ -1601,6 +1829,34 @@ const translations = {
     workshops: "Радионице",
     workshopsComingSoon: "Радионице ускоро",
     workshopsComingSoonDesc: "Регистрације за радионице ће бити доступне ускоро. Молимо проверите касније.",
+
+    // Calendar view
+    eventsOn: "Догађаји на",
+    eventNamesDisplayed: "Имена догађаја се приказују на њиховом оригиналном језику",
+    clickDateToView: "Кликните на датум да видите догађаје",
+    
+    // Month names
+    january: "Јануар",
+    february: "Фебруар",
+    march: "Март",
+    april: "Април",
+    may: "Мај",
+    june: "Јун",
+    july: "Јул",
+    august: "Август",
+    september: "Септембар",
+    october: "Октобар",
+    november: "Новембар",
+    december: "Децембар",
+    
+    // Day names
+    monday: "Пон",
+    tuesday: "Уто",
+    wednesday: "Сре",
+    thursday: "Чет",
+    friday: "Пет",
+    saturday: "Суб",
+    sunday: "Нед",
 
     // Forms
     missingInformation: "Недостајуће информације",
@@ -1704,6 +1960,13 @@ const translations = {
     profile: "Профил",
     manageAccountAndBookings: "Управљајте својим налогом и прегледајте своје резервације",
     saving: "Чувам...",
+    upcomingTickets: "Предстојеће карте",
+    loadingBookings: "Учитавање ваших резервација...",
+    eventDate: "Датум догађаја",
+    eventTime: "Време догађаја",
+    eventVenue: "Место",
+    ticketDetails: "Детаљи карте",
+    seatNumber: "Место",
     noPastEvents: "Нема прошлих догађаја",
     noPastEventsDesc: "Још увек нисте присуствовали ниједном догађају.",
     upcomingEventsDescription: "Ваши предстојећи догађаји и резервације",
@@ -1719,6 +1982,11 @@ const translations = {
     removeFromFavorites: "Уклони из омиљених",
     addedToFavorites: "Додато у омиљене",
     removedFromFavorites: "Уклоњено из омиљених",
+    attendee: "Учесник",
+    row: "Ред",
+    entryQRCode: "QR код за улаз",
+    presentQRCodeMessage: "Покажите овај QR код на улазу у салу",
+    arrivalMessage: "Молимо стигните 15 минута пре почетка представе",
 
     // Program page
     filterEvents: "Филтрирај догађаје",
@@ -1794,7 +2062,6 @@ const translations = {
     fullName: "Пуно име",
     password: "Лозинка",
     confirmPassword: "Потврдите лозинку",
-    createAccount: "Направи налог",
     signingIn: "Пријављујем се...",
     creatingAccount: "Правим налог...",
     showPassword: "Прикажи лозинку",

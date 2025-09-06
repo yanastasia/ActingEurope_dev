@@ -13,8 +13,9 @@ import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/lib/language-context"
 import { useAuth } from "@/components/providers/supabase-auth-provider"
 import TicketCard from "@/components/tickets/TicketCard"
+import QRCodeGenerator from "@/components/ui/qr-code-generator"
 import { isScanner } from "@/lib/auth"
-import { Calendar, Clock, MapPin, Ticket, Settings, User, Scan } from "lucide-react"
+import { Calendar, Clock, MapPin, Ticket, Settings, User, Scan, ChevronLeft, ChevronRight, X } from "lucide-react"
 
 interface UserProfile {
   email: string
@@ -52,12 +53,19 @@ export default function ProfilePage() {
     marketingPreferences: false
   })
   const [bookedTickets, setBookedTickets] = useState<BookedTicket[]>([])
+  const [loadingBookings, setLoadingBookings] = useState(false)
   const [activeTab, setActiveTab] = useState("upcoming")
   const [isSaving, setIsSaving] = useState(false)
+  const [enlargedQR, setEnlargedQR] = useState<string | null>(null)
+  const [currentTicketIndex, setCurrentTicketIndex] = useState<{[key: string]: number}>({})
 
   const fetchUserBookings = async () => {
+    if (!user?.id) return;
+    
+    setLoadingBookings(true)
     try {
-      const response = await fetch('/api/bookings')
+      // With Supabase auth integration, user.id is now the UUID that matches our database
+      const response = await fetch(`/api/bookings?userId=${user.id}`)
       if (!response.ok) {
         throw new Error('Failed to fetch bookings')
       }
@@ -67,7 +75,8 @@ export default function ProfilePage() {
         id: booking.id.toString(),
         eventTitle: booking.event.title,
         date: new Date(booking.event.event_date).toLocaleDateString(),
-        time: new Date(`1970-01-01T${booking.event.event_time}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        time: booking.event.event_time ? 
+          new Date(booking.event.event_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : 'TBA',
         venue: booking.event.venue?.name || 'TBA',
         seats: booking.booked_seats.map((seat: any) => ({
           id: seat.id.toString(),
@@ -89,6 +98,8 @@ export default function ProfilePage() {
         description: "Failed to load your bookings. Please try again.",
         variant: "destructive"
       })
+    } finally {
+      setLoadingBookings(false)
     }
   }
 
@@ -245,7 +256,12 @@ export default function ProfilePage() {
                 <CardDescription>{t("upcomingEventsDescription")}</CardDescription>
               </CardHeader>
               <CardContent>
-                {upcomingTickets.length === 0 ? (
+                {loadingBookings ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                    <p className="text-muted-foreground">{t("loadingBookings")}</p>
+                  </div>
+                ) : upcomingTickets.length === 0 ? (
                   <div className="text-center py-8">
                     <Ticket className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
                     <h3 className="text-lg font-medium mb-2">{t("noTicketsYet")}</h3>
@@ -262,20 +278,75 @@ export default function ProfilePage() {
                           <h3 className="text-lg font-semibold">{ticket.eventTitle}</h3>
                           <Badge>{ticket.bookingReference}</Badge>
                         </div>
-                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                          {ticket.seats.map((seat) => (
-                            <TicketCard
-                              key={seat.id}
-                              bookingReference={ticket.bookingReference}
-                              attendeeName={seat.attendee_name}
-                              eventTitle={ticket.eventTitle}
-                              eventDate={ticket.date}
-                              eventTime={ticket.time}
-                              venue={ticket.venue}
-                              seat={{ row: seat.row_number, number: seat.seat_number }}
-                              qrPayload={seat.qr_code_data}
-                            />
-                          ))}
+                        {/* Ticket Cards Carousel */}
+                        <div className="relative">
+                          {ticket.seats.length > 1 && (
+                            <>
+                              <button
+                                onClick={() => {
+                                  const currentIndex = currentTicketIndex[ticket.id] || 0;
+                                  const newIndex = currentIndex > 0 ? currentIndex - 1 : ticket.seats.length - 1;
+                                  setCurrentTicketIndex(prev => ({ ...prev, [ticket.id]: newIndex }));
+                                }}
+                                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white border border-gray-200 rounded-full p-2 shadow-md transition-all duration-200"
+                                aria-label="Previous ticket"
+                              >
+                                <ChevronLeft className="h-5 w-5" />
+                              </button>
+                              <button
+                                onClick={() => {
+                                  const currentIndex = currentTicketIndex[ticket.id] || 0;
+                                  const newIndex = currentIndex < ticket.seats.length - 1 ? currentIndex + 1 : 0;
+                                  setCurrentTicketIndex(prev => ({ ...prev, [ticket.id]: newIndex }));
+                                }}
+                                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white border border-gray-200 rounded-full p-2 shadow-md transition-all duration-200"
+                                aria-label="Next ticket"
+                              >
+                                <ChevronRight className="h-5 w-5" />
+                              </button>
+                            </>
+                          )}
+                          <div className="flex justify-center">
+                            {(() => {
+                              const currentIndex = currentTicketIndex[ticket.id] || 0;
+                              const seat = ticket.seats[currentIndex];
+                              return (
+                                <div key={seat.id} className="w-full max-w-md">
+                                  <TicketCard
+                                    bookingReference={ticket.bookingReference}
+                                    attendeeName={seat.attendee_name}
+                                    eventTitle={ticket.eventTitle}
+                                    eventDate={ticket.date}
+                                    eventTime={ticket.time}
+                                    venue={ticket.venue}
+                                    seat={{ row: seat.row_number, number: seat.seat_number }}
+                                    qrPayload={seat.qr_code_data}
+                                    onQRClick={() => {
+                                      setEnlargedQR(seat.qr_code_data);
+                                      // Navigate to next ticket
+                                      const newIndex = currentIndex < ticket.seats.length - 1 ? currentIndex + 1 : 0;
+                                      setCurrentTicketIndex(prev => ({ ...prev, [ticket.id]: newIndex }));
+                                    }}
+                                  />
+                                </div>
+                              );
+                            })()}
+                          </div>
+                          {ticket.seats.length > 1 && (
+                            <div className="flex justify-center mt-4 space-x-2">
+                              {ticket.seats.map((_, index) => (
+                                <button
+                                  key={index}
+                                  onClick={() => setCurrentTicketIndex(prev => ({ ...prev, [ticket.id]: index }))}
+                                  className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                                    (currentTicketIndex[ticket.id] || 0) === index
+                                      ? 'bg-blue-600'
+                                      : 'bg-gray-300 hover:bg-gray-400'
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -292,7 +363,12 @@ export default function ProfilePage() {
                 <CardDescription>{t("pastEventsDescription")}</CardDescription>
               </CardHeader>
               <CardContent>
-                {pastTickets.length === 0 ? (
+                {loadingBookings ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                    <p className="text-muted-foreground">{t("loadingBookings")}</p>
+                  </div>
+                ) : pastTickets.length === 0 ? (
                   <div className="text-center py-8">
                     <Clock className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
                     <h3 className="text-lg font-medium mb-2">{t("noPastEvents")}</h3>
@@ -429,6 +505,28 @@ export default function ProfilePage() {
           )}
         </div>
       </div>
+
+      {/* Enlarged QR Code Modal */}
+      {enlargedQR && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setEnlargedQR(null)}>
+          <div className="bg-white p-6 rounded-lg max-w-sm w-full mx-4" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">QR Code</h3>
+              <button
+                onClick={() => setEnlargedQR(null)}
+                className="p-1 hover:bg-gray-100 rounded"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="flex justify-center">
+              <div className="bg-white p-4 rounded border">
+                <QRCodeGenerator data={enlargedQR} size={200} />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

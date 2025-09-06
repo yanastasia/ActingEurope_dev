@@ -1,0 +1,282 @@
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Tickets - Acting Europe</title>
+  <style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f8f9fa;
+  }
+  .email-container {
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  .header {
+    background: linear-gradient(135deg, #021a4a 0%, #0d2a5c 100%);
+    color: white;
+    padding: 30px;
+    text-align: center;
+    position: relative;
+  }
+  .header::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, rgba(255, 204, 0, 0.1) 0%, rgba(255, 255, 255, 0) 60%);
+    pointer-events: none;
+  }
+  .header-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 1;
+  }
+  .header-subtitle {
+    color: #ffcc00;
+    font-size: 16px;
+    font-weight: 400;
+    position: relative;
+    z-index: 1;
+    margin: 0;
+  }
+  .content {
+    padding: 30px;
+  }
+  .event-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #021a4a;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  .event-details {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 25px;
+  }
+  .detail-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 16px;
+  }
+  .detail-row:last-child {
+    margin-bottom: 0;
+  }
+  .detail-icon {
+    font-size: 18px;
+    margin-right: 10px;
+    width: 20px;
+  }
+  .booking-ref {
+    color: #021a4a;
+    font-weight: 700;
+  }
+  .booking-ref-number {
+    color: #ffcc00;
+    font-weight: 700;
+  }
+  .divider {
+    border: none;
+    border-top: 2px solid #ffcc00;
+    margin: 25px 0;
+  }
+  .tickets-section {
+    margin-bottom: 25px;
+  }
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #021a4a;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+  }
+  .section-icon {
+    margin-right: 8px;
+  }
+  .tickets-list {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .ticket-item {
+    background-color: white;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 10px;
+    font-size: 16px;
+  }
+  .ticket-item:last-child {
+    margin-bottom: 0;
+  }
+  .attendee-name {
+    font-weight: 600;
+    color: #021a4a;
+  }
+  .info-box {
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .info-box.warning {
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+  }
+  .info-box.info {
+    background-color: #d1ecf1;
+    border: 1px solid #bee5eb;
+    color: #0c5460;
+  }
+  .footer {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 15px;
+    text-align: center;
+    font-size: 12px;
+    color: #666;
+    margin-top: 20px;
+  }
+
+  /* Language-specific content - hide by default */
+  .lang-en, .lang-bg { display: none; }
+  .lang-en.active, .lang-bg.active { display: block; }
+  .lang-en.active.inline, .lang-bg.active.inline { display: inline; }
+  </style>
+  </head>
+  <body>
+    <div class="email-container">
+      <!-- Header -->
+      <div class="header">
+        <h1 class="header-title">Acting Europe</h1>
+        <p class="header-subtitle">
+          <span class="lang-en">Theatre Without Borders</span>
+          <span class="lang-bg">Театър без граници</span>
+        </p>
+      </div>
+
+      <!-- Main Content -->
+      <div class="content">
+        <h2 class="event-title">
+          <span class="lang-en">Your tickets for</span>
+          <span class="lang-bg">Вашите билети за</span>
+          <span class="event-name">[EVENT_TITLE]</span>
+        </h2>
+
+        <!-- Event Details -->
+        <div class="event-details">
+          <div class="detail-row">
+            <span class="detail-icon">📅</span>
+            <span>
+              <span class="event-date">[EVENT_DATE]</span>
+              <span class="lang-en active inline">at</span>
+              <span class="lang-bg inline">в</span>
+              <span class="event-time">[EVENT_TIME]</span>
+            </span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-icon">📍</span>
+            <span class="venue-name">[VENUE_NAME]</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-icon">🎫</span>
+            <span class="booking-ref">
+              <span class="lang-en active inline">Booking reference:</span>
+              <span class="lang-bg inline">Референтен номер на резервацията:</span>
+              <span class="booking-ref-number">[BOOKING_REFERENCE]</span>
+            </span>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Tickets List -->
+        <div class="tickets-section">
+          <h3 class="section-title">
+            <span class="section-icon">🎭</span>
+            <span class="lang-en active">Tickets in this order</span>
+            <span class="lang-bg">Билети в тази поръчка</span>
+          </h3>
+          <div class="tickets-list">
+            <!-- Ticket items will be inserted here -->
+            <div class="ticket-item">
+              <span class="attendee-name">[ATTENDEE_NAME_1]</span> — <span class="seat-label">[SEAT_LABEL_1]</span>
+            </div>
+            <!-- Add more ticket items as needed -->
+          </div>
+        </div>
+
+        <!-- Important Information -->
+        <div class="info-box warning">
+          <span style="margin-right: 8px;">📱</span>
+          <span class="lang-en active">
+            We attached a separate PDF file for each attendee. Each person should bring their own PDF or show it on a phone at the entrance.
+          </span>
+          <span class="lang-bg">
+            Приложихме отделен PDF файл за всеки участник. Всеки човек трябва да донесе своя PDF или да го покаже на телефона на входа.
+          </span>
+        </div>
+
+        <!-- Support Information -->
+        <div class="info-box info">
+          <span style="margin-right: 8px;">💬</span>
+          <span class="lang-en active">
+            Having trouble opening attachments? Reply to this email and we will resend them.
+          </span>
+          <span class="lang-bg">
+            Имате проблеми с отварянето на прикачените файлове? Отговорете на този имейл и ще ги изпратим отново.
+          </span>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+          <span class="lang-en active">
+            Acting Europe Festival · tickets@actingeurope.com
+          </span>
+          <span class="lang-bg">
+            Фестивал Acting Europe · tickets@actingeurope.com
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Simple language switching function
+      function setLanguage(lang) {
+        // Hide all language elements
+        document.querySelectorAll('.lang-en, .lang-bg').forEach(el => {
+          el.classList.remove('active');
+        });
+        
+        // Show elements for selected language
+        document.querySelectorAll('.lang-' + lang).forEach(el => {
+          el.classList.add('active');
+        });
+      }
+      
+      // Set default language to English
+      // To use Bulgarian, call: setLanguage('bg')
+    </script>
+  </body>
+  </html>

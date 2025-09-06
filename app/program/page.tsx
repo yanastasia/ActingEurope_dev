@@ -49,6 +49,15 @@ const fixCompanyName = (name: string): string => {
     .replace(/ОСАУК "39 мајмуна"/g, 'ОСАУК „36 мајмуна"')
 }
 
+// Helper function for safe translation access
+const getTranslation = (language: string, key: string): string => {
+  const langTranslations = translations[language as keyof typeof translations] || translations.en;
+  if (langTranslations && typeof langTranslations === 'object') {
+    return (langTranslations as Record<string, string>)[key] || key;
+  }
+  return key;
+}
+
 export default function ProgramPage() {
   const { language, t } = useLanguage()
   const [selectedDate, setSelectedDate] = useState<string>("All Dates")
@@ -60,9 +69,9 @@ export default function ProgramPage() {
   const [types, setTypes] = useState<string[]>(["All Types"])
 
 
-  // Function to generate booking URL - redirect to tickets coming soon page
+  // Function to generate booking URL - redirect to registration prompt page
   const getBookingUrl = (event: Event) => {
-    return '/tickets'
+    return '/register-to-book'
   }
 
   const fetchEvents = async () => {
@@ -340,8 +349,8 @@ export default function ProgramPage() {
               
               // Month names
               const monthNames = [
-                "January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November", "December"
+                t('january'), t('february'), t('march'), t('april'), t('may'), t('june'),
+                t('july'), t('august'), t('september'), t('october'), t('november'), t('december')
               ]
               
               return (
@@ -353,7 +362,7 @@ export default function ProgramPage() {
                       </h3>
                       {selectedDate && selectedDate !== "All Dates" && (
                         <div className="text-sm text-primary-gold font-medium">
-                          Selected: {(() => {
+                          {t('selected')}: {(() => {
                             const [day, month, year] = selectedDate.split('-');
                             return new Date(`${year}-${month}-${day}T00:00:00`).toLocaleDateString('en-GB');
                           })()}
@@ -362,7 +371,7 @@ export default function ProgramPage() {
                     </div>
                   </div>
                   <div className="mb-4 grid grid-cols-7 gap-1 text-center">
-                    {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
+                    {[t('monday'), t('tuesday'), t('wednesday'), t('thursday'), t('friday'), t('saturday'), t('sunday')].map((day) => (
                       <div key={day} className="p-2 font-semibold text-secondary-blue">{day}</div>
                     ))}
                     {calendarDays.map((day, index) => {
@@ -415,15 +424,15 @@ export default function ProgramPage() {
                     })}
                   </div>
                   <div className="mt-4 text-center text-sm text-muted-foreground">
-                    <p>Event names and times are displayed directly in each date.</p>
-                    <p className="mt-1">Click on any date to view events for that day.</p>
+                    <p>{t("eventNamesDisplayed") || "Event names and times are displayed directly in each date."}</p>
+                    <p className="mt-1">{t("clickDateToView") || "Click on any date to view events for that day."}</p>
                   </div>
                   
                   {/* Selected Date Events Display */}
                   {selectedDate && selectedDate !== "All Dates" && (
                     <div className="mt-6 border-t pt-6">
                       <h4 className="text-lg font-semibold text-secondary-blue mb-4">
-                        Events on {selectedDate.split('-').join('/')}
+                        {t("eventsOn") || "Events on"} {selectedDate.split('-').join('/')}
                       </h4>
                       {eventsByDate[selectedDate] && eventsByDate[selectedDate].length > 0 ? (
                         <div className="space-y-4">
@@ -437,13 +446,13 @@ export default function ProgramPage() {
                                       {event.time}
                                     </Badge>
                                     <Badge variant="secondary" className="text-xs">
-                                      {event.eventType}
+                                      {t(event.eventType)}
                                     </Badge>
                                   </div>
                                   <h5 className="font-semibold text-lg mb-1">{event.title}</h5>
                                   <p className="text-sm text-muted-foreground mb-2">
                                     <MapPin className="inline h-3 w-3 mr-1" />
-                                    {translations[language][event.venue as keyof typeof translations[typeof language]] || event.venue}
+                                    {getTranslation(language, event.venue) || event.venue}
                                   </p>
                                   <p className="text-sm mb-3">
                                     <span className="font-medium">{translations[language].theatreName}: </span>
@@ -452,12 +461,12 @@ export default function ProgramPage() {
                                   <div className="flex gap-2">
                                     <Link href={getBookingUrl(event)}>
                                       <Button size="sm" className="bg-primary-gold hover:bg-primary-gold/90">
-                                        Book Ticket
+                                        {t("bookTicket")}
                                       </Button>
                                     </Link>
                                     <Link href={`/performances/${event.id}`}>
                                       <Button size="sm" variant="outline">
-                                        Details
+                                        {t("details")}
                                       </Button>
                                     </Link>
                                   </div>

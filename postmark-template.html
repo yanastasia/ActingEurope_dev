@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Tickets - ActingEurope | Вашите билети - ActingEurope</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .header {
+      background-color: #2c3e50;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      border-radius: 8px 8px 0 0;
+    }
+    .content {
+      background-color: #f8f9fa;
+      padding: 30px;
+      border-radius: 0 0 8px 8px;
+    }
+    .event-details {
+      background-color: #e9ecef;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 20px 0;
+    }
+    .detail-row {
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+    .detail-row:last-child {
+      margin-bottom: 0;
+    }
+    .booking-ref {
+      font-weight: 700;
+    }
+    .booking-ref-number {
+      color: #021a4a;
+      font-weight: 700;
+    }
+    .tickets-section {
+      margin: 20px 0;
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #021a4a;
+      margin-bottom: 15px;
+    }
+    .tickets-list {
+      background-color: #e9ecef;
+      padding: 15px;
+      border-radius: 4px;
+    }
+    .ticket-item {
+      background-color: white;
+      padding: 10px;
+      margin-bottom: 8px;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    .ticket-item:last-child {
+      margin-bottom: 0;
+    }
+    .attendee-name {
+      font-weight: 600;
+      color: #021a4a;
+    }
+    .button {
+      display: inline-block;
+      background: linear-gradient(135deg, #ffcc00 0%, #ffd700 100%);
+      color: #021a4a;
+      padding: 16px 32px;
+      text-decoration: none;
+      border-radius: 8px;
+      margin: 20px 0;
+      font-weight: 600;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(255, 204, 0, 0.3);
+    }
+    .button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(255, 204, 0, 0.4);
+    }
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 12px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <!-- English Version -->
+  <div class="header">
+    <h1>Your Tickets - Acting Europe</h1>
+  </div>
+  <div class="content">
+    <h2>Your tickets for {{eventTitle_Value}}</h2>
+    
+    <div class="event-details">
+      <div class="detail-row">
+        <strong>📅 Date & Time:</strong> {{date_Value}} at {{time_Value}}
+      </div>
+      <div class="detail-row">
+        <strong>📍 Venue:</strong> {{venue_Value}}
+      </div>
+      <div class="detail-row">
+        <strong>🎫 Booking Reference:</strong> <span class="booking-ref-number">{{bookingReference_Value}}</span>
+      </div>
+    </div>
+
+    <div class="tickets-section">
+      <h3 class="section-title">🎭 Tickets in this order</h3>
+      <div class="tickets-list">
+        <div class="ticket-item"><span class="attendee-name">{{attendeeName_Value}}</span> — {{seatLabel_Value}}</div>
+      </div>
+    </div>
+
+    <p><strong>📱 Important:</strong> We attached a separate PDF file for each attendee. Each person should bring their own PDF or show it on a phone at the entrance.</p>
+    
+    <p><strong>💬 Need help?</strong> Having trouble opening attachments? Reply to this email and we will resend them.</p>
+    
+    <p>Best regards,<br>The Acting Europe Team</p>
+  </div>
+
+  <!-- Bulgarian Version -->
+  <div class="header" style="margin-top: 40px;">
+    <h1>Вашите билети - Acting Europe</h1>
+  </div>
+  <div class="content">
+    <h2>Вашите билети за {{eventTitle_Value_bg}}</h2>
+    
+    <div class="event-details">
+      <div class="detail-row">
+        <strong>📅 Дата и час:</strong> {{date_Value}} в {{time_Value}}
+      </div>
+      <div class="detail-row">
+        <strong>📍 Място:</strong> {{venue_Value_bg}}
+      </div>
+      <div class="detail-row">
+        <strong>🎫 Референтен номер на резервацията:</strong> <span class="booking-ref-number">{{bookingReference_Value}}</span>
+      </div>
+    </div>
+
+    <div class="tickets-section">
+      <h3 class="section-title">🎭 Билети в тази поръчка</h3>
+      <div class="tickets-list">
+        <div class="ticket-item"><span class="attendee-name">{{attendeeName_Value}}</span> — {{seatLabel_Value_bg}}</div>
+      </div>
+    </div>
+
+    <p><strong>📱 Важно:</strong> Приложихме отделен PDF файл за всеки участник. Всеки човек трябва да донесе своя PDF или да го покаже на телефона на входа.</p>
+    
+    <p><strong>💬 Нужда от помощ?</strong> Имате проблеми с отварянето на прикачените файлове? Отговорете на този имейл и ще ги изпратим отново.</p>
+    
+    <p>Всичко хубаво,<br>Екипът на Acting Europe</p>
+  </div>
+
+  <div class="footer">
+    <p>&copy; 2025 Acting Europe. Всички права запазени.</p>
+  </div>
+</body>
+</html>

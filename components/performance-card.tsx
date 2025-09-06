@@ -57,9 +57,8 @@ export default function PerformanceCard({
   }
 
   const getBookingUrl = () => {
-    // Use originalId if available, otherwise use the current id
-    const eventId = originalId || id
-    return `/events/${eventId}/seat-selection`
+    // Redirect to registration prompt page instead of direct booking
+    return `/register-to-book`
   }
 
   return (

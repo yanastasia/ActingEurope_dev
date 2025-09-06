@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useLanguage } from "@/lib/language-context"
+import { translations } from "@/lib/translations"
 
 // Define Event interface locally
 interface Event {
@@ -24,8 +25,35 @@ interface Event {
 
 export default function TicketsPage() {
   const [allPerformances, setAllPerformances] = useState<Event[]>([])
-  const { t } = useLanguage()
+  const [isLoading, setIsLoading] = useState(true)
+  const { t, language } = useLanguage()
   const router = useRouter()
+
+  // Helper function to extract single name from bilingual format
+  const extractSingleName = (name: string) => {
+    if (!name) return name;
+    return name.includes(' / ') ? name.split(' / ')[0].trim() : name;
+  }
+
+  // Helper function to get translation
+  const getTranslation = (text: string, targetLang: string) => {
+    if (!text || targetLang === 'en') return text;
+    
+    // Check if translation exists in our translations object
+    const langTranslations = translations[targetLang as keyof typeof translations];
+    if (langTranslations && langTranslations[text as keyof typeof langTranslations]) {
+      return langTranslations[text as keyof typeof langTranslations];
+    }
+    
+    // Return original text if no translation found
+    return text;
+  }
+
+  // Helper function to get display text based on current language
+  const getDisplayText = (text: string) => {
+    const singleName = extractSingleName(text);
+    return language === 'bg' ? getTranslation(singleName, 'bg') : singleName;
+  }
 
   // Helper function to fix company names
   const fixCompanyName = (companyName: string) => {
@@ -39,6 +67,7 @@ export default function TicketsPage() {
   // Load performances from database (English only)
   useEffect(() => {
     const fetchEvents = async () => {
+      setIsLoading(true)
       try {
         const response = await fetch('/api/events')
         if (!response.ok) {
@@ -80,6 +109,8 @@ export default function TicketsPage() {
       } catch (error) {
         console.error('Error fetching events:', error)
         setAllPerformances([])
+      } finally {
+        setIsLoading(false)
       }
     }
 
@@ -104,7 +135,15 @@ export default function TicketsPage() {
           <div className="mb-8 rounded-lg bg-muted/30 p-4">
             <>
                 <h2 className="mb-4 text-xl font-semibold text-secondary-blue">{t("availablePerformances")}</h2>
-                {allPerformances.length > 0 ? (
+                {isLoading ? (
+                  <div className="rounded-lg border border-dashed p-8 text-center">
+                    <div className="animate-pulse">
+                      <div className="h-4 bg-gray-200 rounded w-1/4 mx-auto mb-2"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/2 mx-auto"></div>
+                    </div>
+                    <p className="mt-4 text-muted-foreground">{t("loadingPerformances") || "Loading performances..."}</p>
+                  </div>
+                ) : allPerformances.length > 0 ? (
                   <div className="space-y-4">
                     {allPerformances.map((performance) => (
                       <Card key={performance.id} className="overflow-hidden">
@@ -120,9 +159,9 @@ export default function TicketsPage() {
                             </div>
                             <div className="flex flex-1 flex-col justify-between p-4">
                               <div>
-                                <h3 className="mb-1 text-lg font-semibold text-secondary-blue">{t(performance.title) || performance.title}</h3>
+                                <h3 className="mb-1 text-lg font-semibold text-secondary-blue">{getDisplayText(performance.title)}</h3>
                                 <p className="mb-2 text-sm text-muted-foreground">
-                                  {Array.isArray(performance.company) ? performance.company.map((comp: string) => fixCompanyName(t(comp) || comp)).join(' & ') : fixCompanyName(t(performance.company) || performance.company)}
+                                  {t("company")}: {Array.isArray(performance.company) ? performance.company.map((comp: string) => fixCompanyName(t(comp) || comp)).join(' & ') : fixCompanyName(t(performance.company) || performance.company)}
                                 </p>
                                 <div className="mb-4 space-y-1 text-sm">
                                   <div className="flex items-center gap-2">
@@ -132,7 +171,7 @@ export default function TicketsPage() {
                                     </span>
                                   </div>
                                   <div>
-                                    <span className="font-medium">{t("venue")}:</span> {t(performance.venue) || performance.venue}
+                                    <span className="font-medium">{t("venue")}:</span> {getDisplayText(performance.venue)}
                                   </div>
                                 </div>
                               </div>

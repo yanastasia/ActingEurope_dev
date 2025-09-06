@@ -123,8 +123,11 @@ export default function AdminPage() {
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([])  
   const [selectedLanguage, setSelectedLanguage] = useState<string>('all')  
   const [translationGroups, setTranslationGroups] = useState<{[key: string]: Event[]}>({})
-  const [venues, setVenues] = useState<Venue[]>([])
-  const [theatres, setTheatres] = useState<Theatre[]>([])
+  const [venues, setVenues] = useState<Venue[]>([])  
+  const [theatres, setTheatres] = useState<Theatre[]>([])  
+  const [bookings, setBookings] = useState<any[]>([])
+  const [selectedEventForSeats, setSelectedEventForSeats] = useState<string | null>(null)
+  const [eventSeats, setEventSeats] = useState<any[]>([])
   const [editingEvent, setEditingEvent] = useState<Event | null>(null)
   const [editingVenue, setEditingVenue] = useState<Venue | null>(null)
   const [showEventForm, setShowEventForm] = useState(false)
@@ -204,6 +207,8 @@ export default function AdminPage() {
           const theatresData = await theatresResponse.json()
           setTheatres(theatresData || [])
         }
+        
+        // Note: Bookings will be loaded after admin authorization
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -267,6 +272,20 @@ export default function AdminPage() {
     setAuthorized(true)
     setAdminEmail(userEmail)
     setIsLoading(false)
+    
+    // Load bookings after admin authorization
+    const loadBookings = async () => {
+      try {
+        const bookingsResponse = await fetch('/api/bookings')
+        if (bookingsResponse.ok) {
+          const bookingsData = await bookingsResponse.json()
+          setBookings(bookingsData || [])
+        }
+      } catch (error) {
+        console.error('Error fetching bookings:', error)
+      }
+    }
+    loadBookings()
   }, [user, session, authLoading, router])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -1035,6 +1054,169 @@ export default function AdminPage() {
     })
   }
 
+  const handleViewBookingDetails = (booking: any) => {
+    const details = [
+      `Booking Reference: ${booking.booking_reference}`,
+      `User: ${booking.user?.email || 'N/A'}`,
+      `Event: ${booking.event?.title || 'N/A'}`,
+      `Seats: ${booking.booked_seats?.map((seat: any) => `Row ${seat.row_number} Seat ${seat.seat_number}`).join(', ') || 'N/A'}`,
+      `Total Price: €${booking.total_price}`,
+      `Status: ${booking.status}`,
+      `Booking Date: ${new Date(booking.created_at).toLocaleString()}`,
+      `Payment Status: ${booking.payment_status || 'N/A'}`,
+      `Notes: ${booking.notes || 'None'}`
+    ].join('\n')
+    
+    alert(details)
+  }
+
+  const handleCancelBooking = async (bookingId: string) => {
+    if (!confirm('Are you sure you want to cancel this booking? This action cannot be undone.')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/bookings/${bookingId}`, {
+        method: 'DELETE',
+      })
+      
+      if (response.ok) {
+        // Refresh bookings list
+        const bookingsResponse = await fetch('/api/bookings')
+        if (bookingsResponse.ok) {
+          const bookingsData = await bookingsResponse.json()
+          setBookings(bookingsData || [])
+        }
+        
+        toast({
+          title: "Booking cancelled",
+          description: "The booking has been successfully cancelled and seats have been released.",
+        })
+      } else {
+        throw new Error('Failed to cancel booking')
+      }
+    } catch (error) {
+      console.error('Error cancelling booking:', error)
+      toast({
+        title: "Error",
+        description: "Failed to cancel booking. Please try again.",
+        variant: "destructive"
+      })
+    }
+   }
+
+  const handleEventSelect = async (eventId: string) => {
+    setSelectedEventForSeats(eventId)
+    
+    try {
+      const response = await fetch(`/api/events/${eventId}/seats`)
+      if (response.ok) {
+        const seatsData = await response.json()
+        // Extract all seats from sections and group by row
+        const allSeats = seatsData.sections?.flatMap((section: any) => section.seats) || []
+        const groupedSeats = allSeats.reduce((acc: any, seat: any) => {
+          const existingRow = acc.find((row: any) => row.row_number === seat.row_number)
+          if (existingRow) {
+            existingRow.seats.push(seat)
+          } else {
+            acc.push({
+              row_number: seat.row_number,
+              seats: [seat]
+            })
+          }
+          return acc
+        }, [])
+        
+        // Sort rows and seats
+        groupedSeats.sort((a: any, b: any) => a.row_number - b.row_number)
+        groupedSeats.forEach((row: any) => {
+          row.seats.sort((a: any, b: any) => a.seat_number - b.seat_number)
+        })
+        
+        setEventSeats(groupedSeats)
+      }
+    } catch (error) {
+      console.error('Error fetching seats:', error)
+      toast({
+        title: "Error",
+        description: "Failed to load seats for this event.",
+        variant: "destructive"
+      })
+    }
+  }
+
+  const handleToggleSeat = async (seatId: string) => {
+    try {
+      const response = await fetch(`/api/seats/${seatId}/toggle`, {
+        method: 'PATCH',
+      })
+      
+      if (response.ok) {
+        // Refresh seat data
+        if (selectedEventForSeats) {
+          handleEventSelect(selectedEventForSeats)
+        }
+        
+        toast({
+          title: "Seat updated",
+          description: "Seat availability has been updated.",
+        })
+      } else {
+        throw new Error('Failed to toggle seat')
+      }
+    } catch (error) {
+      console.error('Error toggling seat:', error)
+      toast({
+        title: "Error",
+        description: "Failed to update seat availability.",
+        variant: "destructive"
+      })
+    }
+  }
+
+  const handleBulkSeatOperation = async (operation: 'available' | 'unavailable') => {
+    if (!selectedEventForSeats) return
+    
+    const confirmMessage = operation === 'available' 
+      ? 'Are you sure you want to set ALL seats as available for this event?' 
+      : 'Are you sure you want to set ALL seats as unavailable for this event?'
+    
+    if (!confirm(confirmMessage)) {
+      return
+    }
+    
+    try {
+      const response = await fetch(`/api/events/${selectedEventForSeats}/seats/bulk`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          is_available: operation === 'available' 
+        }),
+      })
+      
+      if (response.ok) {
+        // Refresh seat data
+        handleEventSelect(selectedEventForSeats)
+        
+        toast({
+          title: "Seats updated",
+          description: `All seats have been set as ${operation}.`,
+        })
+      } else {
+        throw new Error('Failed to update seats')
+      }
+    } catch (error) {
+      console.error('Error updating seats:', error)
+      toast({
+        title: "Error",
+        description: "Failed to update seat availability.",
+        variant: "destructive"
+      })
+    }
+  }
+
   if (isLoading || authLoading) {
     return (
       <div className="container flex min-h-[calc(100vh-4rem)] items-center justify-center">
@@ -1098,7 +1280,7 @@ export default function AdminPage() {
       </div>
 
       <Tabs defaultValue="events" className="w-full">
-        <TabsList className="grid w-full grid-cols-7 md:w-[1200px]">
+        <TabsList className="grid w-full grid-cols-8 md:w-[1400px]">
           <TabsTrigger value="events" className="gap-2">
             <Calendar className="h-4 w-4" />
             Events
@@ -1110,6 +1292,10 @@ export default function AdminPage() {
           <TabsTrigger value="reservations" className="gap-2">
             <Ticket className="h-4 w-4" />
             Reservations
+          </TabsTrigger>
+          <TabsTrigger value="seats" className="gap-2">
+            <ShieldCheck className="h-4 w-4" />
+            Seat Management
           </TabsTrigger>
           <TabsTrigger value="news" className="gap-2">
             <FileText className="h-4 w-4" />
@@ -1585,8 +1771,8 @@ export default function AdminPage() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="regular">Regular</SelectItem>
-                            <SelectItem value="balcony">Balcony</SelectItem>
+                            <SelectItem value="regular">{t("regularSeating")}</SelectItem>
+                            <SelectItem value="balcony">{t("balconySeating")}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -1776,10 +1962,168 @@ export default function AdminPage() {
               <CardDescription>View and manage ticket reservations</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-center text-muted-foreground">
-                Reservation management table would be displayed here with options to view, confirm, or cancel
-                reservations.
-              </p>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Booking ID</TableHead>
+                    <TableHead>User</TableHead>
+                    <TableHead>Event</TableHead>
+                    <TableHead>Seats</TableHead>
+                    <TableHead>Total Price</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Booking Date</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {bookings.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={8} className="text-center text-muted-foreground">
+                        No bookings found
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    bookings.map((booking) => (
+                      <TableRow key={booking.id}>
+                        <TableCell className="font-medium">{booking.booking_reference}</TableCell>
+                        <TableCell>{booking.user?.email || 'N/A'}</TableCell>
+                        <TableCell>{booking.event?.title || 'N/A'}</TableCell>
+                        <TableCell>
+                          {booking.booked_seats?.map((seat: any) => 
+                            `Row ${seat.row_number} Seat ${seat.seat_number}`
+                          ).join(', ') || 'N/A'}
+                        </TableCell>
+                        <TableCell>€{booking.total_price}</TableCell>
+                        <TableCell>
+                          <span className={`px-2 py-1 rounded-full text-xs ${
+                            booking.status === 'confirmed' ? 'bg-green-100 text-green-800' :
+                            booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-red-100 text-red-800'
+                          }`}>
+                            {booking.status}
+                          </span>
+                        </TableCell>
+                        <TableCell>{new Date(booking.created_at).toLocaleDateString()}</TableCell>
+                        <TableCell>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="mr-2"
+                            onClick={() => handleViewBookingDetails(booking)}
+                          >
+                            View Details
+                          </Button>
+                          {booking.status === 'pending' && (
+                            <Button 
+                              variant="destructive" 
+                              size="sm"
+                              onClick={() => handleCancelBooking(booking.id)}
+                            >
+                              Cancel
+                            </Button>
+                          )}
+                          {booking.status === 'confirmed' && (
+                            <Button 
+                              variant="destructive" 
+                              size="sm"
+                              onClick={() => handleCancelBooking(booking.id)}
+                            >
+                              Refund
+                            </Button>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="seats" className="mt-6 space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Seat Management</CardTitle>
+              <CardDescription>Manage seat availability for events</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <Label htmlFor="eventSelect">Select Event:</Label>
+                  <Select onValueChange={(value) => handleEventSelect(value)}>
+                    <SelectTrigger id="eventSelect" className="w-64">
+                      <SelectValue placeholder="Choose an event" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {events.map((event) => (
+                        <SelectItem key={event.id} value={event.id}>
+                          {event.title} - {event.date}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button 
+                    onClick={() => handleBulkSeatOperation('available')}
+                    variant="outline"
+                    disabled={!selectedEventForSeats}
+                  >
+                    Set All Available
+                  </Button>
+                  <Button 
+                    onClick={() => handleBulkSeatOperation('unavailable')}
+                    variant="destructive"
+                    disabled={!selectedEventForSeats}
+                  >
+                    Set All Unavailable
+                  </Button>
+                </div>
+                
+                {selectedEventForSeats && (
+                  <div className="mt-6">
+                    <h3 className="text-lg font-semibold mb-4">Seat Map for {events.find(e => e.id === selectedEventForSeats)?.title}</h3>
+                    <div className="space-y-4">
+                      {eventSeats.map((row, rowIndex) => (
+                        <div key={rowIndex} className="flex items-center gap-2">
+                          <span className="w-12 text-sm font-medium">Row {row.row_number}:</span>
+                          <div className="flex gap-1">
+                            {row.seats.map((seat: any, seatIndex: number) => (
+                              <button
+                                key={seatIndex}
+                                onClick={() => handleToggleSeat(seat.id)}
+                                className={`w-8 h-8 text-xs border rounded ${
+                                  seat.is_available 
+                                    ? 'bg-green-100 border-green-300 text-green-800 hover:bg-green-200' 
+                                    : 'bg-red-100 border-red-300 text-red-800 hover:bg-red-200'
+                                }`}
+                                title={`Seat ${seat.seat_number} - ${seat.is_available ? 'Available' : 'Unavailable'}`}
+                              >
+                                {seat.seat_number}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="mt-4 flex items-center gap-4 text-sm">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 bg-green-100 border border-green-300 rounded"></div>
+                        <span>Available</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 bg-red-100 border border-red-300 rounded"></div>
+                        <span>Unavailable</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {!selectedEventForSeats && (
+                  <div className="text-center py-8 text-muted-foreground">
+                    Select an event to manage its seat availability
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getEventTranslationGroup } from '@/lib/database-operations'
 
-export async function GET(request: Request, { params }: { params: { translationGroup: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ translationGroup: string }> }) {
   try {
-    const { translationGroup } = params
+    const { translationGroup } = await params
     
     if (!translationGroup) {
       return NextResponse.json({ error: 'Translation group is required' }, { status: 400 })

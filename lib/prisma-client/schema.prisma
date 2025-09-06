@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../lib/prisma-client"
@@ -16,9 +10,8 @@ datasource db {
 }
 
 model User {
-  id                    Int       @id @default(autoincrement())
+  id                    String    @id @db.Uuid
   email                 String    @unique @db.VarChar(255)
-  password_hash         String    @db.VarChar(255)
   first_name            String    @db.VarChar(100)
   last_name             String    @db.VarChar(100)
   phone                 String?   @db.VarChar(20)
@@ -37,18 +30,18 @@ model Theatre {
   name              String         @db.VarChar(255)
   city              String         @db.VarChar(100)
   country           String         @db.VarChar(100)
-  description       String?        @db.Text
-  history           String?        @db.Text
+  description       String?
+  history           String?
   website           String?        @db.VarChar(255)
   founded_year      Int?
-  photos            String[]       @default([])
   content_language  String         @default("en") @db.VarChar(5)
   translation_group String?        @db.VarChar(100)
   created_at        DateTime       @default(now())
   updated_at        DateTime       @updatedAt
+  photos            String[]       @default([])
+  events            Event[]
   images            TheatreImage[]
   tags              TheatreTag[]
-  events            Event[]
 
   @@map("theatres")
 }
@@ -78,14 +71,14 @@ model TheatreTag {
 model Venue {
   id          Int            @id @default(autoincrement())
   name        String         @db.VarChar(100)
-  description String?        @db.Text
+  description String?
   address     String?        @db.VarChar(255)
   city        String?        @db.VarChar(100)
   capacity    Int
   image_url   String?        @db.VarChar(500)
   created_at  DateTime       @default(now())
-  sections    VenueSection[]
   events      Event[]
+  sections    VenueSection[]
 
   @@map("venues")
 }
@@ -96,15 +89,10 @@ model VenueSection {
   section_name String      @db.VarChar(50)
   section_type SectionType
   created_at   DateTime    @default(now())
-  venue        Venue       @relation(fields: [venue_id], references: [id], onDelete: Cascade)
   seats        Seat[]
+  venue        Venue       @relation(fields: [venue_id], references: [id], onDelete: Cascade)
 
   @@map("venue_sections")
-}
-
-enum SectionType {
-  regular
-  balcony
 }
 
 model Seat {
@@ -115,8 +103,8 @@ model Seat {
   is_available     Boolean      @default(true)
   is_accessible    Boolean      @default(false)
   created_at       DateTime     @default(now())
-  venueSection     VenueSection @relation(fields: [venue_section_id], references: [id], onDelete: Cascade)
   booked_seats     BookedSeat[]
+  venueSection     VenueSection @relation(fields: [venue_section_id], references: [id], onDelete: Cascade)
 
   @@unique([venue_section_id, row_number, seat_number], name: "unique_seat")
   @@map("seats")
@@ -130,7 +118,7 @@ model Event {
   event_type           EventType
   event_date           DateTime  @db.Date
   event_time           DateTime  @db.Time(3)
-  description          String?   @db.Text
+  description          String?
   price                Decimal   @db.Decimal(10, 2)
   image_url            String?   @db.VarChar(500)
   poster_url           String?   @db.VarChar(500)
@@ -148,50 +136,38 @@ model Event {
   is_featured          Boolean   @default(false)
   created_at           DateTime  @default(now())
   updated_at           DateTime  @updatedAt
+  bookings             Booking[]
   theatre              Theatre   @relation(fields: [theatre_id], references: [id])
   venue                Venue?    @relation(fields: [venue_id], references: [id])
-  bookings             Booking[]
 
   @@map("events")
 }
 
-enum EventType {
-  performance
-  workshop
-  discussion
-}
-
 model Booking {
   id                Int           @id @default(autoincrement())
-  user_id           Int
+  user_id           String        @db.Uuid
   event_id          Int
   booking_reference String        @unique @db.VarChar(50)
   total_amount      Decimal       @db.Decimal(10, 2)
   booking_status    BookingStatus @default(pending)
-  attendee_names    Json? // [{ seatId: string, fullName: string }] (source of truth)
   created_at        DateTime      @default(now())
   updated_at        DateTime      @updatedAt
-  user              User          @relation(fields: [user_id], references: [id])
-  event             Event         @relation(fields: [event_id], references: [id])
+  attendee_names    Json?
   booked_seats      BookedSeat[]
+  event             Event         @relation(fields: [event_id], references: [id])
+  user              User          @relation(fields: [user_id], references: [id])
 
   @@map("bookings")
-}
-
-enum BookingStatus {
-  pending
-  confirmed
-  cancelled
 }
 
 model BookedSeat {
   id            Int       @id @default(autoincrement())
   booking_id    Int
   seat_id       Int
-  attendee_name String? // denormalized for quick access
-  qr_code_data  String? // the exact QR payload string we generate
-  scanned_at    DateTime? // set when validated at venue
   created_at    DateTime  @default(now())
+  attendee_name String?
+  qr_code_data  String?
+  scanned_at    DateTime?
   booking       Booking   @relation(fields: [booking_id], references: [id], onDelete: Cascade)
   seat          Seat      @relation(fields: [seat_id], references: [id])
 
@@ -204,8 +180,8 @@ model BookedSeat {
 model NewsArticle {
   id                Int       @id @default(autoincrement())
   title             String    @db.VarChar(255)
-  excerpt           String?   @db.Text
-  content           String    @db.Text
+  excerpt           String?
+  content           String
   category          String?   @db.VarChar(100)
   image_url         String?   @db.VarChar(500)
   author            String?   @db.VarChar(100)
@@ -222,10 +198,10 @@ model NewsArticle {
 model AboutPage {
   id                Int      @id @default(autoincrement())
   title             String   @db.VarChar(255)
-  content           String   @db.Text
-  mission           String?  @db.Text
-  vision            String?  @db.Text
-  history           String?  @db.Text
+  content           String
+  mission           String?
+  vision            String?
+  history           String?
   image_url         String?  @db.VarChar(500)
   content_language  String   @default("en") @db.VarChar(5)
   translation_group String?  @db.VarChar(100)
@@ -239,12 +215,12 @@ model AboutPage {
 model ContactPage {
   id                Int      @id @default(autoincrement())
   title             String   @db.VarChar(255)
-  content           String   @db.Text
-  address           String?  @db.Text
+  content           String
+  address           String?
   phone             String?  @db.VarChar(50)
   email             String?  @db.VarChar(255)
-  office_hours      String?  @db.Text
-  map_embed         String?  @db.Text
+  office_hours      String?
+  map_embed         String?
   content_language  String   @default("en") @db.VarChar(5)
   translation_group String?  @db.VarChar(100)
   is_published      Boolean  @default(false)
@@ -252,4 +228,21 @@ model ContactPage {
   updated_at        DateTime @updatedAt
 
   @@map("contact_pages")
+}
+
+enum SectionType {
+  regular
+  balcony
+}
+
+enum EventType {
+  performance
+  workshop
+  discussion
+}
+
+enum BookingStatus {
+  pending
+  confirmed
+  cancelled
 }

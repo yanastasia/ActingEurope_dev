@@ -213,7 +213,7 @@ export default function PerformancesPage({ params }: PerformancesPageProps) {
                     </Link>
                   </Button>
                   <Button variant="outline" asChild>
-                    <Link href="/tickets">
+                    <Link href="/register-to-book">
                       {t('bookTickets')}
                     </Link>
                   </Button>

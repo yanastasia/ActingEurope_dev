@@ -228,7 +228,7 @@ export default function Home() {
                                   className="bg-secondary-blue border-2 border-white text-white hover:bg-secondary-blue/90 font-semibold px-8 py-3 transform transition-transform hover:scale-105"
                                   asChild
                                 >
-                                  <Link href="/tickets">{t("bookTickets")}</Link>
+                                  <Link href="/register-to-book">{t("bookTickets")}</Link>
                                 </Button>
                               </div>
                             </div>
@@ -316,7 +316,7 @@ export default function Home() {
           <div className="grid gap-6 md:grid-cols-3">
             <QuickLinkCard title={t("latestNews")} href="/news" icon={Newspaper} description={t("latestNewsDesc")} />
             <QuickLinkCard title={t("program")} href="/program" icon={Calendar} description={t("programDesc")} />
-            <QuickLinkCard title={t("bookTickets")} href="/tickets" icon={Ticket} description={t("bookTicketsDesc")} />
+            <QuickLinkCard title={t("bookTickets")} href="/register-to-book" icon={Ticket} description={t("bookTicketsDesc")} />
           </div>
         </div>
       </section>
@@ -365,14 +365,14 @@ export default function Home() {
           <h2 className="mb-12 text-center text-3xl font-bold text-secondary-blue">{t("ourPartners")}</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 sm:gap-8 md:gap-6 lg:gap-8 items-center justify-items-center">
             {[1, 2, 3, 4, 5, 6].map((i) => {
-              const partnerImages = ['bgnmk.png', 'Kyustendil_logo.png', 'ec.png', 'SAB_logo_site_2017-500x500.png', 'bgrs.png', 'MT_logo.gif'];
+              const partnerImages = ['bgnmk.png', 'Kyustendil_logo.png', 'ec.png', 'MT_logo.gif', 'bgrs.png', 'SAB_logo_site_2017-500x500.png'];
               const partnerLinks = [
-                'https://bulgaria.representation.ec.europa.eu/index_bg',
-                'https://www.kyustendil.bg/index.php?lang=bg',
-                'https://uba.bg/en/home-page/',
                 'https://ipa-bgmk.mrrb.bg/en',
+                'https://www.kyustendil.bg/index.php?lang=bg',
+                'https://bulgaria.representation.ec.europa.eu/index_bg',
+                'https://www.tourism.government.bg/',
                 'https://ipa-bgrs.mrrb.bg/en',
-                '#'
+                'https://uba.bg/en/home-page/',
               ];
               return (
                 <Link key={i} href={partnerLinks[i-1]} target="_blank" rel="noopener noreferrer" className="block">

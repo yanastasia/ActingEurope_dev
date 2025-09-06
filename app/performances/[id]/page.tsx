@@ -250,7 +250,7 @@ export default function PerformancePage({ params }: { params: Promise<{ id: stri
 
             <div className="space-y-4">
               <Button className="w-full" size="lg" asChild>
-                <Link href="/tickets">{t('bookTicket')}</Link>
+                <Link href="/register-to-book">{t('bookTicket')}</Link>
               </Button>
             </div>
 

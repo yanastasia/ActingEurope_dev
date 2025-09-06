@@ -10,7 +10,8 @@ import { isAdmin, isAuthenticated } from "@/lib/auth"
 
 interface SeatSelectionProps {
   venueId: number | string
-  onSeatsSelected: (seats: string[]) => void
+  eventId?: number | string
+  onSeatsSelected: (seats: { id: number, name: string }[]) => void
   isUserAdmin?: boolean
 }
 
@@ -35,36 +36,80 @@ interface VenueRow {
 }
 
 interface VenueSeat {
+  id: number
   seatNumber: number
   isAccessible: boolean
   isBooked?: boolean
 }
 
-export default function SeatSelection({ venueId, onSeatsSelected, isUserAdmin = false }: SeatSelectionProps) {
+export default function SeatSelection({ venueId, eventId, onSeatsSelected, isUserAdmin = false }: SeatSelectionProps) {
   const { toast } = useToast()
   const { t } = useLanguage()
-  const [selectedSeats, setSelectedSeats] = useState<string[]>([])
+  const [selectedSeats, setSelectedSeats] = useState<{ id: number, name: string }[]>([])
   const [venue, setVenue] = useState<Venue | null>(null)
   const [loading, setLoading] = useState(true)
 
   const admin = isAdmin()
   const loggedIn = isAuthenticated()
 
+  // Helper function to group seats by row for event seats API
+  const groupSeatsByRow = (seats: any[]) => {
+    const rowMap = new Map()
+    
+    seats.forEach(seat => {
+      if (!rowMap.has(seat.row_number)) {
+        rowMap.set(seat.row_number, {
+          rowNumber: seat.row_number,
+          seats: []
+        })
+      }
+      
+      rowMap.get(seat.row_number).seats.push({
+        id: seat.id,
+        seatNumber: seat.seat_number,
+        isAccessible: seat.is_accessible,
+        isBooked: !seat.is_available // Convert is_available to isBooked
+      })
+    })
+    
+    return Array.from(rowMap.values()).sort((a, b) => a.rowNumber - b.rowNumber)
+  }
+
   useEffect(() => {
     const loadVenue = async () => {
       try {
-        // Fetch venue data from API
-        const response = await fetch(`/api/venues/${venueId}`)
+        // Use event seats API if eventId is provided, otherwise fallback to venues API
+        const apiUrl = eventId ? `/api/events/${eventId}/seats` : `/api/venues/${venueId}`
+        const response = await fetch(apiUrl)
+        
         if (response.ok) {
-          const venueData = await response.json()
+          const data = await response.json()
           
-          // Transform API response to match our Venue interface
-          const transformedVenue: Venue = {
-            id: venueData.id,
-            name: venueData.name,
-            description: venueData.description || "",
-            rows: venueData.sections?.[0]?.rows || [],
-            sections: venueData.sections || []
+          let transformedVenue: Venue
+          
+          if (eventId) {
+            // Transform event seats API response
+            transformedVenue = {
+              id: venueId.toString(),
+              name: data.event?.title || "Theatre",
+              description: "",
+              rows: [],
+              sections: data.sections?.map((section: any) => ({
+                id: section.section.id.toString(),
+                sectionName: section.section.name,
+                sectionType: section.section.type,
+                rows: groupSeatsByRow(section.seats)
+              })) || []
+            }
+          } else {
+            // Transform venues API response
+            transformedVenue = {
+              id: data.id,
+              name: data.name,
+              description: data.description || "",
+              rows: data.sections?.[0]?.rows || [],
+              sections: data.sections || []
+            }
           }
           
           setVenue(transformedVenue)
@@ -78,6 +123,7 @@ export default function SeatSelection({ venueId, onSeatsSelected, isUserAdmin = 
               { 
                 rowNumber: 1, 
                 seats: Array.from({ length: 10 }, (_, i) => ({ 
+                  id: (1 * 10) + i + 1,
                   seatNumber: i + 1, 
                   isAccessible: i === 0 || i === 9,
                   isBooked: false 
@@ -86,6 +132,7 @@ export default function SeatSelection({ venueId, onSeatsSelected, isUserAdmin = 
               { 
                 rowNumber: 2, 
                 seats: Array.from({ length: 10 }, (_, i) => ({ 
+                  id: (2 * 10) + i + 1,
                   seatNumber: i + 1, 
                   isAccessible: i === 0 || i === 9,
                   isBooked: false 
@@ -94,6 +141,7 @@ export default function SeatSelection({ venueId, onSeatsSelected, isUserAdmin = 
               { 
                 rowNumber: 3, 
                 seats: Array.from({ length: 10 }, (_, i) => ({ 
+                  id: (3 * 10) + i + 1,
                   seatNumber: i + 1, 
                   isAccessible: i === 0 || i === 9,
                   isBooked: false 
@@ -102,6 +150,7 @@ export default function SeatSelection({ venueId, onSeatsSelected, isUserAdmin = 
               { 
                 rowNumber: 4, 
                 seats: Array.from({ length: 10 }, (_, i) => ({ 
+                  id: (4 * 10) + i + 1,
                   seatNumber: i + 1, 
                   isAccessible: i === 0 || i === 9,
                   isBooked: false 
@@ -110,6 +159,7 @@ export default function SeatSelection({ venueId, onSeatsSelected, isUserAdmin = 
               { 
                 rowNumber: 5, 
                 seats: Array.from({ length: 10 }, (_, i) => ({ 
+                  id: (5 * 10) + i + 1,
                   seatNumber: i + 1, 
                   isAccessible: i === 0 || i === 9,
                   isBooked: false 
@@ -127,12 +177,50 @@ export default function SeatSelection({ venueId, onSeatsSelected, isUserAdmin = 
     }
 
     loadVenue()
-  }, [venueId])
+  }, [venueId, eventId])
 
   // Update the toggleSeat function to handle admin reservations
   const toggleSeat = (seatId: string) => {
-    if (selectedSeats.includes(seatId)) {
-      setSelectedSeats(selectedSeats.filter((seat) => seat !== seatId))
+    // Find the actual seat data from venue to get the database ID
+    let seatDbId: number | null = null
+    if (venue) {
+      for (const section of venue.sections || []) {
+        for (const row of section.rows) {
+          for (const seat of row.seats) {
+            if (`${row.rowNumber}-${seat.seatNumber}` === seatId) {
+              seatDbId = seat.id
+              break
+            }
+          }
+          if (seatDbId) break
+        }
+        if (seatDbId) break
+      }
+      
+      // If not found in sections, check main rows
+      if (!seatDbId) {
+        for (const row of venue.rows) {
+          for (const seat of row.seats) {
+            if (`${row.rowNumber}-${seat.seatNumber}` === seatId) {
+              seatDbId = seat.id
+              break
+            }
+          }
+          if (seatDbId) break
+        }
+      }
+    }
+    
+    if (!seatDbId) {
+      console.error('Could not find seat ID for:', seatId)
+      return
+    }
+    
+    const seatObj = { id: seatDbId, name: seatId }
+    const isSelected = selectedSeats.some(seat => seat.name === seatId)
+    
+    if (isSelected) {
+      setSelectedSeats(selectedSeats.filter((seat) => seat.name !== seatId))
     } else {
       if (!isUserAdmin && selectedSeats.length >= 2) {
         toast({
@@ -142,7 +230,7 @@ export default function SeatSelection({ venueId, onSeatsSelected, isUserAdmin = 
         })
         return
       }
-      setSelectedSeats([...selectedSeats, seatId])
+      setSelectedSeats([...selectedSeats, seatObj])
     }
   }
 
@@ -196,7 +284,7 @@ export default function SeatSelection({ venueId, onSeatsSelected, isUserAdmin = 
               <div className="flex justify-center gap-1 max-w-fit">
                 {row.seats.map((seat) => {
                   const seatId = `${row.rowNumber}-${seat.seatNumber}`
-                  const isSelected = selectedSeats.includes(seatId)
+                  const isSelected = selectedSeats.some(seat => seat.name === seatId)
                   const isBooked = seat.isBooked || false
                   const isAccessible = seat.isAccessible
 
@@ -205,7 +293,7 @@ export default function SeatSelection({ venueId, onSeatsSelected, isUserAdmin = 
                       key={seatId}
                       className={`h-7 w-7 rounded-t-md text-xs font-medium transition-colors relative ${
                         isBooked
-                          ? "cursor-not-allowed bg-gray-200 text-gray-400"
+                          ? "cursor-not-allowed bg-slate-300 text-slate-600 border-2 border-slate-400"
                           : isAccessible
                             ? isSelected
                               ? "bg-blue-600 text-white border-2 border-blue-800"
@@ -294,9 +382,13 @@ export default function SeatSelection({ venueId, onSeatsSelected, isUserAdmin = 
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <div className="mb-2 text-sm font-medium">{venue.name}</div>
+        <div className="mb-2 text-sm font-medium">
+          {venue.name === "Main Stage" ? t("mainStage") : 
+           venue.name === "Chamber Stage" ? t("chamberStage") : 
+           venue.name}
+        </div>
         <p className="text-sm text-muted-foreground">
-          {t("selectedSeats")}: {selectedSeats.length > 0 ? selectedSeats.join(", ") : t("none")}
+          {t("selectedSeats")}: {selectedSeats.length > 0 ? selectedSeats.map(seat => seat.name).join(", ") : t("none")}
           {isUserAdmin ? (
             <span className="ml-2 text-primary-gold">(Admin: Unlimited seats)</span>
           ) : (
@@ -329,7 +421,7 @@ export default function SeatSelection({ venueId, onSeatsSelected, isUserAdmin = 
             <span>{t("selected")}</span>
           </div>
           <div className="flex items-center">
-            <div className="mr-1 h-4 w-4 rounded-sm bg-gray-200"></div>
+            <div className="mr-1 h-4 w-4 rounded-sm bg-slate-300 border border-slate-400"></div>
             <span>{t("unavailable")}</span>
           </div>
         </div>
@@ -339,7 +431,9 @@ export default function SeatSelection({ venueId, onSeatsSelected, isUserAdmin = 
             <TabsList className="grid w-full grid-cols-2 mb-6">
               {sections.map((section) => (
                 <TabsTrigger key={section.id} value={section.id.toString()}>
-                  {section.name}
+                  {section.name === "Regular" ? t("regularSeating") : 
+                   section.name === "Balcony" ? t("balconySeating") : 
+                   section.name}
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -347,7 +441,11 @@ export default function SeatSelection({ venueId, onSeatsSelected, isUserAdmin = 
             {sections.map((section) => (
               <TabsContent key={section.id} value={section.id.toString()}>
                 <div className="mb-4 text-center">
-                  <h3 className="text-lg font-medium text-secondary-blue">{section.name}</h3>
+                  <h3 className="text-lg font-medium text-secondary-blue">
+                    {section.name === "Regular" ? t("regularSeating") : 
+                     section.name === "Balcony" ? t("balconySeating") : 
+                     section.name}
+                  </h3>
                 </div>
                 {renderSeatMap(section.rows)}
               </TabsContent>
@@ -356,7 +454,11 @@ export default function SeatSelection({ venueId, onSeatsSelected, isUserAdmin = 
         ) : (
           <div>
             <div className="mb-4 text-center">
-              <h3 className="text-lg font-medium text-secondary-blue">{sections[0].name}</h3>
+              <h3 className="text-lg font-medium text-secondary-blue">
+                {sections[0].name === "Regular" ? t("regularSeating") : 
+                 sections[0].name === "Balcony" ? t("balconySeating") : 
+                 sections[0].name}
+              </h3>
             </div>
             {renderSeatMap(sections[0].rows)}
           </div>

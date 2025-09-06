@@ -1,4 +1,5 @@
 import { getUsers, updateUserRole, deleteUser } from '@/lib/database-operations';
+import { prisma } from '@/lib/prisma';
 
 // Helper function to check if the request is from a super admin
 // In a real application, this would involve proper authentication and authorization checks
@@ -29,6 +30,39 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error('Error fetching users:', error);
     return NextResponse.json({ message: 'Error fetching users' }, { status: 500 });
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const { email, firstName, lastName } = await request.json();
+    
+    if (!email) {
+      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+    }
+
+    // Try to find existing user by email
+    let user = await prisma.user.findUnique({
+      where: { email: email.toLowerCase() }
+    });
+
+    // If user doesn't exist, create a new one
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          email: email.toLowerCase(),
+          first_name: firstName || '',
+          last_name: lastName || '',
+          password_hash: '', // Required field
+          is_admin: false
+        }
+      });
+    }
+
+    return NextResponse.json({ user });
+  } catch (error) {
+    console.error('Error creating/finding user:', error);
+    return NextResponse.json({ error: 'Failed to create/find user' }, { status: 500 });
   }
 }
 

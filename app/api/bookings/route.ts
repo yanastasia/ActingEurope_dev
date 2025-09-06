@@ -11,10 +11,74 @@ function generateBookingReference(): string {
   return `BK${timestamp}${random}`.toUpperCase();
 }
 
-// GET - Fetch bookings (admin only)
+// GET - Fetch bookings (admin gets all, users get their own)
 export async function GET(request: NextRequest) {
   try {
-    // Check admin access
+    const { searchParams } = new URL(request.url);
+    const userIdParam = searchParams.get('userId');
+    
+    // If userId is provided, fetch user's bookings (no admin check needed)
+    if (userIdParam) {
+      // Validate UUID format
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(userIdParam)) {
+        return NextResponse.json(
+          { error: 'Invalid user ID format' },
+          { status: 400 }
+        );
+      }
+      const userId = userIdParam;
+      
+      const bookings = await prisma.booking.findMany({
+        where: {
+          user_id: userId
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              first_name: true,
+              last_name: true
+            }
+          },
+          event: {
+            select: {
+              id: true,
+              title: true,
+              event_date: true,
+              event_time: true,
+              venue: true,
+              theatre: {
+                select: {
+                  name: true
+                }
+              }
+            }
+          },
+          booked_seats: {
+            include: {
+              seat: {
+                include: {
+                  venueSection: {
+                    select: {
+                      section_name: true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        orderBy: {
+          created_at: 'desc'
+        }
+      });
+      
+      return NextResponse.json(bookings);
+    }
+    
+    // Admin access required for all bookings
     if (!isAdmin()) {
       return NextResponse.json(
         { error: 'Unauthorized. Admin access required.' },
@@ -78,12 +142,41 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    
+    // Debug logging for incoming booking data
+    console.log('\n=== BOOKING API DEBUG ===');
+    console.log('Raw request body:', JSON.stringify(body, null, 2));
+    console.log('Body keys:', Object.keys(body));
+    console.log('Body values:', Object.values(body));
+    
     const { userId, eventId, selectedSeats, totalAmount, attendee_names, customerEmail, customerName } = body;
+    
+    // Debug extracted values
+    console.log('Extracted values:');
+    console.log('- userId:', userId, typeof userId);
+    console.log('- eventId:', eventId, typeof eventId);
+    console.log('- selectedSeats:', selectedSeats, typeof selectedSeats);
+    console.log('- totalAmount:', totalAmount, typeof totalAmount);
+    console.log('- attendee_names:', attendee_names);
+    console.log('- customerEmail:', customerEmail);
+    console.log('- customerName:', customerName);
+    console.log('========================\n');
 
     // Validate required fields
-    if (!userId || !eventId || !selectedSeats || !totalAmount) {
+    if (!userId || !eventId || !selectedSeats || totalAmount === undefined || totalAmount === null) {
+      console.log('VALIDATION FAILED - Missing required fields');
       return NextResponse.json(
         { error: 'Missing required fields: userId, eventId, selectedSeats, totalAmount' },
+        { status: 400 }
+      );
+    }
+
+    // Validate UUID format for userId
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(userId)) {
+      console.log('VALIDATION FAILED - Invalid userId format');
+      return NextResponse.json(
+        { error: 'Invalid userId format - must be a valid UUID' },
         { status: 400 }
       );
     }
@@ -120,8 +213,32 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check seat limit: maximum 2 seats per user per event
+    const existingUserBookings = await prisma.booking.findMany({
+      where: {
+        user_id: userId,
+        event_id: eventId,
+        booking_status: { in: ['pending', 'confirmed'] }
+      },
+      include: {
+        booked_seats: true
+      }
+    });
+
+    const currentlyBookedSeats = existingUserBookings.reduce((total, booking) => {
+      return total + booking.booked_seats.length;
+    }, 0);
+
+    if (currentlyBookedSeats + selectedSeats.length > 2) {
+      return NextResponse.json(
+        { error: `You can only reserve a maximum of 2 seats per event. You currently have ${currentlyBookedSeats} seat(s) booked for this event.` },
+        { status: 400 }
+      );
+    }
+
     // Check if seats are available
-    const seatIds = selectedSeats.map(seat => seat.id);
+    // Handle both array of IDs and array of objects with id property
+    const seatIds = selectedSeats.map(seat => typeof seat === 'object' ? seat.id : seat);
     const seats = await prisma.seat.findMany({
       where: {
         id: { in: seatIds },
@@ -168,19 +285,20 @@ export async function POST(request: NextRequest) {
           event_id: eventId,
           booking_reference: generateBookingReference(),
           total_amount: totalAmount,
-          booking_status: 'pending',
+          booking_status: 'confirmed',
           attendee_names: attendee_names
         }
       });
 
       // Create booked seats with attendee names and QR codes
       const bookedSeatsData = selectedSeats.map((seat, index) => {
+        const seatId = typeof seat === 'object' ? seat.id : seat;
         const attendeeName = attendee_names[index]?.fullName || attendee_names[index];
-        const qrPayload = buildQrPayload(booking.booking_reference, seat.id.toString(), eventId);
+        const qrPayload = buildQrPayload(booking.booking_reference, seatId.toString(), eventId);
         
         return {
-          bookingId: booking.id,
-          seatId: seat.id,
+          booking_id: booking.id,
+          seat_id: seatId,
           attendee_name: attendeeName,
           qr_code_data: qrPayload
         };
@@ -190,15 +308,8 @@ export async function POST(request: NextRequest) {
         data: bookedSeatsData
       });
 
-      // Update seat availability
-      await tx.seat.updateMany({
-        where: {
-          id: { in: seatIds }
-        },
-        data: {
-          is_available: false
-        }
-      });
+      // Note: Seat availability is determined dynamically by checking bookedSeat records
+      // No need to update seat.is_available as it's handled in the events API
 
       return { booking, bookedSeats };
     });
@@ -300,17 +411,9 @@ export async function PUT(request: NextRequest) {
           data: { booking_status: status }
         });
 
-        // Free up seats
-        if (bookedSeats.length > 0) {
-          await tx.seat.updateMany({
-            where: {
-              id: { in: bookedSeats.map((bs: { seat_id: string }) => bs.seat_id) }
-            },
-            data: {
-              is_available: true
-            }
-          });
-        }
+        // Note: Seats are automatically freed when booking status is cancelled
+        // Seat availability is determined dynamically by checking bookedSeat records
+        // and filtering by booking_status in the events API
       });
     } else {
       // Just update status
@@ -326,6 +429,54 @@ export async function PUT(request: NextRequest) {
     console.error('Error updating booking:', error);
     return NextResponse.json(
       { error: 'Failed to update booking' },
+      { status: 500 }
+    );
+  }
+}
+
+// DELETE - Delete booking (admin only)
+export async function DELETE(request: NextRequest) {
+  try {
+    // Check admin access
+    if (!isAdmin()) {
+      return NextResponse.json(
+        { error: 'Unauthorized. Admin access required.' },
+        { status: 401 }
+      );
+    }
+
+    const { searchParams } = new URL(request.url);
+    const bookingId = searchParams.get('bookingId');
+
+    if (!bookingId) {
+      return NextResponse.json(
+        { error: 'Missing required parameter: bookingId' },
+        { status: 400 }
+      );
+    }
+
+    // Delete booking and associated booked seats in a transaction
+    await prisma.$transaction(async (tx: any) => {
+      // First delete all booked seats associated with this booking
+      await tx.bookedSeat.deleteMany({
+        where: { booking_id: parseInt(bookingId) }
+      });
+
+      // Then delete the booking itself
+      await tx.booking.delete({
+        where: { id: parseInt(bookingId) }
+      });
+    });
+
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Booking and associated seats deleted successfully' 
+    });
+
+  } catch (error) {
+    console.error('Error deleting booking:', error);
+    return NextResponse.json(
+      { error: 'Failed to delete booking' },
       { status: 500 }
     );
   }

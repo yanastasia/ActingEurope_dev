@@ -1,54 +1,47 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../lib/prisma-client"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
 model User {
-  id                 Int       @id @default(autoincrement())
-  email              String    @unique @db.VarChar(255)
-  password_hash      String    @db.VarChar(255)
-  first_name         String    @db.VarChar(100)
-  last_name          String    @db.VarChar(100)
-  phone              String?   @db.VarChar(20)
-  is_admin           Boolean   @default(false)
-  email_notifications Boolean   @default(true)
+  id                    String    @id @db.Uuid
+  email                 String    @unique @db.VarChar(255)
+  first_name            String    @db.VarChar(100)
+  last_name             String    @db.VarChar(100)
+  phone                 String?   @db.VarChar(20)
+  is_admin              Boolean   @default(false)
+  email_notifications   Boolean   @default(true)
   marketing_preferences Boolean   @default(false)
-  created_at         DateTime  @default(now())
-  updated_at         DateTime  @updatedAt
-  bookings           Booking[]
+  created_at            DateTime  @default(now())
+  updated_at            DateTime  @updatedAt
+  bookings              Booking[]
 
   @@map("users")
 }
 
 model Theatre {
-  id          Int             @id @default(autoincrement())
-  name        String          @db.VarChar(255)
-  city        String          @db.VarChar(100)
-  country     String          @db.VarChar(100)
-  description String?         @db.Text
-  history     String?         @db.Text
-  website     String?         @db.VarChar(255)
-  founded_year Int?
-  photos      String[]        @default([])
-  content_language String     @default("en") @db.VarChar(5)
-  translation_group String?   @db.VarChar(100)
-  created_at  DateTime        @default(now())
-  updated_at  DateTime        @updatedAt
-  images      TheatreImage[]
-  tags        TheatreTag[]
-  events      Event[]
+  id                Int            @id @default(autoincrement())
+  name              String         @db.VarChar(255)
+  city              String         @db.VarChar(100)
+  country           String         @db.VarChar(100)
+  description       String?
+  history           String?
+  website           String?        @db.VarChar(255)
+  founded_year      Int?
+  content_language  String         @default("en") @db.VarChar(5)
+  translation_group String?        @db.VarChar(100)
+  created_at        DateTime       @default(now())
+  updated_at        DateTime       @updatedAt
+  photos            String[]       @default([])
+  events            Event[]
+  images            TheatreImage[]
+  tags              TheatreTag[]
 
   @@map("theatres")
 }
@@ -76,122 +69,105 @@ model TheatreTag {
 }
 
 model Venue {
-  id           Int            @id @default(autoincrement())
-  name         String         @db.VarChar(100)
-  description  String?        @db.Text
-  address      String?        @db.VarChar(255)
-  city         String?        @db.VarChar(100)
-  capacity     Int
-  image_url    String?        @db.VarChar(500)
-  created_at   DateTime       @default(now())
-  sections     VenueSection[]
-  events       Event[]
+  id          Int            @id @default(autoincrement())
+  name        String         @db.VarChar(100)
+  description String?
+  address     String?        @db.VarChar(255)
+  city        String?        @db.VarChar(100)
+  capacity    Int
+  image_url   String?        @db.VarChar(500)
+  created_at  DateTime       @default(now())
+  events      Event[]
+  sections    VenueSection[]
 
   @@map("venues")
 }
 
 model VenueSection {
-  id           Int      @id @default(autoincrement())
+  id           Int         @id @default(autoincrement())
   venue_id     Int
-  section_name String   @db.VarChar(50)
+  section_name String      @db.VarChar(50)
   section_type SectionType
-  created_at   DateTime @default(now())
-  venue        Venue    @relation(fields: [venue_id], references: [id], onDelete: Cascade)
+  created_at   DateTime    @default(now())
   seats        Seat[]
+  venue        Venue       @relation(fields: [venue_id], references: [id], onDelete: Cascade)
 
   @@map("venue_sections")
 }
 
-enum SectionType {
-  regular
-  balcony
-}
-
 model Seat {
-  id             Int          @id @default(autoincrement())
+  id               Int          @id @default(autoincrement())
   venue_section_id Int
-  row_number     Int
-  seat_number    Int
-  is_available   Boolean      @default(true)
-  is_accessible  Boolean      @default(false)
-  created_at     DateTime     @default(now())
-  venueSection   VenueSection @relation(fields: [venue_section_id], references: [id], onDelete: Cascade)
-  booked_seats   BookedSeat[]
+  row_number       Int
+  seat_number      Int
+  is_available     Boolean      @default(true)
+  is_accessible    Boolean      @default(false)
+  created_at       DateTime     @default(now())
+  booked_seats     BookedSeat[]
+  venueSection     VenueSection @relation(fields: [venue_section_id], references: [id], onDelete: Cascade)
 
   @@unique([venue_section_id, row_number, seat_number], name: "unique_seat")
   @@map("seats")
 }
 
 model Event {
-  id             Int        @id @default(autoincrement())
-  title          String     @db.VarChar(255)
-  theatre_id     Int
-  venue_id       Int?
-  event_type     EventType
-  event_date     DateTime   @db.Date
-  event_time     DateTime   @db.Time(3)
-  description    String?    @db.Text
-  price          Decimal    @db.Decimal(10, 2)
-  image_url      String?    @db.VarChar(500)
-  poster_url     String?    @db.VarChar(500)
-  language       String?    @db.VarChar(50)
-  content_language String   @default("en") @db.VarChar(5)
-  translation_group String? @db.VarChar(100)
-  performance_language String? @db.VarChar(50)
-  subtitle_language String? @db.VarChar(50)
-  genre          String?    @db.VarChar(100)
-  company        String[]   @default([])
-  director       String?    @db.VarChar(255)
-  cast           String[]   @default([])
-  subtitles      String?    @db.VarChar(255)
-  duration       String?    @db.VarChar(100)
-  is_featured    Boolean    @default(false)
-  created_at     DateTime   @default(now())
-  updated_at     DateTime   @updatedAt
-  theatre        Theatre    @relation(fields: [theatre_id], references: [id])
-  venue          Venue?     @relation(fields: [venue_id], references: [id])
-  bookings       Booking[]
+  id                   Int       @id @default(autoincrement())
+  title                String    @db.VarChar(255)
+  theatre_id           Int
+  venue_id             Int?
+  event_type           EventType
+  event_date           DateTime  @db.Date
+  event_time           DateTime  @db.Time(3)
+  description          String?
+  price                Decimal   @db.Decimal(10, 2)
+  image_url            String?   @db.VarChar(500)
+  poster_url           String?   @db.VarChar(500)
+  language             String?   @db.VarChar(50)
+  content_language     String    @default("en") @db.VarChar(5)
+  translation_group    String?   @db.VarChar(100)
+  performance_language String?   @db.VarChar(50)
+  subtitle_language    String?   @db.VarChar(50)
+  genre                String?   @db.VarChar(100)
+  company              String[]  @default([])
+  director             String?   @db.VarChar(255)
+  cast                 String[]  @default([])
+  subtitles            String?   @db.VarChar(255)
+  duration             String?   @db.VarChar(100)
+  is_featured          Boolean   @default(false)
+  created_at           DateTime  @default(now())
+  updated_at           DateTime  @updatedAt
+  bookings             Booking[]
+  theatre              Theatre   @relation(fields: [theatre_id], references: [id])
+  venue                Venue?    @relation(fields: [venue_id], references: [id])
 
   @@map("events")
 }
 
-enum EventType {
-  performance
-  workshop
-  discussion
-}
-
 model Booking {
-  id              Int        @id @default(autoincrement())
-  user_id         Int
-  event_id        Int
-  booking_reference String     @unique @db.VarChar(50)
-  total_amount    Decimal    @db.Decimal(10, 2)
-  booking_status  BookingStatus @default(pending)
-  attendee_names  Json?      // [{ seatId: string, fullName: string }] (source of truth)
-  created_at      DateTime   @default(now())
-  updated_at      DateTime   @updatedAt
-  user            User       @relation(fields: [user_id], references: [id])
-  event           Event      @relation(fields: [event_id], references: [id])
-  booked_seats    BookedSeat[]
+  id                Int           @id @default(autoincrement())
+  user_id           String        @db.Uuid
+  event_id          Int
+  booking_reference String        @unique @db.VarChar(50)
+  total_amount      Decimal       @db.Decimal(10, 2)
+  booking_status    BookingStatus @default(pending)
+  created_at        DateTime      @default(now())
+  updated_at        DateTime      @updatedAt
+  attendee_names    Json?
+  booked_seats      BookedSeat[]
+  event             Event         @relation(fields: [event_id], references: [id])
+  user              User          @relation(fields: [user_id], references: [id])
 
   @@map("bookings")
-}
-
-enum BookingStatus {
-  pending
-  confirmed
-  cancelled
 }
 
 model BookedSeat {
   id            Int       @id @default(autoincrement())
   booking_id    Int
   seat_id       Int
-  attendee_name String?   // denormalized for quick access
-  qr_code_data  String?   // the exact QR payload string we generate
-  scanned_at    DateTime? // set when validated at venue
   created_at    DateTime  @default(now())
+  attendee_name String?
+  qr_code_data  String?
+  scanned_at    DateTime?
   booking       Booking   @relation(fields: [booking_id], references: [id], onDelete: Cascade)
   seat          Seat      @relation(fields: [seat_id], references: [id])
 
@@ -202,54 +178,71 @@ model BookedSeat {
 }
 
 model NewsArticle {
-  id          Int      @id @default(autoincrement())
-  title       String   @db.VarChar(255)
-  excerpt     String?  @db.Text
-  content     String   @db.Text
-  category    String?  @db.VarChar(100)
-  image_url   String?  @db.VarChar(500)
-  author      String?  @db.VarChar(100)
-  content_language String @default("en") @db.VarChar(5)
-  translation_group String? @db.VarChar(100)
-  published_at DateTime?
-  is_published Boolean  @default(false)
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  id                Int       @id @default(autoincrement())
+  title             String    @db.VarChar(255)
+  excerpt           String?
+  content           String
+  category          String?   @db.VarChar(100)
+  image_url         String?   @db.VarChar(500)
+  author            String?   @db.VarChar(100)
+  content_language  String    @default("en") @db.VarChar(5)
+  translation_group String?   @db.VarChar(100)
+  published_at      DateTime?
+  is_published      Boolean   @default(false)
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
 
   @@map("news_articles")
 }
 
 model AboutPage {
-  id          Int      @id @default(autoincrement())
-  title       String   @db.VarChar(255)
-  content     String   @db.Text
-  mission     String?  @db.Text
-  vision      String?  @db.Text
-  history     String?  @db.Text
-  image_url   String?  @db.VarChar(500)
-  content_language String @default("en") @db.VarChar(5)
-  translation_group String? @db.VarChar(100)
-  is_published Boolean  @default(false)
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  id                Int      @id @default(autoincrement())
+  title             String   @db.VarChar(255)
+  content           String
+  mission           String?
+  vision            String?
+  history           String?
+  image_url         String?  @db.VarChar(500)
+  content_language  String   @default("en") @db.VarChar(5)
+  translation_group String?  @db.VarChar(100)
+  is_published      Boolean  @default(false)
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
 
   @@map("about_pages")
 }
 
 model ContactPage {
-  id          Int      @id @default(autoincrement())
-  title       String   @db.VarChar(255)
-  content     String   @db.Text
-  address     String?  @db.Text
-  phone       String?  @db.VarChar(50)
-  email       String?  @db.VarChar(255)
-  office_hours String? @db.Text
-  map_embed   String?  @db.Text
-  content_language String @default("en") @db.VarChar(5)
-  translation_group String? @db.VarChar(100)
-  is_published Boolean  @default(false)
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  id                Int      @id @default(autoincrement())
+  title             String   @db.VarChar(255)
+  content           String
+  address           String?
+  phone             String?  @db.VarChar(50)
+  email             String?  @db.VarChar(255)
+  office_hours      String?
+  map_embed         String?
+  content_language  String   @default("en") @db.VarChar(5)
+  translation_group String?  @db.VarChar(100)
+  is_published      Boolean  @default(false)
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
 
   @@map("contact_pages")
+}
+
+enum SectionType {
+  regular
+  balcony
+}
+
+enum EventType {
+  performance
+  workshop
+  discussion
+}
+
+enum BookingStatus {
+  pending
+  confirmed
+  cancelled
 }

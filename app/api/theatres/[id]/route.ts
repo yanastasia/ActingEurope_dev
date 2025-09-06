@@ -14,10 +14,11 @@ const hasAdminAccess = (request: NextRequest) => {
 // GET /api/theatres/[id] - Get single theatre
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const theatreId = parseInt(params.id);
+    const { id } = await params;
+    const theatreId = parseInt(id);
     
     if (isNaN(theatreId)) {
       return NextResponse.json(
@@ -64,7 +65,7 @@ export async function GET(
 // PUT /api/theatres/[id] - Update theatre (admin only)
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check admin authorization
@@ -75,7 +76,8 @@ export async function PUT(
       );
     }
 
-    const theatreId = parseInt(params.id);
+    const { id } = await params;
+    const theatreId = parseInt(id);
     
     if (isNaN(theatreId)) {
       return NextResponse.json(
@@ -168,7 +170,7 @@ export async function PUT(
 // DELETE /api/theatres/[id] - Delete theatre (admin only)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check admin authorization
@@ -179,7 +181,8 @@ export async function DELETE(
       );
     }
 
-    const theatreId = parseInt(params.id);
+    const { id } = await params;
+    const theatreId = parseInt(id);
     
     if (isNaN(theatreId)) {
       return NextResponse.json(

@@ -312,7 +312,7 @@ export default function PerformancePage({ params }: PerformancePageProps) {
                   {event.price} {t('currency')}
                 </p>
                 <Button asChild className="w-full">
-                  <Link href={`/${resolvedParams.lang}/events/${event.id}/seat-selection`}>
+                  <Link href="/register-to-book">
                     {t('bookTickets')}
                   </Link>
                 </Button>

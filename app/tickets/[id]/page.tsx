@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label"
 import SeatSelection from "@/components/seat-selection"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/lib/language-context"
+import { isAdminEmail, getUserEmail } from "@/lib/auth"
 
 import { Loader2 } from "lucide-react"
 
@@ -57,22 +58,32 @@ export default function IndividualTicketPage() {
     phone: "",
   })
   const [attendeeNames, setAttendeeNames] = useState<string[]>([])
-  const [selectedSeats, setSelectedSeats] = useState<string[]>([])
+  const [selectedSeats, setSelectedSeats] = useState<{ id: number, name: string }[]>([])
   const [performance, setPerformance] = useState<any>(null)
   const [venues, setVenues] = useState<any[]>([])
   const [currentVenue, setCurrentVenue] = useState<any>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [bookingReference, setBookingReference] = useState("")
+  
+  // Check if current user is admin or sales
+  const isAdminOrSales = () => {
+    const email = formData.email || getUserEmail() || ''
+    return isAdminEmail(email) || email.toLowerCase() === 'sales@actingeurope.eu'
+  }
   const [loading, setLoading] = useState(true)
 
   // Load specific performance and venues
   useEffect(() => {
+    const abortController = new AbortController()
+    
     const fetchPerformance = async () => {
       try {
         setLoading(true)
         
         // Fetch all events and find the specific one
-        const response = await fetch('/api/events')
+        const response = await fetch('/api/events', {
+          signal: abortController.signal
+        })
         if (!response.ok) {
           throw new Error('Failed to fetch events')
         }
@@ -80,9 +91,13 @@ export default function IndividualTicketPage() {
         
         // Find the performance by ID (extract numeric ID from performance-X format)
         const numericId = performanceId.replace('performance-', '')
+        console.log('Looking for performance with ID:', numericId)
+        console.log('Available events:', eventsData.map((e: any) => ({ id: e.id, title: e.title })))
         const foundEvent = eventsData.find((event: any) => event.id.toString() === numericId)
+        console.log('Found event:', foundEvent)
         
         if (!foundEvent) {
+          console.error('Performance not found. Looking for ID:', numericId, 'in events:', eventsData.map((e: any) => e.id))
           throw new Error('Performance not found')
         }
 
@@ -112,27 +127,34 @@ export default function IndividualTicketPage() {
           venue: foundEvent.venue,
           venueId: venueIdToUse,
           imageUrl: foundEvent.imageUrl || "/placeholder.svg?height=200&width=300",
-          price: getBGNPrice(foundEvent.price),
-          rawPrice: foundEvent.price === "Free" ? 0 : Number.parseFloat(foundEvent.price.replace("€", "")),
+          price: getBGNPrice(`€${foundEvent.price}`),
+          rawPrice: Number(foundEvent.price) || 0,
           performanceLanguage: foundEvent.performanceLanguage,
           description: foundEvent.description,
         }
 
         setPerformance(mappedPerformance)
         try {
-          const venueResponse = await fetch(`/api/venues/${venueIdToUse}`)
+          const venueResponse = await fetch(`/api/venues/${venueIdToUse}`, {
+            signal: abortController.signal
+          })
           if (venueResponse.ok) {
             const venueData = await venueResponse.json()
             setCurrentVenue(venueData)
           }
-        } catch (venueError) {
+        } catch (venueError: unknown) {
+          if (venueError instanceof DOMException && venueError.name === 'AbortError') return;
           console.error('Error fetching venue:', venueError)
         }
-      } catch (error) {
+      } catch (error: unknown) {
+        // Ignore aborts triggered by cleanup/unmount or StrictMode re-mount
+        if (error instanceof DOMException && error.name === 'AbortError') return;
+        
         console.error('Error fetching performance:', error)
+        const errorMessage = error instanceof Error ? error.message : (t("performanceNotFound") || "Performance not found")
         toast({
           title: t("error"),
-          description: t("performanceNotFound") || "Performance not found",
+          description: errorMessage,
           variant: "destructive",
         })
         router.push('/tickets')
@@ -149,7 +171,7 @@ export default function IndividualTicketPage() {
         }
         const venuesData = await response.json()
         setVenues(venuesData)
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Error fetching venues:', error)
         setVenues([])
       }
@@ -159,7 +181,16 @@ export default function IndividualTicketPage() {
       fetchPerformance()
       loadVenues()
     }
-  }, [performanceId, router, toast, t])
+    
+    return () => {
+      try {
+        abortController.abort()
+      } catch (error: unknown) {
+        // Ignore abort errors during cleanup
+        console.debug('AbortController cleanup:', error)
+      }
+    }
+  }, [performanceId])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -174,7 +205,7 @@ export default function IndividualTicketPage() {
     })
   }
 
-  const handleSeatsSelected = (seats: string[]) => {
+  const handleSeatsSelected = (seats: { id: number, name: string }[]) => {
     setSelectedSeats(seats)
     // Initialize attendee names array with empty strings
     setAttendeeNames(new Array(seats.length).fill(""))
@@ -218,7 +249,7 @@ export default function IndividualTicketPage() {
         date: performance.date,
         time: performance.time,
         venue: performance.venue,
-        seats: selectedSeats,
+        seats: selectedSeats.map(seat => seat.name),
         attendeeNames: attendeeNames,
         customerName: `${formData.firstName} ${formData.lastName}`,
         email: formData.email,
@@ -226,23 +257,109 @@ export default function IndividualTicketPage() {
         price: performance.rawPrice,
       }
 
+      // Get or create user ID based on email using Supabase auth integration
+      let userId = null;
+      try {
+        const userResponse = await fetch('/api/auth/sync-user', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+          }),
+        });
+        
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          userId = userData.user?.id;
+        }
+      } catch (error: unknown) {
+        console.error('Failed to sync user:', error);
+        toast({
+          title: "Error",
+          description: "Failed to create user account. Please try again.",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      if (!userId) {
+        toast({
+          title: "Error",
+          description: "Failed to create user account. Please try again.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Validate data before constructing booking object
+      console.log('=== PRE-BOOKING VALIDATION ===')
+      console.log('performance:', performance)
+      console.log('selectedSeats:', selectedSeats)
+      console.log('attendeeNames:', attendeeNames)
+      console.log('userId:', userId)
+      console.log('===============================')
+
+      if (!performance || !performance.id) {
+        throw new Error('Performance data is missing or invalid')
+      }
+
+      if (!selectedSeats || selectedSeats.length === 0) {
+        throw new Error('No seats selected')
+      }
+
+      if (!userId || userId <= 0) {
+        throw new Error('Invalid user ID')
+      }
+
+      const eventId = parseInt(performance.id.toString().replace('performance-', ''))
+      if (isNaN(eventId) || eventId <= 0) {
+        throw new Error('Invalid event ID parsed from performance')
+      }
+
+      // Use fallback price of 0 for events without pricing (free events)
+      const pricePerSeat = performance.rawPrice || 0
+      const totalAmount = selectedSeats.length * pricePerSeat
+      
+      // Only validate total amount if there's actually a price set
+      if (pricePerSeat > 0 && (isNaN(totalAmount) || totalAmount <= 0)) {
+        throw new Error('Invalid total amount calculated')
+      }
+
       // Save booking to database
       const dbBookingData = {
-        userId: 1, // TODO: Replace with actual authenticated user ID
-        eventId: performance.id as number,
-        selectedSeats: selectedSeats.map((seatName, index) => ({
-          id: index + 1,
-          rowNumber: seatName.charCodeAt(0) - 64,
-          seatNumber: parseInt(seatName.substring(1)),
-        })),
-        attendee_names: selectedSeats.map((seatName, index) => ({
-          seatId: (index + 1).toString(),
+        userId: userId,
+        eventId: eventId,
+        selectedSeats: selectedSeats.map(seat => seat.id),
+        attendee_names: selectedSeats.map((seat, index) => ({
+          seatId: seat.id.toString(),
           fullName: attendeeNames[index]
         })),
-        totalAmount: selectedSeats.length * performance.rawPrice,
+        totalAmount: totalAmount,
         customerEmail: formData.email,
         customerName: `${formData.firstName} ${formData.lastName}`.trim(),
       }
+
+      // Debug logging
+      console.log('=== FRONTEND BOOKING DEBUG ===')
+      console.log('Raw booking data:', {
+        userId,
+        eventId: parseInt(performance.id.toString().replace('performance-', '')),
+        selectedSeats,
+        totalAmount: selectedSeats.length * pricePerSeat,
+        performance,
+      })
+      console.log('dbBookingData being sent:', JSON.stringify(dbBookingData, null, 2))
+      console.log('dbBookingData fields check:')
+      console.log('- userId:', dbBookingData.userId, typeof dbBookingData.userId)
+      console.log('- eventId:', dbBookingData.eventId, typeof dbBookingData.eventId)
+      console.log('- selectedSeats:', dbBookingData.selectedSeats, typeof dbBookingData.selectedSeats)
+      console.log('- totalAmount:', dbBookingData.totalAmount, typeof dbBookingData.totalAmount)
+      console.log('About to make API call to /api/bookings')
+      console.log('===============================')
 
       // Save booking via API
       const response = await fetch('/api/bookings', {
@@ -270,11 +387,12 @@ export default function IndividualTicketPage() {
         title: t("bookingConfirmed"),
         description: t("bookingConfirmedDesc"),
       })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Booking error:", error)
+      const errorMessage = error instanceof Error ? error.message : t("failedToCompleteBooking")
       toast({
         title: t("bookingError"),
-        description: error instanceof Error ? error.message : t("failedToCompleteBooking"),
+        description: errorMessage,
         variant: "destructive",
       })
     } finally {
@@ -301,26 +419,12 @@ export default function IndividualTicketPage() {
     return venue ? venue.id : venueName
   }
 
-  if (loading) {
+  if (loading || !performance) {
     return (
       <div className="container mx-auto px-4 py-12">
         <div className="flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin" />
           <span className="ml-2">{t("loading") || "Loading..."}</span>
-        </div>
-      </div>
-    )
-  }
-
-  if (!performance) {
-    return (
-      <div className="container mx-auto px-4 py-12">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-secondary-blue mb-4">{t("performanceNotFound") || "Performance Not Found"}</h1>
-          <Button onClick={() => router.push('/tickets')}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            {t("backToTickets") || "Back to Tickets"}
-          </Button>
         </div>
       </div>
     )
@@ -406,7 +510,9 @@ export default function IndividualTicketPage() {
             {performance && performance.venueId ? (
               <SeatSelection
                 venueId={performance.venueId}
+                eventId={performance.id.replace('performance-', '')}
                 onSeatsSelected={handleSeatsSelected}
+                isUserAdmin={isAdminOrSales()}
               />
             ) : (
               <div className="rounded-lg border border-dashed p-8 text-center">
@@ -429,10 +535,10 @@ export default function IndividualTicketPage() {
                 <div className="flex flex-wrap gap-2">
                   {selectedSeats.map((seat) => (
                     <div
-                      key={seat}
+                      key={seat.id}
                       className="rounded-md bg-primary-gold/20 px-2 py-1 text-sm font-medium text-secondary-blue"
                     >
-                      {seat}
+                      {seat.name}
                     </div>
                   ))}
                 </div>
@@ -447,9 +553,9 @@ export default function IndividualTicketPage() {
                 <div className="mb-4 font-medium">{t("attendeeNames") || "Attendee Names"}</div>
                 <div className="space-y-3">
                   {selectedSeats.map((seat, index) => (
-                    <div key={seat} className="flex items-center gap-3">
+                    <div key={seat.id} className="flex items-center gap-3">
                       <div className="min-w-[60px] rounded-md bg-primary-gold/20 px-2 py-1 text-sm font-medium text-secondary-blue text-center">
-                        {seat}
+                        {seat.name}
                       </div>
                       <div className="flex-1">
                         <Input
@@ -519,6 +625,8 @@ export default function IndividualTicketPage() {
                   t("confirmBooking") || "Confirm Booking"
                 )}
               </Button>
+              
+
             </form>
           </div>
         )}
