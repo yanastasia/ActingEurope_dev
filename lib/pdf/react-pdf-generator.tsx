@@ -19,6 +19,7 @@ interface SeatInfo {
   row: string | number;
   number: string | number;
   attendeeName: string;
+  attendeeEmail: string;
 }
 
 const styles = StyleSheet.create({
@@ -103,13 +104,42 @@ export async function generateTicketPdfBufferReact(ctx: TicketContext, seat: Sea
   const payload = buildQrPayload({
     eventId: ctx.event.id,
     seatId: seat.seatId,
-    attendeeEmail: seat.attendeeName + '@example.com', // Placeholder email
+    attendeeEmail: seat.attendeeEmail,
     bookingId: ctx.bookingReference
   });
   
   const doc = <TicketDocument ctx={ctx} seat={seat} />;
   const pdfInstance = pdf(doc);
-  const buffer = await pdfInstance.toBuffer();
+  const stream = await pdfInstance.toBuffer();
+  
+  // Convert ReadableStream to Buffer if needed
+  let buffer: Buffer;
+  if (stream instanceof ReadableStream) {
+    const reader = stream.getReader();
+    const chunks: Uint8Array[] = [];
+    let done = false;
+    
+    while (!done) {
+      const { value, done: readerDone } = await reader.read();
+      done = readerDone;
+      if (value) {
+        chunks.push(value);
+      }
+    }
+    
+    const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
+    const result = new Uint8Array(totalLength);
+    let offset = 0;
+    
+    for (const chunk of chunks) {
+      result.set(chunk, offset);
+      offset += chunk.length;
+    }
+    
+    buffer = Buffer.from(result);
+  } else {
+    buffer = stream as unknown as Buffer;
+  }
   
   return { buffer, qrPayload: payload };
 }
