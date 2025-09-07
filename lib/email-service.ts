@@ -305,7 +305,7 @@ export async function sendTicketEmail(bookingId: string) {
   // Create bilingual HTML template with proper language context
   const attendeeSeats = bookingWithRelations.booked_seats.map((bs) => {
     const sectionEn = bs.seat.venueSection?.section_name || '';
-    const sectionBg = sectionEn ? (sectionEn.toLowerCase().includes('balcon') || sectionEn.toLowerCase().includes('balkon') ? 'Балкон' : sectionEn) : '';
+    const sectionBg = sectionEn;
     
     return {
       attendeeName: attendeeBySeat[bs.seat_id.toString()] || bs.attendee_name || "Attendee",
@@ -527,7 +527,7 @@ export async function sendTicketEmail(bookingId: string) {
         }).join("; "),
         seatLabel_Value_bg: bookingWithRelations.booked_seats.map((bs) => {
           const section = bs.seat.venueSection?.section_name;
-          const sectionBg = section ? (section.toLowerCase().includes('balcon') || section.toLowerCase().includes('balkon') ? 'Балкон' : section) : '';
+          const sectionBg = section;
           return sectionBg ? `${sectionBg} - Ред ${bs.seat.row_number}, Място ${bs.seat.seat_number}` : `Ред ${bs.seat.row_number}, Място ${bs.seat.seat_number}`;
         }).join("; ")
       };

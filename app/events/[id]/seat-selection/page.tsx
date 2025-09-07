@@ -146,6 +146,23 @@ export default function SeatSelectionPage() {
 
     setReserving(true)
     try {
+      // Find section information for each selected seat
+      const seatsWithSections = selectedSeats.map(selectedSeat => {
+        // Find which section this seat belongs to
+        for (const sectionData of eventData?.sections || []) {
+          const foundSeat = sectionData.seats.find(seat => seat.id === selectedSeat.id)
+          if (foundSeat) {
+            return {
+              id: selectedSeat.id,
+              section_id: sectionData.section.id,
+              section_name: sectionData.section.name,
+              section_type: sectionData.section.type
+            }
+          }
+        }
+        return { id: selectedSeat.id }
+      })
+
       const response = await fetch('/api/bookings', {
         method: 'POST',
         headers: {
@@ -153,7 +170,8 @@ export default function SeatSelectionPage() {
         },
         body: JSON.stringify({
           event_id: params.id,
-          seat_ids: selectedSeats.map(seat => seat.id)
+          seat_ids: selectedSeats.map(seat => seat.id),
+          seats_with_sections: seatsWithSections
         })
       })
 

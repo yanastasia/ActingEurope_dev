@@ -432,7 +432,6 @@ export default function SeatSelection({ venueId, eventId, onSeatsSelected, isUse
               {sections.map((section) => (
                 <TabsTrigger key={section.id} value={section.id.toString()}>
                   {section.name === "Regular" ? t("regularSeating") : 
-                   section.name === "Balcony" ? t("balconySeating") : 
                    section.name}
                 </TabsTrigger>
               ))}
@@ -443,7 +442,6 @@ export default function SeatSelection({ venueId, eventId, onSeatsSelected, isUse
                 <div className="mb-4 text-center">
                   <h3 className="text-lg font-medium text-secondary-blue">
                     {section.name === "Regular" ? t("regularSeating") : 
-                     section.name === "Balcony" ? t("balconySeating") : 
                      section.name}
                   </h3>
                 </div>
@@ -456,7 +454,6 @@ export default function SeatSelection({ venueId, eventId, onSeatsSelected, isUse
             <div className="mb-4 text-center">
               <h3 className="text-lg font-medium text-secondary-blue">
                 {sections[0].name === "Regular" ? t("regularSeating") : 
-                 sections[0].name === "Balcony" ? t("balconySeating") : 
                  sections[0].name}
               </h3>
             </div>

@@ -167,7 +167,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       message: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
       venueId: id,
-      requestBody: { name, location, capacity, description, imageUrl, sections, rows }
+      requestBody: { name, capacity, description, imageUrl, sections, rows }
     })
     return NextResponse.json({ 
       error: 'Failed to update venue', 

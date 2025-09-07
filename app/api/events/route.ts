@@ -246,6 +246,10 @@ export async function POST(request: Request) {
       }
     }
 
+    // Convert arrays to comma-separated strings for database storage
+    const performanceLanguageString = Array.isArray(performanceLanguage) ? performanceLanguage.join(', ') : performanceLanguage;
+    const subtitleLanguageString = Array.isArray(subtitleLanguage) ? subtitleLanguage.join(', ') : subtitleLanguage;
+
     // Create the event with translations
     const events = await createEventWithTranslations(
       title,
@@ -253,7 +257,7 @@ export async function POST(request: Request) {
       validEventType,
       eventDate,
       eventTime,
-      theatreId || 121, // Default theatre ID
+      (Array.isArray(theatreId) && theatreId.length > 0) ? theatreId[0] : 122, // Default theatre ID
       venueId,
       parseFloat(price) || 0,
       imageUrl,
@@ -266,8 +270,8 @@ export async function POST(request: Request) {
       subtitles,
       duration || '120 min',
       isFeatured || false,
-      performanceLanguage,
-      subtitleLanguage
+      performanceLanguageString,
+      subtitleLanguageString
     )
 
     return NextResponse.json({ 
@@ -280,6 +284,11 @@ export async function POST(request: Request) {
     })
   } catch (error) {
     console.error('Error creating event:', error)
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    })
     return NextResponse.json({ error: 'Failed to create event' }, { status: 500 })
   }
 }

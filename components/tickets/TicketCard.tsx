@@ -73,19 +73,11 @@ export default function TicketCard({
   };
 
   const getSeatType = () => {
-    if (sectionName?.toLowerCase().includes('balcony') || sectionName?.toLowerCase().includes('balkon')) {
-      return {
-        type: 'balcony',
-        label: language === 'en' ? 'Balcony' : 'Балкон',
-        color: 'bg-purple-100 text-purple-800'
-      };
-    } else {
-      return {
-        type: 'regular',
-        label: language === 'en' ? 'Regular' : 'Обикновен',
-        color: 'bg-blue-100 text-blue-800'
-      };
-    }
+    return {
+      type: 'regular',
+      label: language === 'en' ? 'Regular' : 'Обикновен',
+      color: 'bg-blue-100 text-blue-800'
+    };
   };
 
   return (

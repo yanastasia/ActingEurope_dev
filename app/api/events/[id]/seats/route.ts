@@ -231,24 +231,10 @@ export async function GET(
             is_available: Math.random() > 0.3, // 70% available
             is_accessible: i % 20 === 0 // Every 20th seat is accessible
           }))
-        },
-        {
-          section: {
-            id: 2,
-            name: "Balcony",
-            type: "standard"
-          },
-          seats: Array.from({ length: 80 }, (_, i) => ({
-            id: i + 101,
-            row_number: Math.floor(i / 10) + 1,
-            seat_number: (i % 10) + 1,
-            is_available: Math.random() > 0.2, // 80% available
-            is_accessible: i % 25 === 0 // Every 25th seat is accessible
-          }))
         }
       ];
       
-      const totalSeats = 180;
+      const totalSeats = 100;
       const availableSeats = fallbackSections.reduce((acc, section: any) => 
         acc + section.seats.filter((seat: any) => seat.is_available).length, 0);
       

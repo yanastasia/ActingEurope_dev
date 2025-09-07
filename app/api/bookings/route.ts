@@ -149,7 +149,7 @@ export async function POST(request: NextRequest) {
     console.log('Body keys:', Object.keys(body));
     console.log('Body values:', Object.values(body));
     
-    const { userId, eventId, selectedSeats, totalAmount, attendee_names, customerEmail, customerName } = body;
+    const { userId, eventId, selectedSeats, totalAmount, attendee_names, customerEmail, customerName, seats_with_sections } = body;
     
     // Debug extracted values
     console.log('Extracted values:');
@@ -160,6 +160,7 @@ export async function POST(request: NextRequest) {
     console.log('- attendee_names:', attendee_names);
     console.log('- customerEmail:', customerEmail);
     console.log('- customerName:', customerName);
+    console.log('- seats_with_sections:', seats_with_sections);
     console.log('========================\n');
 
     // Validate required fields
@@ -353,7 +354,12 @@ export async function POST(request: NextRequest) {
             seat: {
               select: {
                 row_number: true,
-                seat_number: true
+                seat_number: true,
+                venueSection: {
+                  select: {
+                    section_name: true
+                  }
+                }
               }
             }
           }

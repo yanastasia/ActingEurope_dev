@@ -44,7 +44,7 @@ export interface Venue {
 export interface VenueSection {
   id: number
   sectionName: string
-  sectionType: "regular" | "balcony"
+  sectionType: "regular"
   seats: Seat[]
 }
 
@@ -288,7 +288,7 @@ const Venues: Venue[] = [
   {
     id: 1,
     name: "Main Stage",
-    description: "Main performance venue with regular and balcony seating",
+    description: "Main performance venue with regular seating",
     capacity: 500,
     sections: [
       {
@@ -296,12 +296,6 @@ const Venues: Venue[] = [
         sectionName: "Regular Seating",
         sectionType: "regular",
         seats: generateMainStageRegularSeats(),
-      },
-      {
-        id: 2,
-        sectionName: "Balcony Seating",
-        sectionType: "balcony",
-        seats: generateMainStageBalconySeats(),
       },
     ],
   },
@@ -399,7 +393,7 @@ export async function getVenues(): Promise<Venue[]> {
       sections: venue.sections?.map((section: any) => ({
         id: section.id,
         sectionName: section.section_name,
-        sectionType: section.section_type as "regular" | "balcony",
+        sectionType: "regular",
         seats: section.seats?.map((seat: any) => ({
           id: seat.id,
           rowNumber: seat.row_number,
@@ -450,24 +444,7 @@ function generateMainStageRegularSeats(): Seat[] {
   return seats
 }
 
-function generateMainStageBalconySeats(): Seat[] {
-  const seats: Seat[] = []
-  const rowSeats = [30, 29, 30, 29, 30, 29, 30] // Updated balcony seating as specified
 
-  rowSeats.forEach((seatCount, rowIndex) => {
-    const rowNumber = rowIndex + 1
-    for (let seatNumber = 1; seatNumber <= seatCount; seatNumber++) {
-      seats.push({
-        id: Number.parseInt(`2${rowNumber.toString().padStart(2, "0")}${seatNumber.toString().padStart(2, "0")}`),
-        rowNumber,
-        seatNumber,
-        isAvailable: true, // All balcony seats are available
-      })
-    }
-  })
-
-  return seats
-}
 
 function generateChamberStageSeats(): Seat[] {
   const seats: Seat[] = []

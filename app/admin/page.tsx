@@ -54,7 +54,7 @@ interface Venue {
 interface VenueSection {
   id: string
   sectionName: string
-  sectionType: 'regular' | 'balcony'
+  sectionType: 'regular'
   rows: VenueRow[]
 }
 
@@ -624,7 +624,7 @@ export default function AdminPage() {
      setIsSubmitting(true)
      
      // Validate required fields
-     if (formData.theatreId.length === 0) {
+     if (formData.theatreId.length === 0 && formData.company.length === 0) {
        toast({
          title: "Missing information",
          description: "Please select at least one theatre/company",
@@ -1169,6 +1169,44 @@ export default function AdminPage() {
       toast({
         title: "Error",
         description: "Failed to update seat availability.",
+        variant: "destructive"
+      })
+    }
+  }
+
+  const handleToggleSeatAccessibility = async (seatId: string) => {
+    try {
+      const seat = eventSeats.flatMap(row => row.seats).find((s: any) => s.id.toString() === seatId)
+      if (!seat) return
+
+      const response = await fetch(`/api/seats/${seatId}/accessibility`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          is_accessible: !seat.is_accessible 
+        }),
+      })
+      
+      if (response.ok) {
+        // Refresh seat data
+        if (selectedEventForSeats) {
+          handleEventSelect(selectedEventForSeats)
+        }
+        
+        toast({
+          title: "Seat updated",
+          description: "Seat accessibility has been updated.",
+        })
+      } else {
+        throw new Error('Failed to toggle seat accessibility')
+      }
+    } catch (error) {
+      console.error('Error toggling seat accessibility:', error)
+      toast({
+        title: "Error",
+        description: "Failed to update seat accessibility.",
         variant: "destructive"
       })
     }
@@ -1758,7 +1796,7 @@ export default function AdminPage() {
                         />
                         <Select
                           value={section.sectionType}
-                          onValueChange={(value: 'regular' | 'balcony') => {
+                          onValueChange={(value: 'regular') => {
                             const updatedSections = [...editingVenue.sections]
                             updatedSections[sectionIndex].sectionType = value
                             setEditingVenue({
@@ -1772,7 +1810,6 @@ export default function AdminPage() {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="regular">{t("regularSeating")}</SelectItem>
-                            <SelectItem value="balcony">{t("balconySeating")}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -2083,23 +2120,37 @@ export default function AdminPage() {
                     <h3 className="text-lg font-semibold mb-4">Seat Map for {events.find(e => e.id === selectedEventForSeats)?.title}</h3>
                     <div className="space-y-4">
                       {eventSeats.map((row, rowIndex) => (
-                        <div key={rowIndex} className="flex items-center gap-2">
-                          <span className="w-12 text-sm font-medium">Row {row.row_number}:</span>
-                          <div className="flex gap-1">
-                            {row.seats.map((seat: any, seatIndex: number) => (
-                              <button
-                                key={seatIndex}
-                                onClick={() => handleToggleSeat(seat.id)}
-                                className={`w-8 h-8 text-xs border rounded ${
-                                  seat.is_available 
-                                    ? 'bg-green-100 border-green-300 text-green-800 hover:bg-green-200' 
-                                    : 'bg-red-100 border-red-300 text-red-800 hover:bg-red-200'
-                                }`}
-                                title={`Seat ${seat.seat_number} - ${seat.is_available ? 'Available' : 'Unavailable'}`}
-                              >
-                                {seat.seat_number}
-                              </button>
-                            ))}
+                        <div key={rowIndex} className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <span className="w-12 text-sm font-medium">Row {row.row_number}:</span>
+                            <div className="flex gap-1">
+                              {row.seats.map((seat: any, seatIndex: number) => (
+                                <div key={seatIndex} className="flex flex-col items-center gap-1">
+                                  <button
+                                    onClick={() => handleToggleSeat(seat.id)}
+                                    className={`w-8 h-8 text-xs border rounded ${
+                                      seat.is_available 
+                                        ? (seat.is_accessible ? 'bg-blue-100 border-blue-300 text-blue-800 hover:bg-blue-200' : 'bg-green-100 border-green-300 text-green-800 hover:bg-green-200')
+                                        : 'bg-red-100 border-red-300 text-red-800 hover:bg-red-200'
+                                    }`}
+                                    title={`Seat ${seat.seat_number} - ${seat.is_available ? 'Available' : 'Unavailable'}${seat.is_accessible ? ' (Accessible)' : ''}`}
+                                  >
+                                    {seat.seat_number}
+                                  </button>
+                                  <button
+                                    onClick={() => handleToggleSeatAccessibility(seat.id)}
+                                    className={`w-6 h-4 text-xs rounded ${
+                                      seat.is_accessible 
+                                        ? 'bg-blue-500 text-white hover:bg-blue-600' 
+                                        : 'bg-gray-300 text-gray-600 hover:bg-gray-400'
+                                    }`}
+                                    title={`Toggle accessibility for seat ${seat.seat_number}`}
+                                  >
+                                    {seat.is_accessible ? 'ACC' : 'REG'}
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -2111,8 +2162,22 @@ export default function AdminPage() {
                         <span>Available</span>
                       </div>
                       <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 bg-blue-100 border border-blue-300 rounded"></div>
+                        <span>Available & Accessible</span>
+                      </div>
+                      <div className="flex items-center gap-2">
                         <div className="w-4 h-4 bg-red-100 border border-red-300 rounded"></div>
                         <span>Unavailable</span>
+                      </div>
+                      <div className="flex items-center gap-4 text-xs">
+                        <div className="flex items-center gap-1">
+                          <div className="w-3 h-2 bg-blue-500 text-white rounded text-center"></div>
+                          <span>ACC = Accessible</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <div className="w-3 h-2 bg-gray-300 rounded text-center"></div>
+                          <span>REG = Regular</span>
+                        </div>
                       </div>
                     </div>
                   </div>

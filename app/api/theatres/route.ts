@@ -39,10 +39,13 @@ export async function GET(request: NextRequest) {
 
       return NextResponse.json(theatres);
     } else {
-      // For public interface, return only theatres for specific language
+      // For public interface, return only theatres for specific language (excluding Acting Europe)
       const theatres = await prisma.theatre.findMany({
         where: {
-          content_language: language
+          content_language: language,
+          NOT: {
+            name: 'Acting Europe'
+          }
         },
         include: {
           images: true,
