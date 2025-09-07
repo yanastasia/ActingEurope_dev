@@ -175,7 +175,7 @@ export default function PerformancesPage() {
               </div>
               <CardHeader>
                 <div className="flex justify-between items-start mb-2">
-                  <CardTitle className="text-lg">{performance.title}</CardTitle>
+                  <CardTitle className="text-lg">{t(performance.title) || performance.title}</CardTitle>
                   <Badge className="bg-primary-gold/20 text-secondary-blue">
                     {performance.genre}
                   </Badge>

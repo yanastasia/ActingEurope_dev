@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { isAdmin, isAdminEmail } from '@/lib/auth';
+import { isAdmin, isAdminEmail, canReserveUnlimitedSeats } from '@/lib/auth';
 import { sendTicketEmail } from '@/lib/email-service';
 import { buildQrPayload } from '@/lib/tickets/qr';
 
@@ -227,10 +227,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check seat limit: maximum 2 seats per user per event (unless user is admin)
-    const userIsAdmin = isAdminEmail(user.email);
+    // Check seat limit: maximum 2 seats per user per event (unless user can reserve unlimited seats)
+    const userCanReserveUnlimited = canReserveUnlimitedSeats(user.email);
     
-    if (!userIsAdmin) {
+    if (!userCanReserveUnlimited) {
       const existingUserBookings = await prisma.booking.findMany({
         where: {
           user_id: userId,

@@ -19,7 +19,7 @@ import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/components/providers/supabase-auth-provider"
 import LanguageSwitcher from "@/components/language-switcher"
 import { useLanguage } from "@/lib/language-context"
-import { isAdminEmail, isScannerEmail } from "@/lib/auth"
+import { isAdminEmail, isScannerEmail, hasFullAdminAccess } from "@/lib/auth"
 
 export default function Navigation() {
   const pathname = usePathname()
@@ -41,6 +41,8 @@ export default function Navigation() {
 
   // Check if user is admin based on email domain
   const userIsAdmin = user?.email ? isAdminEmail(user.email) : false
+  // Check if user has full admin access (only admin@actingeurope.eu)
+  const userHasFullAdminAccess = user?.email ? hasFullAdminAccess(user.email) : false
   // Check if user is scanner based on email
   const userIsScanner = user?.email ? isScannerEmail(user.email) : false
 
@@ -163,7 +165,7 @@ export default function Navigation() {
                     </>
                   )}
 
-                  {userIsAdmin && (
+                  {userHasFullAdminAccess && (
                     <>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onSelect={() => router.push("/admin")} className="text-primary-gold">

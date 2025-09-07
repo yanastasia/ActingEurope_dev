@@ -89,8 +89,8 @@ export default function IndividualTicketPage() {
         }
         const eventsData = await response.json()
         
-        // Find the performance by ID (extract numeric ID from performance-X format)
-        const numericId = performanceId.replace('performance-', '')
+        // Find the performance by ID (extract numeric ID from performance-X or event-X format)
+        const numericId = performanceId.replace(/^(performance-|event-)/, '')
         console.log('Looking for performance with ID:', numericId)
         console.log('Available events:', eventsData.map((e: any) => ({ id: e.id, title: e.title })))
         const foundEvent = eventsData.find((event: any) => event.id.toString() === numericId)

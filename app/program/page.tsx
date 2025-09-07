@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { useLanguage, translations } from "@/lib/language-context"
+import Link from "next/link"
 // Removed static import - now using API
 
 // Define Event interface locally
@@ -38,7 +39,6 @@ interface Event {
   price?: string
   contentLanguage?: string
 }
-import Link from "next/link"
 
 // Helper function to fix company names
 const fixCompanyName = (name: string): string => {
@@ -276,7 +276,7 @@ export default function ProgramPage() {
                           <p className="font-semibold text-secondary-blue">{event.time}</p>
                           <div className="flex items-center text-sm text-muted-foreground">
                             <MapPin className="mr-1 h-4 w-4" />
-                            {translations[language][event.venue as keyof typeof translations[typeof language]] || event.venue}
+                            {t(event.venue)}
                           </div>
                           <Badge className={`${getBadgeColor(event.eventType)}`}>
                             {t(event.eventType)}
@@ -304,7 +304,7 @@ export default function ProgramPage() {
                       </div>
 
                         <div className="p-4 md:w-3/4">
-                            <h3 className="text-lg font-semibold text-secondary-blue">{event.title}</h3>
+                            <h3 className="text-lg font-semibold text-secondary-blue">{t(event.title) || event.title}</h3>
                             {event.company && (
                               <p className="text-sm text-muted-foreground italic mb-6">
                                 {Array.isArray(event.company) 
@@ -468,10 +468,10 @@ export default function ProgramPage() {
                                       {t(event.eventType)}
                                     </Badge>
                                   </div>
-                                  <h5 className="font-semibold text-lg mb-1">{event.title}</h5>
+                                  <h5 className="font-semibold text-lg mb-1">{t(event.title)}</h5>
                                   <p className="text-sm text-muted-foreground mb-2">
                                     <MapPin className="inline h-3 w-3 mr-1" />
-                                    {getTranslation(language, event.venue) || event.venue}
+                                    {getTranslation(language, event.venue)}
                                   </p>
                                   <p className="text-sm mb-3">
                                     <span className="font-medium">{translations[language].theatreName}: </span>

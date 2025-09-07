@@ -348,7 +348,7 @@ export default function SeatSelection({ venueId, eventId, onSeatsSelected, isUse
       <div className="flex items-center justify-center p-8">
         <div className="text-center">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary-gold border-t-transparent mx-auto mb-2"></div>
-          <p className="text-sm text-muted-foreground">Loading seating chart...</p>
+          <p className="text-sm text-muted-foreground">{t('loadingSeatingChart')}</p>
         </div>
       </div>
     )
@@ -357,7 +357,7 @@ export default function SeatSelection({ venueId, eventId, onSeatsSelected, isUse
   if (!venue) {
     return (
       <div className="text-center p-8">
-        <p className="text-muted-foreground">Venue not found</p>
+        <p className="text-muted-foreground">{t('venueNotFound')}</p>
       </div>
     )
   }
@@ -381,12 +381,7 @@ export default function SeatSelection({ venueId, eventId, onSeatsSelected, isUse
 
   return (
     <div className="space-y-6">
-      <div className="text-center">
-        <div className="mb-2 text-sm font-medium">
-          {venue.name === "Main Stage" ? t("mainStage") : 
-           venue.name === "Chamber Stage" ? t("chamberStage") : 
-           venue.name}
-        </div>
+      <div className="flex flex-col items-center space-y-4">
         <p className="text-sm text-muted-foreground">
           {t("selectedSeats")}: {selectedSeats.length > 0 ? selectedSeats.map(seat => seat.name).join(", ") : t("none")}
           {isUserAdmin ? (
@@ -395,12 +390,8 @@ export default function SeatSelection({ venueId, eventId, onSeatsSelected, isUse
             <span className="ml-2 text-gray-600">({selectedSeats.length}/2 seats)</span>
           )}
         </p>
+        <Button onClick={handleConfirm}>{t("confirmSelection")}</Button>
       </div>
-
-      {/* Confirm Selection Button - moved to top right */}
-       <div className="flex justify-end mb-2">
-         <Button onClick={handleConfirm}>{t("confirmSelection")}</Button>
-       </div>
 
       <div className="mx-auto max-w-4xl">
         {/* Stage */}

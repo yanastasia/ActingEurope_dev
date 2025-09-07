@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Calendar, Ticket, FileText, AlertTriangle, ShieldCheck, Trash2, MapPin, Info, Phone, Building, Edit } from "lucide-react"
-import { isAdmin, isAdminEmail } from "@/lib/auth"
+import { isAdmin, isAdminEmail, hasFullAdminAccess } from "@/lib/auth"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/lib/language-context"
 import { useAuth } from "@/components/providers/supabase-auth-provider"
@@ -251,9 +251,9 @@ export default function AdminPage() {
       return
     }
 
-    // Check if user is admin based on email
+    // Check if user has full admin access based on email
     const userEmail = user.email || ""
-    const isAdminUser = isAdminEmail(userEmail)
+    const isAdminUser = hasFullAdminAccess(userEmail)
     
     console.log('Admin check:', { 
       userEmail, 
@@ -2094,7 +2094,7 @@ export default function AdminPage() {
                     <SelectContent>
                       {events.map((event) => (
                         <SelectItem key={event.id} value={event.id}>
-                          {event.title} - {event.date}
+                          {t(event.title)} - {event.date}
                         </SelectItem>
                       ))}
                     </SelectContent>

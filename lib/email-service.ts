@@ -263,6 +263,7 @@ export async function sendTicketEmail(bookingId: string) {
           time: booking.event.event_time ? (typeof booking.event.event_time === 'string' ? booking.event.event_time : booking.event.event_time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })) : '19:00',
           venueName: booking.event.venue?.name ?? 'Venue',
           venueAddress: booking.event.venue?.address || "bul. \"Bulgaria\" 26А, Kyustendil, Bulgaria",
+          id: ""
         },
       },
       {
@@ -273,6 +274,7 @@ export async function sendTicketEmail(bookingId: string) {
         category: 'Standard',
         attendeeName: attendeeName,
         sectionName: bs.seat.venueSection?.section_name,
+        attendeeEmail: ""
       }
     );
 
@@ -513,7 +515,7 @@ export async function sendTicketEmail(bookingId: string) {
       const templateData = {
         eventTitle_Value: eventTitleEn,
         eventTitle_Value_bg: eventTitleBg,
-        date_Value: ctx.event.date instanceof Date ? ctx.event.date.toLocaleDateString() : String(ctx.event.date),
+        date_Value: ctx.event.date,
         time_Value: ctx.event.time,
         venue_Value: venueNameEn,
         venue_Value_bg: venueNameBg,

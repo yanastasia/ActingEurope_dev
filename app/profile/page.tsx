@@ -301,7 +301,7 @@ export default function ProfilePage() {
                     {upcomingTickets.map((ticket) => (
                       <div key={ticket.id} className="space-y-4">
                         <div className="flex justify-between items-center mb-4">
-                          <h3 className="text-lg font-semibold">{ticket.eventTitle}</h3>
+                          <h3 className="text-lg font-semibold">{t(ticket.eventTitle)}</h3>
                           <Badge>{ticket.bookingReference}</Badge>
                         </div>
                         {/* Ticket Cards Horizontal Scroll */}

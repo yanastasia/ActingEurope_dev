@@ -6,6 +6,17 @@ export function isAdminEmail(email: string): boolean {
   return adminEmails.includes(email.toLowerCase())
 }
 
+// Check if an email can reserve unlimited seats (admins + sales)
+export function canReserveUnlimitedSeats(email: string): boolean {
+  const unlimitedSeatsEmails = ["admin@actingeurope.eu", "sales@actingeurope.eu"]
+  return unlimitedSeatsEmails.includes(email.toLowerCase())
+}
+
+// Check if an email has full admin access (only admin@actingeurope.eu)
+export function hasFullAdminAccess(email: string): boolean {
+  return email.toLowerCase() === "admin@actingeurope.eu"
+}
+
 // Check if an email belongs to the scanner user
 export function isScannerEmail(email: string): boolean {
   return email.toLowerCase() === "tickets@actingeurope.eu"

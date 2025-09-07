@@ -26,6 +26,7 @@ interface EventData {
   description: any
   id: number;
   title: string;
+  eventType: string;
   company: string[];
   date: string;
   time: string;
@@ -97,9 +98,11 @@ export default function Home() {
         }
         const events = await response.json()
 
+        // Filter events to only include performances
+        const performanceEvents = events.filter((event: EventData) => event.eventType === 'performance')
         
         // Format events for the frontend
-        const formattedPerformances = events.map((event: EventData) => ({
+        const formattedPerformances = performanceEvents.map((event: EventData) => ({
           id: `performance-${event.id}`,
           title: event.title,
           company: event.company,

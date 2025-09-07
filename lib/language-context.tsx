@@ -175,6 +175,7 @@ const translations = {
     eventVenue: "Venue",
     ticketDetails: "Ticket Details",
     bookingReference: "Booking Reference",
+    bookingReferenceMessage: "Booking Reference: {reference}",
     seatNumber: "Seat",
 
     // Email Verification Page
@@ -261,9 +262,25 @@ const translations = {
     maxSeatsReachedDesc: "You can select up to 2 seats per booking",
     noSeatsSelected: "No seats selected",
     pleaseSelectSeats: "Please select at least one seat to continue",
+    accessibleSeat: "Accessible Seat",
+    accessibleSeatMessage: "This seat is reserved for people with accessibility needs. Please contact Acting Europe if you require an accessible seat.",
+    seatLimitReached: "Seat limit reached",
+    adminUnlimitedSeats: "You can select unlimited seats as an admin",
+    seatLimitMessage: "You can only select up to {maxSeats} seats per event",
+    selectAtLeastOneSeat: "Please select at least one seat to continue",
+    reservationSuccessful: "Reservation successful!",
+    reservationFailed: "Reservation failed",
+    failedToReserveSeats: "Failed to reserve seats",
+    failedToLoadEventDetails: "Failed to load event details",
+    eventNotFound: "Event not found",
+    adminUnlimitedSeatsInfo: "As an admin, you can select unlimited seats",
+    seatLimitInfo: "You can select up to {maxSeats} seats per event",
+    noSeatsAvailable: "No seats available for this event.",
 
     // Booking
     loadingPerformances: "Loading performances...",
+    loadingSeatingChart: "Loading seating chart...",
+    venueNotFound: "Venue not found",
     availablePerformances: "Available Performances",
     perTicket: "per ticket",
     yourDetails: "Your Details",
@@ -497,7 +514,7 @@ const translations = {
     // Venue translations
     "Main Stage": "Main Stage",
     "Chamber Stage": "Chamber Stage",
-    "Cinema hall": "Cinema hall",
+    "Cinema Hall": "Cinema Hall",
 
     // Theatre name translations
     "Drama Theatre Kyustendil": "Drama Theatre Kyustendil",
@@ -510,6 +527,8 @@ const translations = {
     // Event title translations
     "Artists in waiting": "Artists in waiting",
     "In the Dark": "In the Dark",
+    "European Funding and Mobility for Theatres: Opportunities for Cross-Border Collaboration": "European Funding and Mobility for Theatres: Opportunities for Cross-Border Collaboration",
+    "New Trends and Challenges: Digital, Sustainable, and Collaborative Theatre in 2025": "New Trends and Challenges: Digital, Sustainable, and Collaborative Theatre in 2025",
 
     // Event types
     performance: "Performance",
@@ -530,6 +549,10 @@ const translations = {
     selectGenre: "Select Genre",
     allGenres: "All Genres",
     noPerformancesFound: "No performances found matching your criteria.",
+    availableWorkshops: "Available Workshops",
+    loadingWorkshops: "Loading workshops...",
+    noWorkshopsYet: "No workshops available yet",
+    noWorkshopsYetDesc: "Check back soon for upcoming workshops and masterclasses.",
     contactDescription: "Have a question, suggestion, or just want to say hello? We'd love to hear from you!\nPlease fill out the form below or reach out to us using the contact information provided.",
     sendMessage: "Send us a Message",
     yourName: "Your Name",
@@ -685,9 +708,25 @@ const translations = {
     maxSeatsReachedDesc: "Можете да изберете до 2 места на резервация",
     noSeatsSelected: "Няма избрани места",
     pleaseSelectSeats: "Моля, изберете поне едно място, за да продължите",
+    accessibleSeat: "Достъпно място",
+    accessibleSeatMessage: "Това място е резервирано за хора с увреждания. Моля, свържете се с Acting Europe, ако имате нужда от достъпно място.",
+    seatLimitReached: "Достигнат лимит на места",
+    adminUnlimitedSeats: "Като администратор можете да избирате неограничен брой места",
+    seatLimitMessage: "Можете да изберете до {maxSeats} места на събитие",
+    selectAtLeastOneSeat: "Моля, изберете поне едно място, за да продължите",
+    reservationSuccessful: "Резервацията е успешна!",
+    reservationFailed: "Резервацията неуспешна",
+    failedToReserveSeats: "Неуспешно резервиране на места",
+    failedToLoadEventDetails: "Неуспешно зареждане на детайли за събитието",
+    eventNotFound: "Събитието не е намерено",
+    adminUnlimitedSeatsInfo: "Като администратор можете да избирате неограничен брой места",
+    seatLimitInfo: "Можете да изберете до {maxSeats} места на събитие",
+    noSeatsAvailable: "Няма налични места за това събитие.",
 
     // Booking
     loadingPerformances: "Зареждане на постановки...",
+    loadingSeatingChart: "Зареждане на схемата на местата...",
+    venueNotFound: "Залата не е намерена",
     availablePerformances: "Налични постановки",
     perTicket: "на билет",
     yourDetails: "Вашите данни",
@@ -703,6 +742,7 @@ const translations = {
     bookingConfirmationEmail: "Имейл за потвърждение е изпратен на вашия имейл адрес с детайли за билетите.",
     bookingDetails: "Детайли на резервацията",
     bookingReference: "Референция на резервацията",
+    bookingReferenceMessage: "Референция на резервацията: {reference}",
     seats: "Места",
     bookAnotherTicket: "Резервирай друг билет",
     backToTickets: "Обратно към билетите",
@@ -912,7 +952,7 @@ const translations = {
     // Venue translations
     "Main Stage": "Голяма зала",
     "Chamber Stage": "Камерна зала",
-    "Cinema hall": "Кино зала",
+    "Cinema Hall": "Кинозала",
     
     // Theatre name translations
     "Drama Theatre Kyustendil": "Драматичен театър Кюстендил",
@@ -925,6 +965,8 @@ const translations = {
     // Event title translations
     "Artists in waiting": "Артисти в очакване",
     "In the Dark": "В неведение",
+    "European Funding and Mobility for Theatres: Opportunities for Cross-Border Collaboration": "Европейско финансиране и мобилност за театри: възможности за трансгранично сътрудничество",
+    "New Trends and Challenges: Digital, Sustainable, and Collaborative Theatre in 2025": "Нови тенденции и предизвикателства: дигитален, устойчив и колаборативен театър през 2025 г.",
 
     // Event types
     performance: "Постановки",
@@ -945,6 +987,10 @@ const translations = {
     selectGenre: "Изберете жанр",
     allGenres: "Всички жанрове",
     noPerformancesFound: "Не са намерени представления, отговарящи на вашите критерии.",
+    availableWorkshops: "Налични работилници",
+    loadingWorkshops: "Зареждане на работилници...",
+    noWorkshopsYet: "Все още няма налични работилници",
+    noWorkshopsYetDesc: "Проверете отново скоро за предстоящи работилници и майсторски класове.",
     contactDescription: "Имате въпрос, предложение или просто искате да поздравите? Бихме искали да чуем от вас!\nМоля, попълнете формуляра по-долу или се свържете с нас, използвайки контактната информация.",
     sendMessage: "Изпратете ни съобщение",
     yourName: "Вашето име",
@@ -1220,9 +1266,25 @@ const translations = {
     maxSeatsReachedDesc: "Можете да изберете до 2 седишта по резервација",
     noSeatsSelected: "Нема избрани седишта",
     pleaseSelectSeats: "Ве молиме изберете најмалку едно седиште за да продолжите",
+    accessibleSeat: "Пристапно седиште",
+    accessibleSeatMessage: "Ова седиште е резервирано за лица со попреченост. Ве молиме контактирајте го Acting Europe ако ви треба пристапно седиште.",
+    seatLimitReached: "Достигнат лимит на седишта",
+    adminUnlimitedSeats: "Како администратор можете да избирате неограничен број седишта",
+    seatLimitMessage: "Можете да изберете до {maxSeats} седишта по настан",
+    selectAtLeastOneSeat: "Ве молиме изберете најмалку едно седиште за да продолжите",
+    reservationSuccessful: "Резервацијата е успешна!",
+    reservationFailed: "Резервацијата неуспешна",
+    failedToReserveSeats: "Неуспешно резервирање на седишта",
+    failedToLoadEventDetails: "Неуспешно вчитување на детали за настанот",
+    eventNotFound: "Настанот не е пронајден",
+    adminUnlimitedSeatsInfo: "Како администратор можете да избирате неограничен број седишта",
+    seatLimitInfo: "Можете да изберете до {maxSeats} седишта по настан",
+    noSeatsAvailable: "Нема достапни седишта за овој настан.",
 
     // Booking
     loadingPerformances: "Се вчитуваат претстави...",
+    loadingSeatingChart: "Се вчитува схемата на седишта...",
+    venueNotFound: "Салата не е пронајдена",
     availablePerformances: "Достапни претстави",
     perTicket: "по билет",
     yourDetails: "Вашите податоци",
@@ -1237,6 +1299,7 @@ const translations = {
     bookingConfirmationEmail: "Е–маил за потврдување е испратен на вашата адреса со деталите за билетите.",
     bookingDetails: "Детали за резервацијата",
     bookingReference: "Референца на резервацијата",
+    bookingReferenceMessage: "Референца на резервацијата: {reference}",
     seats: "Места",
     bookAnotherTicket: "Резервирај друг билет",
     backToTickets: "Назад кон билетите",
@@ -1474,7 +1537,13 @@ const translations = {
     // Venue translations
     "Main Stage": "Голема сала",
     "Chamber Stage": "Камерна сала",
-    "Cinema hall": "Кино сала",
+    "Cinema Hall": "Кино салон",
+    
+    // Event title translations
+    "Artists in waiting": "Артисти во очекување",
+    "In the Dark": "Во темнина",
+    "European Funding and Mobility for Theatres: Opportunities for Cross-Border Collaboration": "Европско финансирање и мобилност за театри: Можности за прекугранична соработка",
+    "New Trends and Challenges: Digital, Sustainable, and Collaborative Theatre in 2025": "Нови трендови и предизвици: дигитален, одржлив и колаборативен театар во 2025 година",
     
     // Theatre name translations
     "Drama Theatre Kyustendil": "Драматски театар Ќустендил",
@@ -1503,6 +1572,10 @@ const translations = {
     selectGenre: "Изберете жанр",
     allGenres: "Сите жанрови",
     noPerformancesFound: "Не се пронајдени претстави што ги исполнуваат вашите критериуми.",
+    availableWorkshops: "Достапни работилници",
+    loadingWorkshops: "Се вчитуваат работилници...",
+    noWorkshopsYet: "Сè уште нема достапни работилници",
+    noWorkshopsYetDesc: "Проверете повторно наскоро за претстојни работилници и мајсторски класови.",
     contactDescription: "Имате прашање, предлог или само сакате да поздравите? Би сакале да слушнеме од вас!\nВе молиме пополнете го формуларот подолу или контактирајте не користејќи ги контакт информациите.",
     sendMessage: "Испратете ни порака",
     yourName: "Вашето име",
@@ -1755,9 +1828,25 @@ const translations = {
     maxSeatsReachedDesc: "Можете изабрати до 2 седишта по резервацији",
     noSeatsSelected: "Нема изабраних седишта",
     pleaseSelectSeats: "Молимо изаберите најмање једно седиште да наставите",
+    accessibleSeat: "Приступачно седиште",
+    accessibleSeatMessage: "Ово седиште је резервисано за особе са инвалидитетом. Молимо контактирајте Acting Europe ако вам је потребно приступачно седиште.",
+    seatLimitReached: "Достигнут лимит седишта",
+    adminUnlimitedSeats: "Као администратор можете да бирате неограничен број седишта",
+    seatLimitMessage: "Можете да изаберете до {maxSeats} седишта по догађају",
+    selectAtLeastOneSeat: "Молимо изаберите најмање једно седиште да бисте наставили",
+    reservationSuccessful: "Резервација успешна!",
+    reservationFailed: "Резервација неуспешна",
+    failedToReserveSeats: "Неуспешно резервисање седишта",
+    failedToLoadEventDetails: "Неуспешно учитавање детаља догађаја",
+    eventNotFound: "Догађај није пронађен",
+    adminUnlimitedSeatsInfo: "Као администратор можете да бирате неограничен број седишта",
+    seatLimitInfo: "Можете да изаберете до {maxSeats} седишта по догађају",
+    noSeatsAvailable: "Нема доступних седишта за овај догађај.",
 
     // Booking
     loadingPerformances: "Учитавање представа...",
+    loadingSeatingChart: "Учитавање схеме седишта...",
+    venueNotFound: "Сала није пронађена",
     availablePerformances: "Доступне представе",
     perTicket: "по карти",
     yourDetails: "Ваши подаци",
@@ -1772,6 +1861,7 @@ const translations = {
     bookingConfirmationEmail: "Е–маил за потврду је послат на вашу адресу са детаљима о картама.",
     bookingDetails: "Детаљи резервације",
     bookingReference: "Референца резервације",
+    bookingReferenceMessage: "Референца резервације: {reference}",
     seats: "Места",
     bookAnotherTicket: "Резервиши другу карту",
     backToTickets: "Назад на карте",
@@ -2005,7 +2095,13 @@ const translations = {
     // Venue translations
     "Main Stage": "Велика Сала",
     "Chamber Stage": "Камерна Сала",
-    "Cinema hall": "Биоскопска сала",
+    "Cinema Hall": "Биоскопска сала",
+    
+    // Event title translations
+    "Artists in waiting": "Уметници у чекању",
+    "In the Dark": "У мраку",
+    "European Funding and Mobility for Theatres: Opportunities for Cross-Border Collaboration": "Европско финансирање и мобилност за позоришта: Могућности за прекограничну сарадњу",
+    "New Trends and Challenges: Digital, Sustainable, and Collaborative Theatre in 2025": "Нови трендови и изазови: Дигитално, одрживо и колаборативно позориште у 2025. години",
     
     // Theatre name translations
     "Drama Theatre Kyustendil": "Драмски театар Ћустендил",
@@ -2034,6 +2130,10 @@ const translations = {
     selectGenre: "Изаберите жанр",
     allGenres: "Сви жанрови",
     noPerformancesFound: "Нису пронађене представе које одговарају вашим критеријумима.",
+    availableWorkshops: "Доступне радионице",
+    loadingWorkshops: "Учитавање радионица...",
+    noWorkshopsYet: "Још увек нема доступних радионица",
+    noWorkshopsYetDesc: "Проверите поново ускоро за предстојеће радионице и мајсторске класове.",
     contactDescription: "Имате питање, предлог или само желите да поздравите? Волели бисмо да чујемо од вас!\nМолимо попуните формулар испод или нас контактирајте користећи контакт информације.",
     sendMessage: "Пошаљите нам поруку",
     yourName: "Ваше име",
@@ -2173,9 +2273,19 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("actingEurope_language", lang)
   }
 
-  // Translation function
-  const t = (key: string): string => {
-    return translations[language][key as keyof (typeof translations)[typeof language]] || key
+  // Translation function with interpolation support
+  const t = (key: string, params?: Record<string, any>): string => {
+    let translation = translations[language][key as keyof (typeof translations)[typeof language]] || key
+    
+    // Handle interpolation if params are provided
+    if (params && typeof translation === 'string') {
+      Object.keys(params).forEach(paramKey => {
+        const placeholder = `{${paramKey}}`
+        translation = translation.replace(new RegExp(placeholder, 'g'), String(params[paramKey]))
+      })
+    }
+    
+    return translation
   }
 
   return <LanguageContext.Provider value={{ language, setLanguage, t }}>{children}</LanguageContext.Provider>

@@ -9,7 +9,7 @@ import { useLanguage } from "@/lib/language-context"
 import { ArrowLeft, MapPin, Calendar, Clock, Users, Ticket } from "lucide-react"
 import { useAuth } from "@/components/providers/supabase-auth-provider"
 import { toast } from "@/hooks/use-toast"
-import { isAdminEmail } from "@/lib/auth"
+import { isAdminEmail, canReserveUnlimitedSeats } from "@/lib/auth"
 
 interface Seat {
   id: number
@@ -63,7 +63,7 @@ export default function SeatSelectionPage() {
   const [loading, setLoading] = useState(true)
   const [reserving, setReserving] = useState(false)
 
-  const maxSeats = user?.email && isAdminEmail(user.email) ? 999 : 2
+  const maxSeats = user?.email && canReserveUnlimitedSeats(user.email) ? 999 : 2
 
   const fetchEventAndSeats = useCallback(async () => {
     try {
@@ -87,15 +87,15 @@ export default function SeatSelectionPage() {
 
       if (!seatsResponse.ok || !eventResponse.ok) {
         toast({
-          title: "Error",
-          description: "Failed to load event details",
+          title: t("error"),
+          description: t("failedToLoadEventDetails"),
           variant: "destructive"
         })
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to load event details",
+        title: t("error"),
+        description: t("failedToLoadEventDetails"),
         variant: "destructive"
       })
     } finally {
@@ -110,6 +110,16 @@ export default function SeatSelectionPage() {
   const handleSeatSelect = (seat: Seat) => {
     if (!seat.is_available) return
 
+    // Check if seat is accessible and user is not admin
+    if (seat.is_accessible && !(user?.email && canReserveUnlimitedSeats(user.email))) {
+      toast({
+        title: t("accessibleSeat"),
+        description: t("accessibleSeatMessage"),
+        variant: "default"
+      })
+      return
+    }
+
     const isSelected = selectedSeats.some(s => s.id === seat.id)
     
     if (isSelected) {
@@ -117,10 +127,10 @@ export default function SeatSelectionPage() {
     } else {
       if (selectedSeats.length >= maxSeats) {
         toast({
-          title: "Seat limit reached",
-          description: user?.email && isAdminEmail(user.email) 
-            ? "You can select unlimited seats as an admin" 
-            : `You can only select up to ${maxSeats} seats per event`,
+          title: t("seatLimitReached"),
+          description: user?.email && canReserveUnlimitedSeats(user.email) 
+            ? t("adminUnlimitedSeats")
+            : t("seatLimitMessage"),
           variant: "destructive"
         })
         return
@@ -132,8 +142,8 @@ export default function SeatSelectionPage() {
   const handleReservation = async () => {
     if (selectedSeats.length === 0) {
       toast({
-        title: "No seats selected",
-        description: "Please select at least one seat to continue",
+        title: t("noSeatsSelected"),
+        description: t("selectAtLeastOneSeat"),
         variant: "destructive"
       })
       return
@@ -178,22 +188,22 @@ export default function SeatSelectionPage() {
       if (response.ok) {
         const booking = await response.json()
         toast({
-          title: "Reservation successful!",
-          description: `Your booking reference is ${booking.booking_reference}`
+          title: t("reservationSuccessful"),
+          description: t("bookingReferenceMessage")
         })
         router.push(`/profile?tab=upcoming`)
       } else {
         const error = await response.json()
         toast({
-          title: "Reservation failed",
-          description: error.message || "Failed to reserve seats",
+          title: t("reservationFailed"),
+          description: error.message || t("failedToReserveSeats"),
           variant: "destructive"
         })
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to reserve seats",
+        title: t("error"),
+        description: t("failedToReserveSeats"),
         variant: "destructive"
       })
     } finally {
@@ -204,6 +214,7 @@ export default function SeatSelectionPage() {
   const getSeatColor = (seat: Seat) => {
     if (!seat.is_available) return "bg-red-300 cursor-not-allowed"
     if (selectedSeats.some(s => s.id === seat.id)) return "bg-blue-500 text-white"
+    if (seat.is_accessible && !(user?.email && isAdminEmail(user.email))) return "bg-blue-300 cursor-not-allowed opacity-75"
     if (seat.is_accessible) return "bg-green-200 hover:bg-green-300"
     return "bg-gray-200 hover:bg-gray-300"
   }
@@ -222,7 +233,7 @@ export default function SeatSelectionPage() {
     return (
       <div className="container mx-auto px-4 py-12">
         <div className="text-center">
-          <p className="text-muted-foreground">Event not found</p>
+          <p className="text-muted-foreground">{t("eventNotFound")}</p>
         </div>
       </div>
     )
@@ -274,7 +285,7 @@ export default function SeatSelectionPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4" />
-                  Available: {eventData.available_seats} / {eventData.total_seats}
+                  {t("available")}: {eventData.available_seats} / {eventData.total_seats}
                 </div>
               </div>
 
@@ -296,7 +307,7 @@ export default function SeatSelectionPage() {
                   <div className="mt-4 p-3 bg-blue-50 rounded">
                     <div className="flex justify-between items-center">
                       <span className="font-medium">{t("total")}:</span>
-                      <span className="font-bold">${totalPrice.toFixed(2)}</span>
+                      <span className="font-bold">€{totalPrice.toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
@@ -312,9 +323,9 @@ export default function SeatSelectionPage() {
               </Button>
 
               <div className="text-xs text-muted-foreground">
-                {user?.email && isAdminEmail(user.email) 
-                  ? "As an admin, you can select unlimited seats" 
-                  : `You can select up to ${maxSeats} seats per event`
+                {user?.email && canReserveUnlimitedSeats(user.email) 
+                  ? t("adminUnlimitedSeatsInfo")
+                  : t("seatLimitInfo")
                 }
               </div>
             </CardContent>
@@ -389,11 +400,11 @@ export default function SeatSelectionPage() {
                             <button
                               key={seat.id}
                               onClick={() => handleSeatSelect(seat)}
-                              disabled={!seat.is_available}
+                              disabled={!seat.is_available || (seat.is_accessible && !(user?.email && isAdminEmail(user.email)))}
                               className={`w-8 h-8 text-xs rounded transition-colors ${
                                 getSeatColor(seat)
                               }`}
-                              title={`Row ${seat.row_number}, Seat ${seat.seat_number}${seat.is_accessible ? ' (Accessible)' : ''}${!seat.is_available ? ' (Unavailable)' : ''}`}
+                              title={`Row ${seat.row_number}, Seat ${seat.seat_number}${seat.is_accessible ? ' (Accessible - Contact Acting Europe)' : ''}${!seat.is_available ? ' (Unavailable)' : ''}`}
                             >
                               {seat.seat_number}
                             </button>
@@ -405,7 +416,7 @@ export default function SeatSelectionPage() {
                   ))
                 ) : (
                   <div className="text-center py-8">
-                    <p className="text-muted-foreground">No seats available for this event.</p>
+                    <p className="text-muted-foreground">{t("noSeatsAvailable")}</p>
                   </div>
                 )}
               </div>
