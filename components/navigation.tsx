@@ -176,6 +176,10 @@ export default function Navigation() {
                         <User className="mr-2 h-4 w-4" />
                         <span>User Management</span>
                       </DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => router.push("/admin/qr-scanner")} className="text-primary-gold">
+                        <Scan className="mr-2 h-4 w-4" />
+                        <span>QR Scanner</span>
+                      </DropdownMenuItem>
                     </>
                   )}
 

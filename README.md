@@ -47,6 +47,8 @@ Acting Europe is a modern web application designed to connect theatre enthusiast
 - **User Administration**: Manage user accounts and permissions
 - **News Management**: Create and publish news articles with automatic multilingual support
 - **Theatre Management**: Comprehensive theatre profiles with automatic translation group creation
+- **QR Code Scanner**: Admin interface for scanning and validating QR codes with attendee name input
+- **External QR Integration**: Add external QR codes to the system for validation purposes
 - **Analytics Dashboard**: Monitor bookings, events, and user engagement
 - **Content Management**: Upload images, manage descriptions, and organize content
 - **Dynamic Page Content**: Edit about and contact page content directly from the admin interface
@@ -375,6 +377,10 @@ For detailed schema information, see `prisma/schema.prisma`.
 - `POST /api/contact` - Create contact page content (admin)
 - `PUT /api/contact` - Update contact page content (admin)
 - `POST /api/upload` - Upload files (admin)
+
+### Admin QR Management
+- `POST /api/admin/add-qr` - Add external QR codes to system with attendee information (admin)
+- `GET /api/admin/qr-scanner` - Access admin QR scanner interface (admin)
 
 ## 🤝 Contributing
 

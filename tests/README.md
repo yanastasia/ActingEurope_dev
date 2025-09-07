@@ -54,6 +54,8 @@ Tests for QR code generation, verification, and ticket validation:
 - `test-qr-bulk-verification.js` - Bulk QR verification tests
 - `test-qr-security.js` - QR code security and tampering tests
 - `test-ticket-pdf.js` - PDF ticket generation with QR codes
+- `test-admin-qr-scanner.js` - Admin QR scanner interface tests
+- `test-external-qr-integration.js` - External QR code integration tests
 
 ## 🎟️ Booking Tests (`/booking`)
 Tests for the booking system and multi-ticket functionality:
@@ -79,6 +81,8 @@ node tests/qr/test-qr-generation.js
 node tests/qr/test-qr-verification.js
 node tests/qr/test-qr-bulk-verification.js
 node tests/qr/test-qr-security.js
+node tests/qr/test-admin-qr-scanner.js
+node tests/qr/test-external-qr-integration.js
 
 # Booking tests
 node tests/booking/test-single-booking.js
@@ -148,6 +152,26 @@ node tests/email/test-ticket-email.js --single
 node tests/email/test-ticket-email.js --multi
 
 # Test email grouping by attendee email
+node tests/email/test-multi-ticket-email.js --grouping
+```
+
+### 5. Admin QR Scanner Testing
+
+```bash
+# Test admin QR scanner API endpoint
+node tests/qr/test-admin-qr-scanner.js --api
+
+# Test external QR code integration
+node tests/qr/test-external-qr-integration.js --integration
+
+# Test QR code scanning with attendee names
+node tests/qr/test-admin-qr-scanner.js --attendee-names
+
+# Test duplicate QR code prevention
+node tests/qr/test-external-qr-integration.js --duplicates
+
+# Test QR codes without seat assignment
+node tests/qr/test-external-qr-integration.js --no-seat
 node tests/email/test-multi-attendee-booking.js
 ```
 

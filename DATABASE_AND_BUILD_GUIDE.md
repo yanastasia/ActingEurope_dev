@@ -351,6 +351,14 @@ The application now includes a fully database-connected CMS for dynamic content 
 - Secure filename sanitization
 - Files stored in `public/uploads/` directory
 
+### Admin QR Code Management
+- Camera-based QR code scanning interface at `/admin/qr-scanner`
+- Manual QR code input option for backup entry
+- External QR code integration with attendee name association
+- API endpoint: `POST /api/admin/add-qr`
+- Integration with existing QR verification system
+- Support for QR codes not linked to specific seats (validation-only)
+
 ## File Structure
 
 ```
@@ -364,7 +372,11 @@ The application now includes a fully database-connected CMS for dynamic content 
 ├── app/api/                  # API routes (server-side)
 │   ├── about/                # About page content management
 │   ├── contact/              # Contact page content management
+│   ├── admin/                # Admin-specific API endpoints
+│   │   └── add-qr/           # External QR code integration
 │   └── upload/               # File upload handling
+├── app/admin/                # Admin interface pages
+│   └── qr-scanner/           # QR code scanning interface
 ├── components/               # React components
 ├── public/uploads/           # Uploaded files directory
 └── .env                     # Environment variables
