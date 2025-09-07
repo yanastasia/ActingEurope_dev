@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { generateQRCode } from '@/lib/tickets/qr-generator';
 import { parseQrPayload } from '@/lib/tickets/qr';
 
@@ -72,7 +73,7 @@ export default function QRCodeGenerator({
   }
 
   return (
-    <img 
+    <Image 
       src={qrCodeUrl} 
       alt={alt}
       width={size}

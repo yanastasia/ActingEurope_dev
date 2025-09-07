@@ -57,8 +57,8 @@ export default function PerformanceCard({
   }
 
   const getBookingUrl = () => {
-    // Redirect to registration prompt page instead of direct booking
-    return `/register-to-book`
+    // Redirect to registration prompt page with event ID preserved
+    return `/register-to-book?eventId=${id}`
   }
 
   return (
@@ -73,7 +73,7 @@ export default function PerformanceCard({
         {featured && <Badge className="absolute right-2 top-2 bg-primary-gold text-secondary-blue">Featured</Badge>}
       </div>
       <CardHeader className="p-4">
-        <CardTitle className="line-clamp-1 text-xl text-secondary-blue">{title}</CardTitle>
+        <CardTitle className="line-clamp-1 text-xl text-secondary-blue">{t(title) || title}</CardTitle>
         <p className="text-sm font-medium text-muted-foreground">
           {Array.isArray(company) ? company.map((comp: string) => fixCompanyName(t(comp) || comp)).join(' & ') : fixCompanyName(t(company) || company)}
         </p>

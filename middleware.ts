@@ -65,6 +65,15 @@ export async function middleware(request: NextRequest) {
 
   // Redirect authenticated users away from auth routes
   if (isAuthRoute && user) {
+    // Check for redirectTo parameter first
+    const redirectTo = request.nextUrl.searchParams.get('redirectTo')
+    
+    if (redirectTo) {
+      // If there's a redirectTo parameter, use it
+      return NextResponse.redirect(new URL(redirectTo, request.url))
+    }
+    
+    // Otherwise, use role-based default redirects
     // Check if user is admin based on email
     const isAdmin = user.email === 'admin@actingeurope.eu'
     // Check if user is scanner based on email

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { isAdmin } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -319,9 +320,11 @@ const AdminNewsPage = () => {
               <div className="mt-2">
                 {imagePreview ? (
                   <div className="relative inline-block">
-                    <img 
+                    <Image 
                       src={imagePreview} 
                       alt="Preview" 
+                      width={128}
+                      height={128}
                       className="w-32 h-32 object-cover rounded-md"
                     />
                     <Button
@@ -438,9 +441,11 @@ const AdminNewsPage = () => {
                   </p>
                   <p className="mt-2 text-gray-700 line-clamp-3">{mainArticle.content}</p>
                   {mainArticle.imageUrl && (
-                    <img 
+                    <Image 
                       src={mainArticle.imageUrl} 
                       alt={mainArticle.title} 
+                      width={400}
+                      height={192}
                       className="mt-4 w-full h-48 object-cover rounded-md" 
                     />
                   )}

@@ -75,11 +75,8 @@ export async function GET(request: Request) {
       // Handle time formatting more safely
       let timeString = '00:00';
       if (event.eventTime) {
-        // eventTime is a DateTime, convert to time string
-        const timeDate = new Date(event.eventTime);
-        if (!isNaN(timeDate.getTime())) {
-          timeString = timeDate.toTimeString().substring(0, 5);
-        }
+        // eventTime is a DateTime, use direct time string conversion
+        timeString = `${event.eventTime.getHours().toString().padStart(2, '0')}:${event.eventTime.getMinutes().toString().padStart(2, '0')}`;
       }
       
       // Get translated theatre information for primary theatre (for location info)
@@ -104,7 +101,10 @@ export async function GET(request: Request) {
             select: { name: true }
           });
           if (venue) {
-            venueName = venue.name;
+            // Apply translation to venue name
+            const langTranslations = translations[language as keyof typeof translations] || translations.en;
+            const translation = langTranslations && typeof langTranslations === 'object' ? (langTranslations as Record<string, string>)[venue.name] : undefined;
+            venueName = translation || venue.name;
           }
         } catch (error) {
           console.error('Error fetching venue:', error);

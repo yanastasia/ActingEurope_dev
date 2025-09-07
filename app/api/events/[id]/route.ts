@@ -77,12 +77,15 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         month: '2-digit',
         year: 'numeric',
       }).replace(/\//g, '-'),
-      time: new Date(event.event_time).toLocaleTimeString('en-GB', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      }),
-      venue: event.venue?.name || 'TBA',
+      time: `${event.event_time.getHours().toString().padStart(2, '0')}:${event.event_time.getMinutes().toString().padStart(2, '0')}`,
+      venue: (() => {
+        const venueName = event.venue?.name || 'TBA';
+        if (venueName === 'TBA') return venueName;
+        
+        const langTranslations = translations[requestedLanguage as keyof typeof translations] || translations.en;
+        const translation = langTranslations && typeof langTranslations === 'object' ? (langTranslations as Record<string, string>)[venueName] : undefined;
+        return translation || venueName;
+      })(),
       imageUrl: event.image_url || '/placeholder.svg?height=1080&width=1920',
       posterUrl: event.poster_url,
       genre: event.genre || 'Drama',

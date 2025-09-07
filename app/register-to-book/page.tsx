@@ -1,6 +1,6 @@
 "use client"
 
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -11,10 +11,12 @@ import { useAuth } from "@/components/providers/supabase-auth-provider"
 
 export default function RegisterToBookPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { t, language } = useLanguage()
   const { user, loading } = useAuth()
   const [isChecking, setIsChecking] = useState(true)
   const [isMounted, setIsMounted] = useState(false)
+  const eventId = searchParams.get('eventId')
 
   // Ensure component is mounted (client-side)
   useEffect(() => {
@@ -26,14 +28,18 @@ export default function RegisterToBookPage() {
   useEffect(() => {
     if (!loading) {
       if (user) {
-        // User is authenticated, redirect to tickets page
-        router.push('/tickets')
+        // User is authenticated, redirect to seat selection for specific event or tickets page
+        if (eventId) {
+          router.push(`/events/${eventId}/seat-selection`)
+        } else {
+          router.push('/tickets')
+        }
       } else {
         // User is not authenticated, show registration prompt
         setIsChecking(false)
       }
     }
-  }, [user, loading, router])
+  }, [user, loading, router, eventId])
 
   // Show loading while checking authentication or mounting
   if (loading || isChecking || !isMounted) {
@@ -99,7 +105,7 @@ export default function RegisterToBookPage() {
                     {isMounted ? t('createAccountMessage') : 'Join thousands of theatre enthusiasts and secure your spot at Acting Europe 2025.'}
                   </p>
                   
-                  <Link href="/signup">
+                  <Link href={`/auth/signup${eventId ? `?redirectTo=${encodeURIComponent(`/register-to-book?eventId=${eventId}`)}` : ''}`}>
                     <Button className="w-full bg-green-600 hover:bg-green-700">
                       <UserPlus className="mr-2 h-4 w-4" />
                       {isMounted ? t('createAccount') : 'Create Account'}
@@ -120,7 +126,7 @@ export default function RegisterToBookPage() {
                     {isMounted ? t('alreadyHaveAccountMessage') : 'Sign in to your existing account to access your profile and book tickets.'}
                   </p>
                   
-                  <Link href="/login">
+                  <Link href={`/auth/login${eventId ? `?redirectTo=${encodeURIComponent(`/register-to-book?eventId=${eventId}`)}` : ''}`}>
                     <Button variant="outline" className="w-full border-blue-300 text-blue-700 hover:bg-blue-100">
                       <Mail className="mr-2 h-4 w-4" />
                       {isMounted ? t('signIn') : 'Sign In'}

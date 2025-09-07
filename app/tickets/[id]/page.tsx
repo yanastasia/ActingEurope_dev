@@ -4,7 +4,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
 import Image from "next/image"
-import { Calendar, ArrowLeft } from "lucide-react"
+import { Calendar, ArrowLeft, MapPin } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -468,7 +468,14 @@ export default function IndividualTicketPage() {
                       {performance.date} {t("at")} {performance.time}
                     </span>
                   </div>
-
+                  {currentVenue && (
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-primary-gold" />
+                      <span className="font-medium">
+                        {t(currentVenue.name) || currentVenue.name}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

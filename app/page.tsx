@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { ReactNode, useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Newspaper, Calendar, Ticket } from "lucide-react"
@@ -21,6 +21,9 @@ const fixCompanyName = (name: string): string => {
 }
 
 interface EventData {
+  cast: any
+  director: any
+  description: any
   id: number;
   title: string;
   company: string[];
@@ -37,6 +40,9 @@ interface EventData {
 }
 
 interface FormattedPerformance {
+  description: ReactNode
+  subtitle: ReactNode
+  type: string
   id: string;
   title: string;
   company: string[];
@@ -142,7 +148,13 @@ export default function Home() {
           title: t("heroTitle"),
           subtitle: t("heroSubtitle"),
           description: t("heroDescription"),
-          date: t("heroDate")
+          date: t("heroDate"),
+          company: [],
+          time: "",
+          venue: "",
+          imageUrl: "",
+          featured: false,
+          contentLanguage: ""
         }])
       }
     }
@@ -250,7 +262,7 @@ export default function Home() {
                             </div>
                           ) : (
                             <div>
-                              <h1 className="mb-4 text-4xl font-bold md:text-6xl">{slide.title}</h1>
+                              <h1 className="mb-4 text-4xl font-bold md:text-6xl">{t(slide.title) || slide.title}</h1>
                               <h2 className="mb-6 text-xl font-medium text-primary-gold md:text-2xl">
                                 {slide.company ? (Array.isArray(slide.company) ? slide.company.map((comp: string) => fixCompanyName(t(comp) || comp)).join(' & ') : fixCompanyName(t(slide.company) || slide.company)) : "Acting Europe Festival"}
                               </h2>

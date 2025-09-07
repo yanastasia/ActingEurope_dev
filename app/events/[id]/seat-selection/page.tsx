@@ -237,8 +237,8 @@ export default function SeatSelectionPage() {
         <div className="lg:col-span-1">
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl">{event.title}</CardTitle>
-              <CardDescription>{event.theatreName}</CardDescription>
+              <CardTitle className="text-xl">{t(event.title)}</CardTitle>
+              <CardDescription>{t(event.theatreName)}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2 text-sm">
@@ -252,7 +252,7 @@ export default function SeatSelectionPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
-                  {event.venue}
+                  <span>{t(event.venue)}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4" />
