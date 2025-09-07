@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { performances } from '@/lib/performance-data'
 import { getEventTranslationGroup, updateEvent, deleteEventWithTranslations, getTheatreByIdAndLanguage } from '@/lib/database-operations'
 import { translations } from '@/lib/translations'
 

@@ -293,10 +293,9 @@ npm run lint
    - **Deprecated Function Warnings**: Update any usage of `createServerClient` to `createBrowserClient` for SSR compatibility
 
 5. **Missing Performance Data**
-   - If events like "Don Juan" are missing from the database:
-     - Run the data synchronization script: `node reset-events-from-performance-data.js`
-     - Verify theatre and venue ID mappings are correct
-     - Check for foreign key constraint violations in the console output
+   - Events are now managed through the Supabase database
+   - Use the admin interface or API endpoints to manage event data
+   - Verify theatre and venue ID mappings are correct in the database
 
 ### Reset Database
 

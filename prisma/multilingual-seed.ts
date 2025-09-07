@@ -1,4 +1,4 @@
-import { performances } from '../lib/performance-data'
+// Performance data now comes from Supabase database
 import { prisma } from '../lib/prisma'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -156,29 +156,7 @@ const multilingualTheatres = [
   }
 ]
 
-// Multilingual event data based on existing performances
-const createMultilingualEvents = (performances: any[]) => {
-  const languages = ['en', 'bg', 'mk', 'sr']
-  const events: any[] = []
-
-  performances.forEach((performance, index) => {
-    const translationGroupId = uuidv4()
-    
-    languages.forEach(lang => {
-      const event = {
-        ...performance,
-        content_language: lang,
-        translation_group: translationGroupId,
-        title: getTranslatedTitle(performance.title, lang),
-        description: getTranslatedDescription(performance.synopsis || performance.title, lang),
-        genre: getTranslatedGenre(performance.genre || 'Drama', lang)
-      }
-      events.push(event)
-    })
-  })
-
-  return events
-}
+// createMultilingualEvents function removed - events now managed through Supabase
 
 // Translation helper functions
 function getTranslatedTitle(title: string, lang: string): string {
@@ -362,50 +340,12 @@ async function main() {
     },
   })
 
-  // Seed Multilingual Events
-  console.log('🎪 Seeding multilingual events...')
-  const multilingualEvents = createMultilingualEvents(performances)
-  
-  for (const event of multilingualEvents) {
-    // Find matching theatre ID (use first company for theatre lookup)
-    const primaryCompany = event.company[0]
-    const theatreId = theatreMap.get(primaryCompany)
-
-    if (!theatreId) {
-      console.warn(`Skipping event ${event.title}: theatre not found (${primaryCompany})`)
-      continue
-    }
-
-    await prisma.event.create({
-      data: {
-        title: event.title,
-        theatre_id: theatreId,
-        venue_id: venue.id,
-        event_type: 'performance',
-        event_date: new Date(event.date.split('-').reverse().join('-')),
-        event_time: new Date(`1970-01-01T${event.time}:00.000Z`),
-        description: event.description,
-        price: 0, // Default price
-        image_url: event.imageUrl,
-        poster_url: event.posterUrl,
-        language: event.language || 'Bulgarian',
-        performance_language: event.language || 'Bulgarian',
-        genre: event.genre,
-        company: event.company,
-        director: event.director,
-        cast: event.cast,
-        subtitles: event.subtitles,
-        duration: event.duration,
-        content_language: event.content_language,
-        translation_group: event.translation_group,
-        is_featured: false,
-      },
-    })
-  }
+  // Events are now managed through the Supabase database
+  console.log('🎪 Events are managed through Supabase database')
 
   console.log('✅ Multilingual database seeded successfully!')
   console.log(`Created ${multilingualTheatres.length * languages.length} theatre entries`)
-  console.log(`Created ${multilingualEvents.length} event entries`)
+  console.log('Events are managed through Supabase database')
   console.log(`Languages supported: ${languages.join(', ')}`)
 }
 
