@@ -110,46 +110,14 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   } catch (error) {
     console.error('Error fetching event:', error)
     
-    // If database is unavailable (connection limit reached), return fallback data
+    // If database is unavailable, return appropriate error
     if (error instanceof Error && 
         (error.message.includes('Request Unit limit') || 
          error.message.includes('database connections opened') ||
          error.name === 'PrismaClientInitializationError')) {
       
-      console.log('Database unavailable, searching fallback performance data for event ID:', resolvedParams.id)
-      
-      // Find the specific performance by ID
-      const performance = performances.find(p => p.id === resolvedParams.id)
-      
-      if (performance) {
-        // Transform performance data to match expected event format
-        const fallbackEvent = {
-          id: performance.id,
-          title: performance.title,
-          company: performance.company,
-          date: performance.date,
-          time: performance.time,
-          venue: performance.venue,
-          imageUrl: performance.imageUrl,
-          posterUrl: performance.posterUrl,
-          genre: performance.genre,
-          language: performance.language,
-          duration: performance.duration,
-          synopsis: performance.synopsis,
-          director: performance.director,
-          cast: performance.cast,
-          price: 'TBA',
-          eventType: 'performance',
-          isFeatured: false,
-          theatreName: 'Acting Europe Festival',
-          theatreCity: 'Various',
-          theatreCountry: 'Europe',
-        }
-        
-        return NextResponse.json(fallbackEvent)
-      } else {
-        return NextResponse.json({ error: 'Event not found' }, { status: 404 })
-      }
+      console.log('Database unavailable for event ID:', resolvedParams.id)
+      return NextResponse.json({ error: 'Database temporarily unavailable' }, { status: 503 })
     }
     
     return NextResponse.json({ error: 'Failed to fetch event' }, { status: 500 })
