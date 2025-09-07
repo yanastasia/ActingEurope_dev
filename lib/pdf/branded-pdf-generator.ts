@@ -32,10 +32,11 @@ export interface TicketContext {
 
 export interface SeatInfo {
   id: string;
-  row: number;
-  number: string;
+  row: string | number;
+  number: string | number;
   price: number;
   category: string;
+  sectionName?: string;
   attendeeName: string;
   attendeeEmail: string;
 }
@@ -121,16 +122,22 @@ export async function generateBrandedTicketPdf(
   setFontForLanguage(doc, false, 'normal');
   doc.text(`Row: ${seat.row}`, 20, 160);
   doc.text(`Seat: ${seat.number}`, 20, 170);
-  doc.text(`Category: ${seat.category}`, 20, 180);
+  if (seat.sectionName) {
+    doc.text(`Section: ${seat.sectionName}`, 20, 180);
+    doc.text(`Category: ${seat.category}`, 20, 190);
+  } else {
+    doc.text(`Category: ${seat.category}`, 20, 180);
+  }
   
   // Attendee information
   doc.setFontSize(18);
   setFontForLanguage(doc, false, 'bold');
-  doc.text('ATTENDEE', 20, 210);
+  const attendeeY = seat.sectionName ? 220 : 210;
+  doc.text('ATTENDEE', 20, attendeeY);
   
   doc.setFontSize(14);
   setFontForLanguage(doc, false, 'normal');
-  doc.text(`Name: ${seat.attendeeName}`, 20, 225);
+  doc.text(`Name: ${seat.attendeeName}`, 20, attendeeY + 15);
 
   // QR Code
   doc.addImage(qrCodeDataUrl, 'PNG', 140, 140, 50, 50);

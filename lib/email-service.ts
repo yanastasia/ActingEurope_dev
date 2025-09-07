@@ -174,7 +174,20 @@ export async function sendTicketEmail(bookingId: string) {
       user: { select: { email: true } },
       event: { select: { id: true, title: true, event_date: true, event_time: true, venue: true } },
       booked_seats: {
-        include: { seat: { select: { id: true, row_number: true, seat_number: true } } }
+        include: { 
+          seat: { 
+            select: { 
+              id: true, 
+              row_number: true, 
+              seat_number: true,
+              venueSection: {
+                select: {
+                  section_name: true
+                }
+              }
+            } 
+          } 
+        }
       }
     }
   });
@@ -184,7 +197,7 @@ export async function sendTicketEmail(bookingId: string) {
   const bookingWithRelations = booking as typeof booking & {
     user: { email: string };
     event: { id: number; title: string; event_date: Date; event_time: string; venue: any };
-    booked_seats: Array<{ seat: { id: number; row_number: number; seat_number: number } }>;
+    booked_seats: Array<{ seat: { id: number; row_number: number; seat_number: number; venueSection?: { section_name: string } } }>;
   };
 
   const attendeeBySeat: Record<string, string> = {};
@@ -259,6 +272,7 @@ export async function sendTicketEmail(bookingId: string) {
         price: 0,
         category: 'Standard',
         attendeeName: attendeeName,
+        sectionName: bs.seat.venueSection?.section_name,
       }
     );
 
@@ -289,11 +303,16 @@ export async function sendTicketEmail(bookingId: string) {
   const venueNameBg = getTranslation(venueNameEn, 'bg');
 
   // Create bilingual HTML template with proper language context
-  const attendeeSeats = bookingWithRelations.booked_seats.map((bs) => ({
-    attendeeName: attendeeBySeat[bs.seat_id.toString()] || bs.attendee_name || "Attendee",
-    seatLabelEn: `Row ${bs.seat.row_number}, Seat ${bs.seat.seat_number}`,
-    seatLabelBg: `Ред ${bs.seat.row_number}, Място ${bs.seat.seat_number}`
-  }));
+  const attendeeSeats = bookingWithRelations.booked_seats.map((bs) => {
+    const sectionEn = bs.seat.venueSection?.section_name || '';
+    const sectionBg = sectionEn ? (sectionEn.toLowerCase().includes('balcon') || sectionEn.toLowerCase().includes('balkon') ? 'Балкон' : sectionEn) : '';
+    
+    return {
+      attendeeName: attendeeBySeat[bs.seat_id.toString()] || bs.attendee_name || "Attendee",
+      seatLabelEn: sectionEn ? `${sectionEn} - Row ${bs.seat.row_number}, Seat ${bs.seat.seat_number}` : `Row ${bs.seat.row_number}, Seat ${bs.seat.seat_number}`,
+      seatLabelBg: sectionBg ? `${sectionBg} - Ред ${bs.seat.row_number}, Място ${bs.seat.seat_number}` : `Ред ${bs.seat.row_number}, Място ${bs.seat.seat_number}`
+    };
+  });
   
   const seatLabelsEn = attendeeSeats.map(seat => seat.seatLabelEn).join("; ");
   const seatLabelsBg = attendeeSeats.map(seat => seat.seatLabelBg).join("; ");
@@ -502,12 +521,15 @@ export async function sendTicketEmail(bookingId: string) {
         attendeeName_Value: bookingWithRelations.booked_seats.map((bs) => 
           attendeeBySeat[bs.seat_id.toString()] || bs.attendee_name || "Attendee"
         ).join(", "),
-        seatLabel_Value: bookingWithRelations.booked_seats.map((bs) => 
-          `Row ${bs.seat.row_number}, Seat ${bs.seat.seat_number}`
-        ).join("; "),
-        seatLabel_Value_bg: bookingWithRelations.booked_seats.map((bs) => 
-          `Ред ${bs.seat.row_number}, Място ${bs.seat.seat_number}`
-        ).join("; ")
+        seatLabel_Value: bookingWithRelations.booked_seats.map((bs) => {
+          const section = bs.seat.venueSection?.section_name;
+          return section ? `${section} - Row ${bs.seat.row_number}, Seat ${bs.seat.seat_number}` : `Row ${bs.seat.row_number}, Seat ${bs.seat.seat_number}`;
+        }).join("; "),
+        seatLabel_Value_bg: bookingWithRelations.booked_seats.map((bs) => {
+          const section = bs.seat.venueSection?.section_name;
+          const sectionBg = section ? (section.toLowerCase().includes('balcon') || section.toLowerCase().includes('balkon') ? 'Балкон' : section) : '';
+          return sectionBg ? `${sectionBg} - Ред ${bs.seat.row_number}, Място ${bs.seat.seat_number}` : `Ред ${bs.seat.row_number}, Място ${bs.seat.seat_number}`;
+        }).join("; ")
       };
 
       const result = await postmarkTicketClient.sendEmailWithTemplate({

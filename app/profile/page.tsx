@@ -39,8 +39,12 @@ interface BookingData {
     attendee_name: string;
     qr_code_data: string;
     seat: {
+      id: number;
       row_number: number;
       seat_number: number;
+      venueSection?: {
+        section_name: string;
+      };
     };
   }>;
   booking_reference: string;
@@ -53,7 +57,7 @@ interface BookedTicket {
   date: string
   time: string
   venue: string
-  seats: { id: string; row_number: number; seat_number: number; attendee_name: string; qr_code_data: string }[]
+  seats: { id: string; row_number: number; seat_number: number; attendee_name: string; qr_code_data: string; sectionName?: string }[]
   bookingReference: string
   eventId: number
   totalAmount: number
@@ -99,12 +103,13 @@ export default function ProfilePage() {
         time: booking.event.event_time ? 
           new Date(booking.event.event_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : 'TBA',
         venue: booking.event.venue?.name || 'TBA',
-        seats: booking.booked_seats.map((seat) => ({
-          id: seat.id.toString(),
-          row_number: seat.seat.row_number,
-          seat_number: seat.seat.seat_number,
-          attendee_name: seat.attendee_name,
-          qr_code_data: seat.qr_code_data
+        seats: booking.booked_seats.map((bookedSeat) => ({
+          id: bookedSeat.seat.id.toString(),
+          row_number: bookedSeat.seat.row_number,
+          seat_number: bookedSeat.seat.seat_number,
+          attendee_name: bookedSeat.attendee_name,
+          qr_code_data: bookedSeat.qr_code_data,
+          sectionName: bookedSeat.seat.venueSection?.section_name
         })),
         bookingReference: booking.booking_reference,
         eventId: booking.id,
@@ -299,73 +304,92 @@ export default function ProfilePage() {
                           <h3 className="text-lg font-semibold">{ticket.eventTitle}</h3>
                           <Badge>{ticket.bookingReference}</Badge>
                         </div>
-                        {/* Ticket Cards Carousel */}
+                        {/* Ticket Cards Horizontal Scroll */}
                         <div className="relative">
-                          {ticket.seats.length > 1 && (
-                            <>
-                              <button
-                                onClick={() => {
-                                  const currentIndex = currentTicketIndex[ticket.id] || 0;
-                                  const newIndex = currentIndex > 0 ? currentIndex - 1 : ticket.seats.length - 1;
-                                  setCurrentTicketIndex(prev => ({ ...prev, [ticket.id]: newIndex }));
-                                }}
-                                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white border border-gray-200 rounded-full p-2 shadow-md transition-all duration-200"
-                                aria-label="Previous ticket"
-                              >
-                                <ChevronLeft className="h-5 w-5" />
-                              </button>
-                              <button
-                                onClick={() => {
-                                  const currentIndex = currentTicketIndex[ticket.id] || 0;
-                                  const newIndex = currentIndex < ticket.seats.length - 1 ? currentIndex + 1 : 0;
-                                  setCurrentTicketIndex(prev => ({ ...prev, [ticket.id]: newIndex }));
-                                }}
-                                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white border border-gray-200 rounded-full p-2 shadow-md transition-all duration-200"
-                                aria-label="Next ticket"
-                              >
-                                <ChevronRight className="h-5 w-5" />
-                              </button>
-                            </>
-                          )}
-                          <div className="flex justify-center">
-                            {(() => {
-                              const currentIndex = currentTicketIndex[ticket.id] || 0;
-                              const seat = ticket.seats[currentIndex];
-                              return (
-                                <div key={seat.id} className="w-full max-w-md">
-                                  <TicketCard
-                                    bookingReference={ticket.bookingReference}
-                                    attendeeName={seat.attendee_name}
-                                    eventTitle={ticket.eventTitle}
-                                    eventDate={ticket.date}
-                                    eventTime={ticket.time}
-                                    venue={ticket.venue}
-                                    seat={{ row: seat.row_number, number: seat.seat_number }}
-                                    qrPayload={seat.qr_code_data}
-                                    onQRClick={() => {
-                                      setEnlargedQR(seat.qr_code_data);
-                                      // Navigate to next ticket
-                                      const newIndex = currentIndex < ticket.seats.length - 1 ? currentIndex + 1 : 0;
-                                      setCurrentTicketIndex(prev => ({ ...prev, [ticket.id]: newIndex }));
-                                    }}
-                                  />
-                                </div>
-                              );
-                            })()}
-                          </div>
-                          {ticket.seats.length > 1 && (
-                            <div className="flex justify-center mt-4 space-x-2">
-                              {ticket.seats.map((_, index) => (
-                                <button
-                                  key={index}
-                                  onClick={() => setCurrentTicketIndex(prev => ({ ...prev, [ticket.id]: index }))}
-                                  className={`w-2 h-2 rounded-full transition-all duration-200 ${
-                                    (currentTicketIndex[ticket.id] || 0) === index
-                                      ? 'bg-blue-600'
-                                      : 'bg-gray-300 hover:bg-gray-400'
-                                  }`}
+                          {ticket.seats.length === 1 ? (
+                            <div className="flex justify-center">
+                              <div className="w-full max-w-md">
+                                <TicketCard
+                                  bookingReference={ticket.bookingReference}
+                                  attendeeName={ticket.seats[0].attendee_name}
+                                  eventTitle={ticket.eventTitle}
+                                  eventDate={ticket.date}
+                                  eventTime={ticket.time}
+                                  venue={ticket.venue}
+                                  seat={{ 
+                                    row: ticket.seats[0].row_number, 
+                                    number: ticket.seats[0].seat_number,
+                                    id: parseInt(ticket.seats[0].id)
+                                  }}
+                                  qrPayload={ticket.seats[0].qr_code_data}
+                                  sectionName={ticket.seats[0].sectionName}
+                                  onQRClick={() => {
+                                    setEnlargedQR(ticket.seats[0].qr_code_data);
+                                  }}
                                 />
-                              ))}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="relative">
+                              <div className="overflow-x-auto scrollbar-hide scroll-smooth" id={`ticket-slider-${ticket.id}`}>
+                                <div className="flex gap-4 pb-4 px-2 min-w-max">
+                                  {ticket.seats.map((seat, index) => (
+                                    <div 
+                                      key={seat.id} 
+                                      className="flex-shrink-0 w-[350px]"
+                                    >
+                                      <TicketCard
+                                        bookingReference={ticket.bookingReference}
+                                        attendeeName={seat.attendee_name}
+                                        eventTitle={ticket.eventTitle}
+                                        eventDate={ticket.date}
+                                        eventTime={ticket.time}
+                                        venue={ticket.venue}
+                                        seat={{ 
+                                          row: seat.row_number, 
+                                          number: seat.seat_number,
+                                          id: parseInt(seat.id)
+                                        }}
+                                      qrPayload={seat.qr_code_data}
+                                      sectionName={seat.sectionName}
+                                      onQRClick={() => {
+                                         setEnlargedQR(seat.qr_code_data)
+                                       }}
+                                     />
+                                   </div>
+                                 ))}
+                               </div>
+                              </div>
+                              {ticket.seats.length > 1 && (
+                                <div className="flex justify-center gap-2 mt-4">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      const slider = document.getElementById(`ticket-slider-${ticket.id}`);
+                                      if (slider) {
+                                        slider.scrollBy({ left: -370, behavior: 'smooth' });
+                                      }
+                                    }}
+                                    className="h-8 w-8 p-0"
+                                  >
+                                    <ChevronLeft className="h-4 w-4" />
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      const slider = document.getElementById(`ticket-slider-${ticket.id}`);
+                                      if (slider) {
+                                        slider.scrollBy({ left: 370, behavior: 'smooth' });
+                                      }
+                                    }}
+                                    className="h-8 w-8 p-0"
+                                  >
+                                    <ChevronRight className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>

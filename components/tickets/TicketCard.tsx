@@ -14,10 +14,12 @@ interface TicketCardProps {
   seat: {
     row: number;
     number: number;
+    id?: number;
   };
   qrPayload: string;
   className?: string;
   onQRClick?: () => void;
+  sectionName?: string;
 }
 
 export default function TicketCard({
@@ -30,7 +32,8 @@ export default function TicketCard({
   seat,
   qrPayload,
   className = '',
-  onQRClick
+  onQRClick,
+  sectionName
 }: TicketCardProps) {
   const { t, language } = useLanguage();
   const primaryColor = process.env.NEXT_PUBLIC_TICKET_BRAND_PRIMARY || '#021a4a';
@@ -67,6 +70,22 @@ export default function TicketCard({
     
     // Return original text
     return text;
+  };
+
+  const getSeatType = () => {
+    if (sectionName?.toLowerCase().includes('balcony') || sectionName?.toLowerCase().includes('balkon')) {
+      return {
+        type: 'balcony',
+        label: language === 'en' ? 'Balcony' : 'Балкон',
+        color: 'bg-purple-100 text-purple-800'
+      };
+    } else {
+      return {
+        type: 'regular',
+        label: language === 'en' ? 'Regular' : 'Обикновен',
+        color: 'bg-blue-100 text-blue-800'
+      };
+    }
   };
 
   return (
@@ -120,6 +139,17 @@ export default function TicketCard({
                 <p className="text-gray-900 font-medium">{seat.number}</p>
               </div>
             </div>
+
+            {sectionName && (
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  {language === 'en' ? 'Section' : 'Секция'}
+                </label>
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getSeatType().color}`}>
+                  {getSeatType().label}
+                </span>
+              </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">

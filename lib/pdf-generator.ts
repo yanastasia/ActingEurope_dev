@@ -9,6 +9,7 @@ interface TicketInfo {
   time: string
   venue: string
   seat: string
+  sectionName?: string
   attendeeName: string
   bookingReference: string
   qrData: string
@@ -94,6 +95,7 @@ export async function generatePDF(ticketData: TicketData): Promise<Buffer> {
           time: language === 'en' ? 'Time:' : 'Час:',
           venue: language === 'en' ? 'Venue:' : 'Място:',
           seat: language === 'en' ? 'Seat:' : 'Място:',
+          section: language === 'en' ? 'Section:' : 'Секция:',
           attendee: language === 'en' ? 'Attendee:' : 'Посетител:',
           booking: language === 'en' ? 'Booking Reference:' : 'Номер на резервация:',
           ticketId: language === 'en' ? 'Ticket ID:' : 'ID на билет:'
@@ -116,10 +118,20 @@ export async function generatePDF(ticketData: TicketData): Promise<Buffer> {
         doc.fillColor(primaryColor).text(`${labels.seat}`, 70, startY + 140, { continued: true })
         doc.fillColor('#333').text(` ${ticket.seat}`)
 
-        doc.fillColor(primaryColor).text(`${labels.attendee}`, 70, startY + 170, { continued: true })
-        doc.fillColor('#333').text(` ${ticket.attendeeName}`)
-
-        doc.fillColor(primaryColor).text(`${labels.booking}`, 70, startY + 200, { continued: true })
+        if (ticket.sectionName) {
+          doc.fillColor(primaryColor).text(`${labels.section}`, 70, startY + 170, { continued: true })
+          doc.fillColor('#333').text(` ${getDisplayText(ticket.sectionName, language)}`)
+          
+          doc.fillColor(primaryColor).text(`${labels.attendee}`, 70, startY + 200, { continued: true })
+          doc.fillColor('#333').text(` ${ticket.attendeeName}`)
+          
+          doc.fillColor(primaryColor).text(`${labels.booking}`, 70, startY + 230, { continued: true })
+        } else {
+          doc.fillColor(primaryColor).text(`${labels.attendee}`, 70, startY + 170, { continued: true })
+          doc.fillColor('#333').text(` ${ticket.attendeeName}`)
+          
+          doc.fillColor(primaryColor).text(`${labels.booking}`, 70, startY + 200, { continued: true })
+        }
         doc.fillColor('#333').text(` ${ticket.bookingReference}`)
 
         doc.fillColor(primaryColor).text(`${labels.ticketId}`, 70, startY + 230, { continued: true })
