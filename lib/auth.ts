@@ -1,8 +1,9 @@
 // Simple auth utility functions for the Acting Europe application
 
-// Check if an email belongs to an admin (specifically admin@actingeurope.eu)
+// Check if an email belongs to an admin (admin@actingeurope.eu or sales@actingeurope.eu)
 export function isAdminEmail(email: string): boolean {
-  return email.toLowerCase() === "admin@actingeurope.eu"
+  const adminEmails = ["admin@actingeurope.eu", "sales@actingeurope.eu"]
+  return adminEmails.includes(email.toLowerCase())
 }
 
 // Check if an email belongs to the scanner user

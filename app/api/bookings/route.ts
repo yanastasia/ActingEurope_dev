@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { isAdmin } from '@/lib/auth';
+import { isAdmin, isAdminEmail } from '@/lib/auth';
 import { sendTicketEmail } from '@/lib/email-service';
 import { buildQrPayload } from '@/lib/tickets/qr';
 
@@ -213,27 +213,44 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check seat limit: maximum 2 seats per user per event
-    const existingUserBookings = await prisma.booking.findMany({
-      where: {
-        user_id: userId,
-        event_id: eventId,
-        booking_status: { in: ['pending', 'confirmed'] }
-      },
-      include: {
-        booked_seats: true
-      }
+    // Get user details to check if they're an admin
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true }
     });
 
-    const currentlyBookedSeats = existingUserBookings.reduce((total, booking) => {
-      return total + booking.booked_seats.length;
-    }, 0);
-
-    if (currentlyBookedSeats + selectedSeats.length > 2) {
+    if (!user) {
       return NextResponse.json(
-        { error: `You can only reserve a maximum of 2 seats per event. You currently have ${currentlyBookedSeats} seat(s) booked for this event.` },
-        { status: 400 }
+        { error: 'User not found' },
+        { status: 404 }
       );
+    }
+
+    // Check seat limit: maximum 2 seats per user per event (unless user is admin)
+    const userIsAdmin = isAdminEmail(user.email);
+    
+    if (!userIsAdmin) {
+      const existingUserBookings = await prisma.booking.findMany({
+        where: {
+          user_id: userId,
+          event_id: eventId,
+          booking_status: { in: ['pending', 'confirmed'] }
+        },
+        include: {
+          booked_seats: true
+        }
+      });
+
+      const currentlyBookedSeats = existingUserBookings.reduce((total, booking) => {
+        return total + booking.booked_seats.length;
+      }, 0);
+
+      if (currentlyBookedSeats + selectedSeats.length > 2) {
+        return NextResponse.json(
+          { error: `You can only reserve a maximum of 2 seats per event. You currently have ${currentlyBookedSeats} seat(s) booked for this event.` },
+          { status: 400 }
+        );
+      }
     }
 
     // Check if seats are available
