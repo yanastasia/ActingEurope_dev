@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
     const ticketInfo = {
       title: bookedSeat.booking.event.title,
       date: bookedSeat.booking.event.event_date.toLocaleDateString(),
-      time: bookedSeat.booking.event.event_time ? `${bookedSeat.booking.event.event_time.getHours().toString().padStart(2, '0')}:${bookedSeat.booking.event.event_time.getMinutes().toString().padStart(2, '0')}` : '19:00',
+      time: bookedSeat.booking.event.event_time ? bookedSeat.booking.event.event_time.toISOString().slice(11, 16) : '19:00',
       venue: venue,
       seat: `Row ${bookedSeat.seat.row_number}, Seat ${bookedSeat.seat.seat_number}`,
       sectionName: bookedSeat.seat.venueSection?.section_name,
