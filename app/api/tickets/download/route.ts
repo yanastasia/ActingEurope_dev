@@ -9,7 +9,10 @@ export async function GET(request: NextRequest) {
     const seatId = searchParams.get('seatId');
     const attendeeName = searchParams.get('attendeeName');
 
+    console.log('PDF Download Request:', { bookingReference, seatId, attendeeName });
+
     if (!bookingReference || !seatId || !attendeeName) {
+      console.log('Missing parameters:', { bookingReference, seatId, attendeeName });
       return NextResponse.json(
         { error: 'Missing required parameters: bookingReference, seatId, attendeeName' },
         { status: 400 }
@@ -45,11 +48,14 @@ export async function GET(request: NextRequest) {
     });
 
     if (!bookedSeat) {
+      console.log('Ticket not found for:', { bookingReference, seatId, attendeeName });
       return NextResponse.json(
         { error: 'Ticket not found' },
         { status: 404 }
       );
     }
+
+    console.log('Found booked seat:', bookedSeat.id);
 
     // Prepare ticket information for PDF generation
     const venue = typeof bookedSeat.booking.event.venue === 'object' 
@@ -69,7 +75,9 @@ export async function GET(request: NextRequest) {
     };
 
     // Generate PDF
+    console.log('Generating PDF with ticket info:', ticketInfo);
     const pdfBuffer = await generateSingleTicketPDF(ticketInfo);
+    console.log('PDF generated successfully, buffer length:', pdfBuffer.length);
 
     // Create filename
     const filename = `ticket-${bookingReference}-${attendeeName.replace(/\s+/g, '-').toLowerCase()}.pdf`;

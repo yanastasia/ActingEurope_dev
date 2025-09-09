@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getEventsByLanguage, getAllEvents, createEventWithTranslations, getTheatreByIdAndLanguage } from '@/lib/database-operations'
 import { translations } from '@/lib/translations'
+import { formatEventTime } from '@/lib/utils'
 
 // Helper function to fix company names
 const fixCompanyName = (name: string): string => {
@@ -72,11 +73,7 @@ export async function GET(request: Request) {
       const eventDate = new Date(event.eventDate);
       
       // Handle time formatting more safely
-      let timeString = '00:00';
-      if (event.eventTime) {
-        // eventTime is a DateTime, use direct time string conversion
-        timeString = `${event.eventTime.getHours().toString().padStart(2, '0')}:${event.eventTime.getMinutes().toString().padStart(2, '0')}`;
-      }
+      const timeString = formatEventTime(event.eventTime);
       
       // Get translated theatre information for primary theatre (for location info)
       const theatre = await getTheatreByIdAndLanguage(event.theatreId, event.contentLanguage || language || 'en');
@@ -284,11 +281,6 @@ export async function POST(request: Request) {
     })
   } catch (error) {
     console.error('Error creating event:', error)
-    console.error('Error details:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
-    })
     return NextResponse.json({ error: 'Failed to create event' }, { status: 500 })
   }
 }

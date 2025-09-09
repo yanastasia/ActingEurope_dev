@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getEventTranslationGroup, updateEvent, deleteEventWithTranslations, getTheatreByIdAndLanguage } from '@/lib/database-operations'
 import { translations } from '@/lib/translations'
+import { formatEventTime } from '@/lib/utils'
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
@@ -76,7 +77,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         month: '2-digit',
         year: 'numeric',
       }).replace(/\//g, '-'),
-      time: `${event.event_time.getHours().toString().padStart(2, '0')}:${event.event_time.getMinutes().toString().padStart(2, '0')}`,
+      time: formatEventTime(event.event_time),
       venue: (() => {
         const venueName = event.venue?.name || 'TBA';
         if (venueName === 'TBA') return venueName;

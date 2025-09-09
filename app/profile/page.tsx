@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/lib/language-context"
 import { useAuth } from "@/components/providers/supabase-auth-provider"
+import { formatEventTime } from "@/lib/utils"
 import TicketCard from "@/components/tickets/TicketCard"
 import QRCodeGenerator from "@/components/ui/qr-code-generator"
 import { isScanner } from "@/lib/auth"
@@ -101,7 +102,7 @@ export default function ProfilePage() {
         eventTitle: booking.event.title,
         date: new Date(booking.event.event_date).toLocaleDateString(),
         time: booking.event.event_time ? 
-          booking.event.event_time.toISOString().slice(11, 16) : 'TBA',
+          formatEventTime(booking.event.event_time) : 'TBA',
         venue: booking.event.venue?.name || 'TBA',
         seats: booking.booked_seats.map((bookedSeat) => ({
           id: bookedSeat.seat.id.toString(),
