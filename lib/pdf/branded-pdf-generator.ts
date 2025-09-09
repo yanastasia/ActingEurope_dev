@@ -37,7 +37,6 @@ export interface SeatInfo {
   price: number;
   category: string;
   sectionName?: string;
-  attendeeName: string;
   attendeeEmail: string;
 }
 
@@ -129,16 +128,6 @@ export async function generateBrandedTicketPdf(
     doc.text(`Category: ${seat.category}`, 20, 180);
   }
   
-  // Attendee information
-  doc.setFontSize(18);
-  setFontForLanguage(doc, false, 'bold');
-  const attendeeY = seat.sectionName ? 220 : 210;
-  doc.text('ATTENDEE', 20, attendeeY);
-  
-  doc.setFontSize(14);
-  setFontForLanguage(doc, false, 'normal');
-  doc.text(`Name: ${seat.attendeeName}`, 20, attendeeY + 15);
-
   // QR Code
   doc.addImage(qrCodeDataUrl, 'PNG', 140, 140, 50, 50);
   doc.setFontSize(10);

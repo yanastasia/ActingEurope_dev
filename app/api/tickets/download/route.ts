@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { generateSingleTicketPDF } from '@/lib/pdf-generator';
+import { generateBrandedTicketPdf } from '@/lib/pdf/branded-pdf-generator';
+import { formatEventTime } from '@/lib/utils';
 
 export async function GET(request: NextRequest) {
   try {
@@ -25,8 +26,8 @@ export async function GET(request: NextRequest) {
         booking: {
           booking_reference: bookingReference
         },
-        seat_id: parseInt(seatId),
-        attendee_name: attendeeName
+        seat_id: parseInt(seatId)
+        // Note: Using attendeeName from URL parameter instead of database
       },
       include: {
         booking: {
@@ -62,32 +63,45 @@ export async function GET(request: NextRequest) {
       ? bookedSeat.booking.event.venue?.name || 'TBD'
       : bookedSeat.booking.event.venue || 'TBD';
 
-    const ticketInfo = {
-      title: bookedSeat.booking.event.title,
-      date: bookedSeat.booking.event.event_date.toLocaleDateString(),
-      time: bookedSeat.booking.event.event_time ? bookedSeat.booking.event.event_time.toISOString().slice(11, 16) : '19:00',
-      venue: venue,
-      seat: `Row ${bookedSeat.seat.row_number}, Seat ${bookedSeat.seat.seat_number}`,
-      sectionName: bookedSeat.seat.venueSection?.section_name,
-      attendeeName: bookedSeat.attendee_name || 'Guest',
+    // Prepare data for the branded PDF generator
+    const ticketContext = {
       bookingReference: bookedSeat.booking.booking_reference,
-      qrData: bookedSeat.qr_code_data || ''
+      event: {
+        id: bookedSeat.booking.event.id.toString(),
+        title: bookedSeat.booking.event.title,
+        date: bookedSeat.booking.event.event_date.toLocaleDateString('en-GB'),
+        time: bookedSeat.booking.event.event_time ? formatEventTime(bookedSeat.booking.event.event_time) : '19:00',
+        venueName: venue,
+        venueAddress: undefined // Add if available in your data
+      }
+    };
+
+    const seatInfo = {
+      id: bookedSeat.seat.id.toString(),
+      row: bookedSeat.seat.row_number,
+      number: bookedSeat.seat.seat_number,
+      price: 0, // Add actual price if available
+      category: bookedSeat.seat.venueSection?.section_name || 'Standard',
+      sectionName: bookedSeat.seat.venueSection?.section_name,
+      attendeeEmail: '' // Add if available in your data
     };
 
     // Generate PDF
-    console.log('Generating PDF with ticket info:', ticketInfo);
-    const pdfBuffer = await generateSingleTicketPDF(ticketInfo);
+    console.log('Generating PDF with context:', ticketContext, 'and seat:', seatInfo);
+    const { buffer: pdfBuffer } = await generateBrandedTicketPdf(ticketContext, seatInfo);
     console.log('PDF generated successfully, buffer length:', pdfBuffer.length);
 
-    // Create filename
-    const filename = `ticket-${bookingReference}-${attendeeName.replace(/\s+/g, '-').toLowerCase()}.pdf`;
+    // Create filename with proper encoding for non-ASCII characters
+    const safeAttendee = attendeeName.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+    const filename = `ticket-${bookingReference}-${safeAttendee}.pdf`;
+    const encodedFilename = encodeURIComponent(`ticket-${bookingReference}-${attendeeName}.pdf`);
 
     // Return PDF as download
     return new NextResponse(pdfBuffer, {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="${filename}"`,
+        'Content-Disposition': `attachment; filename="${filename}"; filename*=UTF-8''${encodedFilename}`,
         'Content-Length': pdfBuffer.length.toString(),
       },
     });

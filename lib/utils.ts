@@ -6,6 +6,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 // Helper function to format event time consistently across environments
+// All times in the database are GMT+3 and should be displayed as GMT+3
 export function formatEventTime(eventTime: any): string {
   if (!eventTime) return 'TBA';
   
@@ -28,7 +29,7 @@ export function formatEventTime(eventTime: any): string {
     timeObj = new Date(eventTime);
   }
   
-  // Return formatted time as HH:MM
+  // Return formatted time as HH:MM (times are already in GMT+3 from database)
   if (!isNaN(timeObj.getTime())) {
     return `${timeObj.getHours().toString().padStart(2, '0')}:${timeObj.getMinutes().toString().padStart(2, '0')}`;
   }

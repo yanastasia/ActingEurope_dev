@@ -87,7 +87,6 @@ const TicketDocument = ({ ctx, seat }: { ctx: TicketContext; seat: SeatInfo }) =
       
       <View style={styles.ticketSection}>
         <Text style={styles.sectionTitle}>Ticket</Text>
-        <Text style={styles.ticketInfo}>Attendee: {seat.attendeeName}</Text>
         <Text style={styles.ticketInfo}>Seat: Row {seat.row || 'N/A'}, Seat {seat.number || 'N/A'}</Text>
         <Text style={styles.ticketInfo}>Booking Ref: {ctx.bookingReference}</Text>
       </View>

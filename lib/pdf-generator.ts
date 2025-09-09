@@ -10,7 +10,6 @@ interface TicketInfo {
   venue: string
   seat: string
   sectionName?: string
-  attendeeName: string
   bookingReference: string
   qrData: string
 }
@@ -122,15 +121,9 @@ export async function generatePDF(ticketData: TicketData): Promise<Buffer> {
           doc.fillColor(primaryColor).text(`${labels.section}`, 70, startY + 170, { continued: true })
           doc.fillColor('#333').text(` ${getDisplayText(ticket.sectionName, language)}`)
           
-          doc.fillColor(primaryColor).text(`${labels.attendee}`, 70, startY + 200, { continued: true })
-          doc.fillColor('#333').text(` ${ticket.attendeeName}`)
-          
-          doc.fillColor(primaryColor).text(`${labels.booking}`, 70, startY + 230, { continued: true })
-        } else {
-          doc.fillColor(primaryColor).text(`${labels.attendee}`, 70, startY + 170, { continued: true })
-          doc.fillColor('#333').text(` ${ticket.attendeeName}`)
-          
           doc.fillColor(primaryColor).text(`${labels.booking}`, 70, startY + 200, { continued: true })
+        } else {
+          doc.fillColor(primaryColor).text(`${labels.booking}`, 70, startY + 170, { continued: true })
         }
         doc.fillColor('#333').text(` ${ticket.bookingReference}`)
 
@@ -224,7 +217,6 @@ export async function generateSingleTicketPDF(ticketInfo: TicketInfo): Promise<B
 export function generateQRData(data: {
   bookingReference: string;
   seat: string;
-  attendee: string;
   eventId: string | number;
 }): string {
   const ticketId = uuidv4()
@@ -232,7 +224,6 @@ export function generateQRData(data: {
     ticketId,
     bookingReference: data.bookingReference,
     seat: data.seat,
-    attendee: data.attendee,
     eventId: data.eventId,
     timestamp: new Date().toISOString()    
   })

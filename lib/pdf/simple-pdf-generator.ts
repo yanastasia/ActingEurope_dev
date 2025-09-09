@@ -21,7 +21,6 @@ interface SeatInfo {
   number: string;
   price: number;
   category: string;
-  attendeeName: string;
   attendeeEmail: string;
 }
 
@@ -68,7 +67,6 @@ export async function generateSimpleTicketPdf(ctx: TicketContext, seat: SeatInfo
   // Ticket info
   doc.fontSize(14).text('Ticket Information:', { underline: true });
   doc.fontSize(12)
-    .text(`Attendee: ${seat.attendeeName}`)
     .text(`Seat: Row ${seat.row || 'N/A'}, Number ${seat.number || 'N/A'}`)
     .text(`Category: ${seat.category || 'Standard'}`)
     .text(`Booking Reference: ${ctx.bookingReference}`);
