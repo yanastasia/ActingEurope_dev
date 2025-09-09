@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Facebook, Instagram, Twitter, Youtube } from "lucide-react"
+import { Facebook, Instagram } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 
 export default function Footer() {
@@ -51,21 +51,13 @@ export default function Footer() {
           <div className="space-y-3">
             <h3 className="text-lg font-medium text-secondary-blue">{t("followUs")}</h3>
             <div className="flex space-x-4">
-              <Link href="#" className="text-muted-foreground hover:text-primary-gold">
+              <Link href="https://www.facebook.com/share/1Kn9dKY8gM/" className="text-muted-foreground hover:text-primary-gold">
                 <Facebook className="h-5 w-5" />
                 <span className="sr-only">Facebook</span>
               </Link>
-              <Link href="#" className="text-muted-foreground hover:text-primary-gold">
+              <Link href="https://www.instagram.com/actingeurope?igsh=enM4ZHdnc2ZlbGhv" className="text-muted-foreground hover:text-primary-gold">
                 <Instagram className="h-5 w-5" />
                 <span className="sr-only">Instagram</span>
-              </Link>
-              <Link href="#" className="text-muted-foreground hover:text-primary-gold">
-                <Twitter className="h-5 w-5" />
-                <span className="sr-only">Twitter</span>
-              </Link>
-              <Link href="#" className="text-muted-foreground hover:text-primary-gold">
-                <Youtube className="h-5 w-5" />
-                <span className="sr-only">YouTube</span>
               </Link>
             </div>
             <p className="text-sm text-muted-foreground">{t("subscribeNewsletter")}</p>

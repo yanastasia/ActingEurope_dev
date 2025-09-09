@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Mail, Phone, MapPin, Clock, Facebook, Instagram, Twitter, Edit } from 'lucide-react';
+import { Mail, Phone, MapPin, Clock, Facebook, Instagram, Edit } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/lib/language-context';
 import { isAdmin } from '@/lib/auth';
@@ -368,14 +368,11 @@ export default function ContactPage() {
             <div className="mt-6">
               <h3 className="text-lg font-semibold mb-3">{t('followUsContact')}</h3>
               <div className="flex space-x-4">
-                <a href="#" className="text-blue-600 hover:text-blue-800">
+                <a href="https://www.facebook.com/share/1Kn9dKY8gM/" className="text-blue-600 hover:text-blue-800">
                   <Facebook className="w-6 h-6" />
                 </a>
-                <a href="#" className="text-pink-600 hover:text-pink-800">
+                <a href="https://www.instagram.com/actingeurope?igsh=enM4ZHdnc2ZlbGhv" className="text-pink-600 hover:text-pink-800">
                   <Instagram className="w-6 h-6" />
-                </a>
-                <a href="#" className="text-blue-400 hover:text-blue-600">
-                  <Twitter className="w-6 h-6" />
                 </a>
               </div>
             </div>
