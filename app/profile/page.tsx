@@ -101,7 +101,7 @@ export default function ProfilePage() {
         eventTitle: booking.event.title,
         date: new Date(booking.event.event_date).toLocaleDateString(),
         time: booking.event.event_time ? 
-          new Date(booking.event.event_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : 'TBA',
+          booking.event.event_time.toISOString().slice(11, 16) : 'TBA',
         venue: booking.event.venue?.name || 'TBA',
         seats: booking.booked_seats.map((bookedSeat) => ({
           id: bookedSeat.seat.id.toString(),
