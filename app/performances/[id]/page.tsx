@@ -261,7 +261,11 @@ export default function PerformancePage({ params }: { params: Promise<{ id: stri
               )}
               <div className="flex items-center gap-2">
                 <Users className="h-5 w-5 text-primary-gold" />
-                <span className="text-sm">{t('suitableForAges')}</span>
+                <span className="text-sm">
+                  {performance.title === "Aivar or Lutenitsa" || performance.title === "Айвар или лютеница" || performance.title === "Ајвар или лутеница" || performance.title === "Ајвар или лутеница" 
+                    ? t('suitableForAges16') 
+                    : t('suitableForAges')}
+                </span>
               </div>
             </div>
 
