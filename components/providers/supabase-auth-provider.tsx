@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { User, Session } from '@supabase/supabase-js'
-import { clientAuth } from '@/lib/supabase-client'
+import { clientAuth, supabaseClient } from '@/lib/supabase-client'
 import { useRouter } from 'next/navigation'
 import { setAuthenticated, clearAuthentication, isAdminEmail } from '@/lib/auth'
 
@@ -39,12 +39,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const router = useRouter()
 
   useEffect(() => {
-    // Get initial session
+    // Get initial session with mobile browser compatibility
     const getInitialSession = async () => {
       try {
-        const { data: { session }, error } = await clientAuth.getSession()
+        // First try to get session
+        let { data: { session }, error } = await clientAuth.getSession()
+        
+        // If no session found, try to refresh it (helps with mobile browsers)
+        if (!session && !error) {
+          console.log('No session found, attempting refresh...')
+          const refreshResult = await supabaseClient.auth.refreshSession()
+          if (refreshResult.data.session) {
+            session = refreshResult.data.session
+            console.log('Session refreshed successfully')
+          }
+        }
+        
         if (error) {
           console.error('Error getting session:', error)
+          // Clear any stale auth data
+          clearAuthentication()
         } else {
           setSession(session)
           setUser(session?.user ?? null)
@@ -57,7 +71,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
             console.log('Initial Session Debug:', {
               email: session.user.email,
               isAdmin,
-              userRole
+              userRole,
+              userAgent: typeof window !== 'undefined' ? navigator.userAgent : 'server'
             })
             
             setAuthenticated(session.user.email, userRole)
@@ -77,6 +92,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
       } catch (error) {
         console.error('Error in getInitialSession:', error)
+        // Clear any stale auth data on error
+        clearAuthentication()
       } finally {
         setLoading(false)
       }

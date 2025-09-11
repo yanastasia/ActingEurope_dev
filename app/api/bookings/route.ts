@@ -3,6 +3,8 @@ import { prisma } from '@/lib/prisma';
 import { isAdmin, isAdminEmail, canReserveUnlimitedSeats } from '@/lib/auth';
 import { sendTicketEmail } from '@/lib/email-service';
 import { buildQrPayload } from '@/lib/tickets/qr';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 
 // Generate unique booking reference
 function generateBookingReference(): string {
@@ -17,11 +19,14 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const userIdParam = searchParams.get('userId');
     
+    console.log('Bookings API called with userId:', userIdParam);
+    
     // If userId is provided, fetch user's bookings (no admin check needed)
     if (userIdParam) {
       // Validate UUID format
       const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
       if (!uuidRegex.test(userIdParam)) {
+        console.log('Invalid userId format:', userIdParam);
         return NextResponse.json(
           { error: 'Invalid user ID format' },
           { status: 400 }
@@ -29,6 +34,39 @@ export async function GET(request: NextRequest) {
       }
       const userId = userIdParam;
       
+      // Verify session authentication
+        const cookieStore = cookies();
+        const supabase = createServerClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+          {
+            cookies: {
+              async get(name: string) {
+                return (await cookieStore).get(name)?.value;
+              },
+            },
+          }
+        );
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error('Session error:', sessionError);
+        return NextResponse.json({ error: 'Authentication error' }, { status: 401 });
+      }
+      
+      if (!session?.user) {
+        console.log('No authenticated user found');
+        return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+      }
+      
+      if (session.user.id !== userId) {
+        console.log('User ID mismatch:', session.user.id, 'vs', userId);
+        return NextResponse.json({ error: 'Unauthorized access' }, { status: 403 });
+      }
+      
+      console.log('Authentication verified for user:', session.user.id);
+      
+      console.log('Querying database for bookings with user_id:', userId);
       const bookings = await prisma.booking.findMany({
         where: {
           user_id: userId
@@ -75,7 +113,15 @@ export async function GET(request: NextRequest) {
         }
       });
       
+      console.log('Found bookings:', bookings.length, 'for user:', userId);
       return NextResponse.json(bookings);
+    }
+  } catch (error) {
+      console.error('Error in user bookings fetch:', error);
+      return NextResponse.json(
+        { error: 'Failed to fetch user bookings' },
+        { status: 500 }
+      );
     }
     
     // Admin access required for all bookings
@@ -129,6 +175,7 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json(bookings);
+  try {
   } catch (error) {
     console.error('Error fetching bookings:', error);
     return NextResponse.json(

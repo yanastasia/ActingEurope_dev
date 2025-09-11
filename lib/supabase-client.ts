@@ -9,8 +9,23 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables')
 }
 
-// For client components - use SSR-compatible browser client
-export const supabaseClient = createBrowserClient(supabaseUrl, supabaseAnonKey)
+// For client components - use SSR-compatible browser client with enhanced mobile support
+export const supabaseClient = createBrowserClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+    flowType: 'pkce'
+  },
+  global: {
+    headers: {
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    }
+  }
+})
 
 // Auth helper functions for client components
 export const clientAuth = {

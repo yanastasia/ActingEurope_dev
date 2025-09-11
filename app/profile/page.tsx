@@ -85,17 +85,37 @@ export default function ProfilePage() {
   const [enlargedQR, setEnlargedQR] = useState<string | null>(null)
   const [currentTicketIndex, setCurrentTicketIndex] = useState<{[key: string]: number}>({})
 
-  const fetchUserBookings = useCallback(async () => {
-    if (!user?.id) return;
+  const fetchUserBookings = useCallback(async (retryCount = 0) => {
+    if (!user?.id) {
+      console.log('No user ID available for fetching bookings')
+      return;
+    }
     
     setLoadingBookings(true)
     try {
+      console.log('Fetching bookings for user:', user.id, 'Retry count:', retryCount)
+      
       // With Supabase auth integration, user.id is now the UUID that matches our database
-      const response = await fetch(`/api/bookings?userId=${user.id}`)
+      const response = await fetch(`/api/bookings?userId=${user.id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        },
+        credentials: 'include'
+      })
+      
+      console.log('Bookings API response status:', response.status)
+      
       if (!response.ok) {
-        throw new Error('Failed to fetch bookings')
+        const errorText = await response.text()
+        console.error('Bookings API error:', response.status, errorText)
+        throw new Error(`Failed to fetch bookings: ${response.status} ${errorText}`)
       }
+      
       const bookings = await response.json()
+      console.log('Fetched bookings:', bookings?.length || 0, 'bookings')
       
       const formattedTickets: BookedTicket[] = (bookings as BookingData[]).map((booking) => ({
         id: booking.id.toString(),
@@ -118,11 +138,22 @@ export default function ProfilePage() {
       }))
       
       setBookedTickets(formattedTickets)
+      console.log('Successfully formatted tickets:', formattedTickets.length)
     } catch (error) {
       console.error('Error fetching bookings:', error)
+      
+      // Retry logic for mobile browsers
+      if (retryCount < 2) {
+        console.log('Retrying booking fetch in 1 second...')
+        setTimeout(() => {
+          fetchUserBookings(retryCount + 1)
+        }, 1000)
+        return
+      }
+      
       toast({
         title: "Error",
-        description: "Failed to load your bookings. Please try again.",
+        description: "Failed to load your bookings. Please try refreshing the page or logging out and back in.",
         variant: "destructive"
       })
     } finally {
