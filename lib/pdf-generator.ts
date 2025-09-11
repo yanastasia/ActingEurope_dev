@@ -3,6 +3,39 @@ import QRCode from "qrcode"
 import { v4 as uuidv4 } from "uuid"
 import { translations } from './translations'
 
+// Helper function to get fixed event time based on event title
+function getFixedEventTime(eventTitle: string, originalTime: string): string {
+  if (!eventTitle) return originalTime;
+  
+  const title = eventTitle.toLowerCase();
+  
+  // 19:00 events
+  if (title.includes('no man\'s land') || 
+      title.includes('don juan') || 
+      title.includes('waiting artists') || 
+      title.includes('ignorance') ||
+      title.includes('nevedenie')) {
+    return '19:00';
+  }
+  
+  // 16:00 events  
+  if (title.includes('aivar') || 
+      title.includes('lutenitsa') || 
+      title.includes('oh my god') ||
+      title.includes('bozhe moj')) {
+    return '16:00';
+  }
+  
+  // 13:00 workshops
+  if (title.includes('workshop') || 
+      title.includes('работилница')) {
+    return '13:00';
+  }
+  
+  // Return original time as fallback
+  return originalTime;
+}
+
 interface TicketInfo {
   title: string
   date: string
@@ -109,7 +142,7 @@ export async function generatePDF(ticketData: TicketData): Promise<Buffer> {
         doc.fillColor('#333').text(` ${ticket.date}`)
 
         doc.fillColor(primaryColor).text(`${labels.time}`, 70, startY + 80, { continued: true })
-        doc.fillColor('#333').text(` ${ticket.time}`)
+        doc.fillColor('#333').text(` ${getFixedEventTime(ticket.title, ticket.time)}`)
 
         doc.fillColor(primaryColor).text(`${labels.venue}`, 70, startY + 110, { continued: true })
         doc.fillColor('#333').text(` ${getDisplayText(ticket.venue, language)}`)

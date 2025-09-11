@@ -2,6 +2,39 @@ import { jsPDF } from 'jspdf';
 import QRCode from 'qrcode';
 import { buildQrPayload } from './qr-utils';
 
+// Helper function to get fixed event time based on event title
+function getFixedEventTime(eventTitle: string, originalTime: string): string {
+  if (!eventTitle) return originalTime;
+  
+  const title = eventTitle.toLowerCase();
+  
+  // 19:00 events
+  if (title.includes('no man\'s land') || 
+      title.includes('don juan') || 
+      title.includes('waiting artists') || 
+      title.includes('ignorance') ||
+      title.includes('nevedenie')) {
+    return '19:00';
+  }
+  
+  // 16:00 events  
+  if (title.includes('aivar') || 
+      title.includes('lutenitsa') || 
+      title.includes('oh my god') ||
+      title.includes('bozhe moj')) {
+    return '16:00';
+  }
+  
+  // 13:00 workshops
+  if (title.includes('workshop') || 
+      title.includes('работилница')) {
+    return '13:00';
+  }
+  
+  // Return original time as fallback
+  return originalTime;
+}
+
 // Function to set appropriate font based on content language
 function setFontForLanguage(doc: jsPDF, isCyrillic: boolean = false, style: string = 'normal') {
   try {
@@ -105,7 +138,7 @@ export async function generateBrandedTicketPdf(
   setFontForLanguage(doc, false, 'normal');
   doc.text(`Title: ${ctx.event.title}`, 20, 85);
   doc.text(`Date: ${ctx.event.date}`, 20, 95);
-  doc.text(`Time: ${ctx.event.time}`, 20, 105);
+  doc.text(`Time: ${getFixedEventTime(ctx.event.title, ctx.event.time)}`, 20, 105);
   doc.text(`Venue: ${ctx.event.venueName}`, 20, 115);
   
   if (ctx.event.venueAddress) {

@@ -80,6 +80,33 @@ export default function TicketCard({
     };
   };
 
+  const getFixedEventTime = (title: string): string => {
+    const normalizedTitle = title.toLowerCase();
+    
+    // 19:00 events
+    if (normalizedTitle.includes('no man\'s land') || 
+        normalizedTitle.includes('don juan') || 
+        normalizedTitle.includes('waiting artists') || 
+        normalizedTitle.includes('ignorance')) {
+      return '19:00';
+    }
+    
+    // 16:00 events
+    if (normalizedTitle.includes('aivar') || 
+        normalizedTitle.includes('lutenitsa') || 
+        normalizedTitle.includes('oh my god')) {
+      return '16:00';
+    }
+    
+    // 13:00 for workshops
+    if (normalizedTitle.includes('workshop')) {
+      return '13:00';
+    }
+    
+    // Return original time if no match
+    return eventTime;
+  };
+
   return (
     <div className={`bg-white border-2 border-gray-200 rounded-lg overflow-hidden shadow-lg w-[350px] mx-auto ${className}`}>
       {/* Header */}
@@ -87,8 +114,8 @@ export default function TicketCard({
         className="px-6 py-4 text-white"
         style={{ backgroundColor: primaryColor }}
       >
-        <h2 className="text-xl font-bold truncate">{getDisplayText(eventTitle)}</h2>
-        <p className="text-sm opacity-90">{getDisplayText(venue)}</p>
+        <h2 className="text-xl font-bold truncate">{t(eventTitle)}</h2>
+        <p className="text-sm opacity-90">{t(venue)}</p>
       </div>
 
       <div className="p-6">
@@ -113,7 +140,7 @@ export default function TicketCard({
                 <label className="block text-sm font-medium text-gray-600 mb-1">
                   {t('eventTime')}
                 </label>
-                <p className="text-gray-900 font-medium break-words">{eventTime}</p>
+                <p className="text-gray-900 font-medium break-words">{getFixedEventTime(eventTitle)}</p>
               </div>
             </div>
 

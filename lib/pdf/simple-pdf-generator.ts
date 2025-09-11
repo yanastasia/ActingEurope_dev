@@ -2,6 +2,39 @@ import PDFDocument from 'pdfkit';
 import { buildQrPayload } from './qr-utils';
 import QRCode from 'qrcode';
 
+// Helper function to get fixed event time based on event title
+function getFixedEventTime(eventTitle: string, originalTime: string): string {
+  if (!eventTitle) return originalTime;
+  
+  const title = eventTitle.toLowerCase();
+  
+  // 19:00 events
+  if (title.includes('no man\'s land') || 
+      title.includes('don juan') || 
+      title.includes('waiting artists') || 
+      title.includes('ignorance') ||
+      title.includes('nevedenie')) {
+    return '19:00';
+  }
+  
+  // 16:00 events  
+  if (title.includes('aivar') || 
+      title.includes('lutenitsa') || 
+      title.includes('oh my god') ||
+      title.includes('bozhe moj')) {
+    return '16:00';
+  }
+  
+  // 13:00 workshops
+  if (title.includes('workshop') || 
+      title.includes('работилница')) {
+    return '13:00';
+  }
+  
+  // Return original time as fallback
+  return originalTime;
+}
+
 interface TicketContext {
   event: {
     id: string;
@@ -55,7 +88,7 @@ export async function generateSimpleTicketPdf(ctx: TicketContext, seat: SeatInfo
   
   doc.fontSize(12)
     .text(`Date: ${eventDate}`)
-    .text(`Time: ${ctx.event.time || 'TBD'}`)
+    .text(`Time: ${getFixedEventTime(ctx.event.title, ctx.event.time || 'TBD')}`)
     .text(`Venue: ${ctx.event.venueName || ctx.event.venue || 'TBD'}`);
   
   if (ctx.event.address) {
