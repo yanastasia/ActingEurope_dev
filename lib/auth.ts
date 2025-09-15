@@ -8,7 +8,7 @@ export function isAdminEmail(email: string): boolean {
 
 // Check if an email can reserve unlimited seats (admins + sales)
 export function canReserveUnlimitedSeats(email: string): boolean {
-  const unlimitedSeatsEmails = ["admin@actingeurope.eu", "sales@actingeurope.eu"]
+  const unlimitedSeatsEmails = ["admin@actingeurope.eu", "sales@actingeurope.eu", "actingeurope@gmail.com", "tickets@actingeurope.eu"]
   return unlimitedSeatsEmails.includes(email.toLowerCase())
 }
 
