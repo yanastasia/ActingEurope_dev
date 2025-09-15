@@ -4,7 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import { User, Session } from '@supabase/supabase-js'
 import { clientAuth, supabaseClient } from '@/lib/supabase-client'
 import { useRouter } from 'next/navigation'
-import { setAuthenticated, clearAuthentication, isAdminEmail } from '@/lib/auth'
+import { setAuthenticated, clearAuthentication, isAdminEmail, canReserveUnlimitedSeats } from '@/lib/auth'
 
 interface AuthContextType {
   user: User | null
@@ -66,11 +66,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
           // Sync with localStorage if session exists
           if (session?.user?.email) {
             const isAdmin = isAdminEmail(session.user.email)
-            const userRole = isAdmin ? 'admin' : 'user'
+            const hasUnlimitedSeats = canReserveUnlimitedSeats(session.user.email)
+            const userRole = isAdmin ? 'admin' : hasUnlimitedSeats ? 'unlimited' : 'user'
             
             console.log('Initial Session Debug:', {
               email: session.user.email,
               isAdmin,
+              hasUnlimitedSeats,
               userRole,
               userAgent: typeof window !== 'undefined' ? navigator.userAgent : 'server'
             })
@@ -116,11 +118,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
             // User signed in - sync with localStorage
             if (session?.user?.email) {
               const isAdmin = isAdminEmail(session.user.email)
-              const userRole = isAdmin ? 'admin' : 'user'
+              const hasUnlimitedSeats = canReserveUnlimitedSeats(session.user.email)
+              const userRole = isAdmin ? 'admin' : hasUnlimitedSeats ? 'unlimited' : 'user'
               
               console.log('SIGNED_IN Event Debug:', {
                 email: session.user.email,
                 isAdmin,
+                hasUnlimitedSeats,
                 userRole
               })
               
@@ -140,14 +144,37 @@ export function AuthProvider({ children }: AuthProviderProps) {
             // Token was refreshed - ensure localStorage is still set
             if (session?.user?.email) {
               const isAdmin = isAdminEmail(session.user.email)
-              const userRole = isAdmin ? 'admin' : 'user'
+              const hasUnlimitedSeats = canReserveUnlimitedSeats(session.user.email)
+              const userRole = isAdmin ? 'admin' : hasUnlimitedSeats ? 'unlimited' : 'user'
+              
+              console.log('TOKEN_REFRESHED Event Debug:', {
+                email: session.user.email,
+                isAdmin,
+                hasUnlimitedSeats,
+                userRole
+              })
+              
               setAuthenticated(session.user.email, userRole)
               // Dispatch custom event for admin page
               window.dispatchEvent(new CustomEvent('user-logged-in'))
             }
             break
           case 'USER_UPDATED':
-            // User data was updated
+            // User data updated - sync with localStorage
+            if (session?.user?.email) {
+              const isAdmin = isAdminEmail(session.user.email)
+              const hasUnlimitedSeats = canReserveUnlimitedSeats(session.user.email)
+              const userRole = isAdmin ? 'admin' : hasUnlimitedSeats ? 'unlimited' : 'user'
+              
+              console.log('USER_UPDATED Event Debug:', {
+                email: session.user.email,
+                isAdmin,
+                hasUnlimitedSeats,
+                userRole
+              })
+              
+              setAuthenticated(session.user.email, userRole)
+            }
             break
         }
       }

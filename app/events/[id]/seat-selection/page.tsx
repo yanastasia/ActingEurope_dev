@@ -63,7 +63,21 @@ export default function SeatSelectionPage() {
   const [loading, setLoading] = useState(true)
   const [reserving, setReserving] = useState(false)
 
-  const maxSeats = user?.email && canReserveUnlimitedSeats(user.email) ? 999 : 2
+  // Calculate max seats based on user role and unlimited seats function
+  const userRole = typeof window !== 'undefined' ? localStorage.getItem('actingEurope_userRole') : null
+  const isAdmin = userRole === 'admin'
+  const hasUnlimitedRole = userRole === 'unlimited'
+  const canReserveUnlimited = canReserveUnlimitedSeats(user?.email || '')
+  const maxSeats = isAdmin || hasUnlimitedRole || canReserveUnlimited ? 999 : 2
+  
+  console.log('Seat Selection Debug:', {
+    userEmail: user?.email,
+    userRole,
+    isAdmin,
+    hasUnlimitedRole,
+    canReserveUnlimited,
+    maxSeats
+  })
 
   const fetchEventAndSeats = useCallback(async () => {
     try {
@@ -125,12 +139,13 @@ export default function SeatSelectionPage() {
     if (isSelected) {
       setSelectedSeats(selectedSeats.filter(s => s.id !== seat.id))
     } else {
-      if (selectedSeats.length >= maxSeats) {
+      // Check seat limit only for non-unlimited users
+      const userCanReserveUnlimited = user?.email && canReserveUnlimitedSeats(user.email);
+      
+      if (!userCanReserveUnlimited && selectedSeats.length >= 2) {
         toast({
           title: t("seatLimitReached"),
-          description: user?.email && canReserveUnlimitedSeats(user.email) 
-            ? t("adminUnlimitedSeats")
-            : t("seatLimitMessage"),
+          description: t("seatLimitMessage"),
           variant: "destructive"
         })
         return
@@ -179,7 +194,7 @@ export default function SeatSelectionPage() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          event_id: params.id,
+          event_id: parseInt(params.id as string),
           seat_ids: selectedSeats.map(seat => seat.id),
           seats_with_sections: seatsWithSections
         })

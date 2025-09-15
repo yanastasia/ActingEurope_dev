@@ -51,12 +51,7 @@ export default function IndividualTicketPage() {
   }
 
   const [step, setStep] = useState(1) // 1: seat selection, 2: details form, 3: confirmation
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-  })
+  const [formData, setFormData] = useState({})
   const [attendeeNames, setAttendeeNames] = useState<string[]>([])
   const [selectedSeats, setSelectedSeats] = useState<{ id: number, name: string }[]>([])
   const [performance, setPerformance] = useState<any>(null)
@@ -67,7 +62,7 @@ export default function IndividualTicketPage() {
   
   // Check if current user is admin or sales
   const isAdminOrSales = () => {
-    const email = formData.email || getUserEmail() || ''
+    const email = getUserEmail() || ''
     return isAdminEmail(email) || email.toLowerCase() === 'sales@actingeurope.eu'
   }
   const [loading, setLoading] = useState(true)
@@ -216,10 +211,12 @@ export default function IndividualTicketPage() {
     e.preventDefault()
     setIsProcessing(true)
 
-    if (!formData.firstName || !formData.lastName || !formData.email) {
+    // Get user email from session
+    const userEmail = await getUserEmail()
+    if (!userEmail) {
       toast({
-        title: t("missingInformation"),
-        description: t("pleaseCompleteForm"),
+        title: t("authRequired") || "Authentication Required",
+        description: t("pleaseLogin") || "Please log in to book tickets",
         variant: "destructive",
       })
       setIsProcessing(false)
@@ -244,65 +241,22 @@ export default function IndividualTicketPage() {
       }
 
       // Prepare booking data for ticket generation
-      const bookingData = {
+      const ticketData = {
         title: performance.title,
         date: performance.date,
         time: performance.time,
         venue: performance.venue,
         seats: selectedSeats.map(seat => seat.name),
         attendeeNames: attendeeNames,
-        customerName: `${formData.firstName} ${formData.lastName}`,
-        email: formData.email,
-        phone: formData.phone,
+        customerName: userEmail,
+        email: userEmail,
+        phone: "",
         price: performance.rawPrice,
       }
 
-      // Get or create user ID based on email using Supabase auth integration
-      let userId = null;
-      try {
-        const userResponse = await fetch('/api/auth/sync-user', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: formData.email,
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-          }),
-        });
-        
-        if (userResponse.ok) {
-          const userData = await userResponse.json();
-          userId = userData.user?.id;
-        }
-      } catch (error: unknown) {
-        console.error('Failed to sync user:', error);
-        toast({
-          title: "Error",
-          description: "Failed to create user account. Please try again.",
-          variant: "destructive"
-        });
-        return;
-      }
-      
-      if (!userId) {
-        toast({
-          title: "Error",
-          description: "Failed to create user account. Please try again.",
-          variant: "destructive"
-        });
-        return;
-      }
+      // User is already authenticated via session, no need to create/sync user
 
       // Validate data before constructing booking object
-      console.log('=== PRE-BOOKING VALIDATION ===')
-      console.log('performance:', performance)
-      console.log('selectedSeats:', selectedSeats)
-      console.log('attendeeNames:', attendeeNames)
-      console.log('userId:', userId)
-      console.log('===============================')
-
       if (!performance || !performance.id) {
         throw new Error('Performance data is missing or invalid')
       }
@@ -311,55 +265,24 @@ export default function IndividualTicketPage() {
         throw new Error('No seats selected')
       }
 
-      if (!userId || userId <= 0) {
-        throw new Error('Invalid user ID')
-      }
-
       const eventId = parseInt(performance.id.toString().replace('performance-', ''))
       if (isNaN(eventId) || eventId <= 0) {
         throw new Error('Invalid event ID parsed from performance')
       }
 
-      // Use fallback price of 0 for events without pricing (free events)
-      const pricePerSeat = performance.rawPrice || 0
-      const totalAmount = selectedSeats.length * pricePerSeat
-      
-      // Only validate total amount if there's actually a price set
-      if (pricePerSeat > 0 && (isNaN(totalAmount) || totalAmount <= 0)) {
-        throw new Error('Invalid total amount calculated')
-      }
-
-      // Save booking to database
-      const dbBookingData = {
-        userId: userId,
-        eventId: eventId,
-        selectedSeats: selectedSeats.map(seat => seat.id),
+      // Prepare booking data in the format expected by the API
+      const apiBookingData = {
+        event_id: eventId,
+        seat_ids: selectedSeats.map(seat => seat.id),
         attendee_names: selectedSeats.map((seat, index) => ({
           seatId: seat.id.toString(),
           fullName: attendeeNames[index]
         })),
-        totalAmount: totalAmount,
-        customerEmail: formData.email,
-        customerName: `${formData.firstName} ${formData.lastName}`.trim(),
       }
 
-      // Debug logging
-      console.log('=== FRONTEND BOOKING DEBUG ===')
-      console.log('Raw booking data:', {
-        userId,
-        eventId: parseInt(performance.id.toString().replace('performance-', '')),
-        selectedSeats,
-        totalAmount: selectedSeats.length * pricePerSeat,
-        performance,
-      })
-      console.log('dbBookingData being sent:', JSON.stringify(dbBookingData, null, 2))
-      console.log('dbBookingData fields check:')
-      console.log('- userId:', dbBookingData.userId, typeof dbBookingData.userId)
-      console.log('- eventId:', dbBookingData.eventId, typeof dbBookingData.eventId)
-      console.log('- selectedSeats:', dbBookingData.selectedSeats, typeof dbBookingData.selectedSeats)
-      console.log('- totalAmount:', dbBookingData.totalAmount, typeof dbBookingData.totalAmount)
-      console.log('About to make API call to /api/bookings')
-      console.log('===============================')
+      console.log('=== BOOKING REQUEST ===')
+      console.log('API Booking data:', JSON.stringify(apiBookingData, null, 2))
+      console.log('=======================')
 
       // Save booking via API
       const response = await fetch('/api/bookings', {
@@ -367,7 +290,7 @@ export default function IndividualTicketPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(dbBookingData),
+        body: JSON.stringify(apiBookingData),
       })
 
       if (!response.ok) {
@@ -402,12 +325,7 @@ export default function IndividualTicketPage() {
 
   const resetBooking = () => {
     setStep(1)
-    setFormData({
-      firstName: "",
-      lastName: "",
-      email: "",
-      phone: "",
-    })
+    setFormData({})
     setSelectedSeats([])
     setAttendeeNames([])
     setBookingReference("")
@@ -577,50 +495,7 @@ export default function IndividualTicketPage() {
                 </div>
               </div>
 
-              {/* Customer Information Form */}
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">{t("firstName")} *</Label>
-                  <Input
-                    id="firstName"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">{t("lastName")} *</Label>
-                  <Input
-                    id="lastName"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">{t("email")} *</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone">{t("phone")}</Label>
-                  <Input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
+              {/* No additional customer information needed - using logged-in user's email */}
 
               <Button type="submit" className="w-full" disabled={isProcessing}>
                 {isProcessing ? (

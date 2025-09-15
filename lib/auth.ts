@@ -6,10 +6,21 @@ export function isAdminEmail(email: string): boolean {
   return adminEmails.includes(email.toLowerCase())
 }
 
-// Check if an email can reserve unlimited seats (admins + sales)
+// Check if an email has special privileges (admin, sales, or unlimited seats)
+export function hasSpecialPrivileges(email: string): boolean {
+  return canReserveUnlimitedSeats(email)
+}
+
+// Check if an email can reserve unlimited seats (admin, sales, or specific emails)
 export function canReserveUnlimitedSeats(email: string): boolean {
-  const unlimitedSeatsEmails = ["admin@actingeurope.eu", "sales@actingeurope.eu", "actingeurope@gmail.com", "tickets@actingeurope.eu"]
-  return unlimitedSeatsEmails.includes(email.toLowerCase())
+  const unlimitedSeatsEmails = [
+    "admin@actingeurope.eu", 
+    "sales@actingeurope.eu",
+    "actingeurope@gmail.com",
+    "tickets@actingeurope.eu"
+  ];
+  
+  return unlimitedSeatsEmails.includes(email.toLowerCase());
 }
 
 // Check if an email has full admin access (only admin@actingeurope.eu)

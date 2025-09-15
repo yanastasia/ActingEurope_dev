@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/lib/language-context"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 // Removed database-storage import - now using API
-import { isAdmin, isAuthenticated } from "@/lib/auth"
+import { isAdmin, isAuthenticated, canReserveUnlimitedSeats, getUserEmail } from "@/lib/auth"
 
 interface SeatSelectionProps {
   venueId: number | string
@@ -51,6 +51,8 @@ export default function SeatSelection({ venueId, eventId, onSeatsSelected, isUse
 
   const admin = isAdmin()
   const loggedIn = isAuthenticated()
+  const userEmail = getUserEmail()
+  const canReserveUnlimited = userEmail ? canReserveUnlimitedSeats(userEmail) : false
 
   // Helper function to group seats by row for event seats API
   const groupSeatsByRow = (seats: any[]) => {
@@ -222,7 +224,8 @@ export default function SeatSelection({ venueId, eventId, onSeatsSelected, isUse
     if (isSelected) {
       setSelectedSeats(selectedSeats.filter((seat) => seat.name !== seatId))
     } else {
-      if (!isUserAdmin && selectedSeats.length >= 2) {
+      // Check seat limit only for non-unlimited users
+      if (!isUserAdmin && !canReserveUnlimited && selectedSeats.length >= 2) {
         toast({
           title: t("maxSeatsReached"),
           description: t("maxSeatsReachedDesc"),

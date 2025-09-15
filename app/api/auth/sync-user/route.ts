@@ -24,6 +24,11 @@ export async function POST(request: NextRequest) {
   try {
     const { email, firstName, lastName } = await request.json();
     
+    console.log('=== SYNC-USER API CALLED ===');
+    console.log('Email:', email);
+    console.log('FirstName:', firstName);
+    console.log('LastName:', lastName);
+    
     if (!email) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
     }
@@ -70,20 +75,35 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ user: dbUser });
     } else {
       // User exists in Supabase auth, check if they exist in our database
+      console.log('User found in Supabase auth:', authUser.email);
       let dbUser = await prisma.user.findUnique({
         where: { id: authUser.id }
       });
+      console.log('User found in database:', dbUser ? 'Yes' : 'No');
       
       if (!dbUser) {
         // User exists in auth but not in our database, create them
-        dbUser = await prisma.user.create({
-          data: {
-            id: authUser.id,
-            email: authUser.email!,
-            first_name: firstName || authUser.user_metadata?.first_name || '',
-            last_name: lastName || authUser.user_metadata?.last_name || ''
-          }
+        console.log('Creating user in database with data:', {
+          id: authUser.id,
+          email: authUser.email!,
+          first_name: firstName || authUser.user_metadata?.first_name || '',
+          last_name: lastName || authUser.user_metadata?.last_name || ''
         });
+        
+        try {
+          dbUser = await prisma.user.create({
+            data: {
+              id: authUser.id,
+              email: authUser.email!,
+              first_name: firstName || authUser.user_metadata?.first_name || '',
+              last_name: lastName || authUser.user_metadata?.last_name || ''
+            }
+          });
+          console.log('User created successfully:', dbUser);
+        } catch (createError) {
+          console.error('Error creating user in database:', createError);
+          return NextResponse.json({ error: 'Failed to create user in database', details: createError }, { status: 500 });
+        }
       }
       
       return NextResponse.json({ user: dbUser });

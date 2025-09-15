@@ -188,69 +188,71 @@ export async function GET(request: NextRequest) {
 // POST - Create new booking
 export async function POST(request: NextRequest) {
   try {
+    // Get authenticated user from session
+    const cookieStore = cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          async get(name: string) {
+            return (await cookieStore).get(name)?.value;
+          },
+        },
+      }
+    );
+    
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    
+    if (sessionError || !session?.user) {
+      console.log('Authentication error:', sessionError);
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    }
+    
+    const userId = session.user.id;
+    const userEmail = session.user.email;
+    
     const body = await request.json();
     
     // Debug logging for incoming booking data
     console.log('\n=== BOOKING API DEBUG ===');
+    console.log('Authenticated user:', userId, userEmail);
     console.log('Raw request body:', JSON.stringify(body, null, 2));
-    console.log('Body keys:', Object.keys(body));
-    console.log('Body values:', Object.values(body));
     
-    const { userId, eventId, selectedSeats, totalAmount, attendee_names, customerEmail, customerName, seats_with_sections } = body;
+    const { event_id: eventId, seat_ids: selectedSeats, seats_with_sections } = body;
     
     // Debug extracted values
     console.log('Extracted values:');
-    console.log('- userId:', userId, typeof userId);
+    console.log('- userId:', userId);
     console.log('- eventId:', eventId, typeof eventId);
     console.log('- selectedSeats:', selectedSeats, typeof selectedSeats);
-    console.log('- totalAmount:', totalAmount, typeof totalAmount);
-    console.log('- attendee_names:', attendee_names);
-    console.log('- customerEmail:', customerEmail);
-    console.log('- customerName:', customerName);
     console.log('- seats_with_sections:', seats_with_sections);
     console.log('========================\n');
 
     // Validate required fields
-    if (!userId || !eventId || !selectedSeats || totalAmount === undefined || totalAmount === null) {
+    if (!eventId || !selectedSeats) {
       console.log('VALIDATION FAILED - Missing required fields');
       return NextResponse.json(
-        { error: 'Missing required fields: userId, eventId, selectedSeats, totalAmount' },
-        { status: 400 }
-      );
-    }
-
-    // Validate UUID format for userId
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-    if (!uuidRegex.test(userId)) {
-      console.log('VALIDATION FAILED - Invalid userId format');
-      return NextResponse.json(
-        { error: 'Invalid userId format - must be a valid UUID' },
+        { error: 'Missing required fields: event_id, seat_ids' },
         { status: 400 }
       );
     }
 
     if (!Array.isArray(selectedSeats) || selectedSeats.length === 0) {
       return NextResponse.json(
-        { error: 'selectedSeats must be a non-empty array' },
+        { error: 'seat_ids must be a non-empty array' },
         { status: 400 }
       );
     }
 
-    // Validate attendee names
-    if (!attendee_names || !Array.isArray(attendee_names) || attendee_names.length !== selectedSeats.length) {
-      return NextResponse.json(
-        { error: 'attendee_names must be an array with one name per selected seat' },
-        { status: 400 }
-      );
-    }
-
-    // Get event details to find translation group
+    // Get event details to find translation group and price
     const event = await prisma.event.findUnique({
       where: { id: eventId },
       select: {
         id: true,
         translation_group: true,
-        venue_id: true
+        venue_id: true,
+        price: true
       }
     });
 
@@ -261,18 +263,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get user details to check if they're an admin
-    const user = await prisma.user.findUnique({
+    // Get or create user in database
+    let user = await prisma.user.findUnique({
       where: { id: userId },
       select: { email: true }
     });
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
+      // Create user in database if they don't exist
+      user = await prisma.user.create({
+        data: {
+          id: userId,
+          email: userEmail!,
+          first_name: session.user.user_metadata?.first_name || '',
+          last_name: session.user.user_metadata?.last_name || ''
+        },
+        select: { email: true }
+      });
     }
+
+    // Calculate total amount based on event price and number of seats
+    const totalAmount = event.price.toString();
+    
+    // Use user's email as attendee name for all seats
+    const attendee_names = selectedSeats.map(() => userEmail);
 
     // Check seat limit: maximum 2 seats per user per event (unless user can reserve unlimited seats)
     const userCanReserveUnlimited = canReserveUnlimitedSeats(user.email);
@@ -358,7 +372,7 @@ export async function POST(request: NextRequest) {
       // Create booked seats with attendee names and QR codes
       const bookedSeatsData = selectedSeats.map((seat, index) => {
         const seatId = typeof seat === 'object' ? seat.id : seat;
-        const attendeeName = attendee_names[index]?.fullName || attendee_names[index];
+        const attendeeName = attendee_names[index];
         const qrPayload = buildQrPayload(booking.booking_reference, seatId.toString(), eventId);
         
         return {
@@ -415,7 +429,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Send ticket email if customer email is provided
-    if (customerEmail && completeBooking) {
+    if (userEmail && completeBooking) {
       try {
         await sendTicketEmail(completeBooking.id.toString());
       } catch (emailError) {
