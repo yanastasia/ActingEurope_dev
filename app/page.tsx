@@ -90,9 +90,13 @@ export default function Home() {
 
   // Load performances from database
   useEffect(() => {
+    const abortController = new AbortController()
+    
     const fetchEvents = async () => {
       try {
-        const response = await fetch(`/api/events?language=${language}`)
+        const response = await fetch(`/api/events?language=${language}`, {
+          signal: abortController.signal
+        })
         if (!response.ok) {
           throw new Error('Failed to fetch events')
         }
@@ -142,6 +146,9 @@ export default function Home() {
           setFeaturedPerformance(formattedPerformances[randomIndex]);
         }
       } catch (error) {
+        if (error.name === 'AbortError') {
+          return // Request was aborted, don't log error
+        }
         console.error('Error fetching events:', error)
         // Fallback to empty state
 
@@ -163,6 +170,10 @@ export default function Home() {
     }
 
     fetchEvents()
+    
+    return () => {
+      abortController.abort()
+    }
   }, [t, language])
 
   return (

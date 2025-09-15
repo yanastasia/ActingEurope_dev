@@ -160,13 +160,17 @@ export default function IndividualTicketPage() {
 
     const loadVenues = async () => {
       try {
-        const response = await fetch('/api/venues')
+        const response = await fetch('/api/venues', {
+          signal: abortController.signal
+        })
         if (!response.ok) {
           throw new Error('Failed to fetch venues')
         }
         const venuesData = await response.json()
         setVenues(venuesData)
       } catch (error: unknown) {
+        // Ignore aborts triggered by cleanup/unmount or StrictMode re-mount
+        if (error instanceof DOMException && error.name === 'AbortError') return;
         console.error('Error fetching venues:', error)
         setVenues([])
       }

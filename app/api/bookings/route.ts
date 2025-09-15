@@ -219,13 +219,14 @@ export async function POST(request: NextRequest) {
     console.log('Authenticated user:', userId, userEmail);
     console.log('Raw request body:', JSON.stringify(body, null, 2));
     
-    const { event_id: eventId, seat_ids: selectedSeats, seats_with_sections } = body;
+    const { event_id: eventId, seat_ids: selectedSeats, attendee_names: requestAttendeeNames, seats_with_sections } = body;
     
     // Debug extracted values
     console.log('Extracted values:');
     console.log('- userId:', userId);
     console.log('- eventId:', eventId, typeof eventId);
     console.log('- selectedSeats:', selectedSeats, typeof selectedSeats);
+    console.log('- attendee_names:', requestAttendeeNames);
     console.log('- seats_with_sections:', seats_with_sections);
     console.log('========================\n');
 
@@ -285,8 +286,24 @@ export async function POST(request: NextRequest) {
     // Calculate total amount based on event price and number of seats
     const totalAmount = event.price.toString();
     
-    // Use user's email as attendee name for all seats
-    const attendee_names = selectedSeats.map(() => userEmail);
+    // Extract attendee names from request or use user email as fallback
+    let attendee_names: string[];
+    if (requestAttendeeNames && Array.isArray(requestAttendeeNames)) {
+      // Handle both old format (array of strings) and new format (array of objects with fullName)
+      attendee_names = requestAttendeeNames.map((attendee: any) => {
+        if (typeof attendee === 'string') {
+          return attendee;
+        } else if (typeof attendee === 'object' && attendee.fullName) {
+          return attendee.fullName;
+        }
+        return userEmail; // fallback
+      });
+    } else {
+      // Fallback to user email for all seats if no attendee names provided
+      attendee_names = selectedSeats.map(() => userEmail!);
+    }
+    
+    console.log('Final attendee_names:', attendee_names);
 
     // Check seat limit: maximum 2 seats per user per event (unless user can reserve unlimited seats)
     const userCanReserveUnlimited = canReserveUnlimitedSeats(user.email);
