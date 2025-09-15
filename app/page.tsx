@@ -146,7 +146,7 @@ export default function Home() {
           setFeaturedPerformance(formattedPerformances[randomIndex]);
         }
       } catch (error) {
-        if (error.name === 'AbortError') {
+        if ((error as Error).name === 'AbortError') {
           return // Request was aborted, don't log error
         }
         console.error('Error fetching events:', error)
