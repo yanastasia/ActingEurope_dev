@@ -280,7 +280,7 @@ export default function PerformancePage({ params }: { params: Promise<{ id: stri
             <div className="mt-6 rounded-lg bg-muted/30 p-4 text-center text-sm">
               <p className="font-medium">{t('needAssistance')}</p>
               <p className="text-muted-foreground">{t('contactBoxOffice')}</p>
-              <p className="text-primary-gold">tickets@actingeurope.com</p>
+              <p className="text-primary-gold">actingeurope@gmail.com</p>
             </div>
           </div>
         </div>

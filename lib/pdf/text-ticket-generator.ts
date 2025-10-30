@@ -64,7 +64,7 @@ BOOKING REF: ${ctx.bookingReference}
 QR CODE DATA: ${payload}
 
 Please present this ticket at the venue entrance.
-For support, contact: info@actingeurope.com
+For support, contact: actingeurope@gmail.com
 
 ═══════════════════════════════════════════════════════════════
 `;

@@ -1,18 +1,26 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables')
-}
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+const supabaseEnabled = !!supabaseUrl && !!supabaseAnonKey
 
 // For server components and API routes
 export const createSupabaseServerClient = () => {
+  if (!supabaseEnabled) {
+    // Fallback server client with minimal auth interface
+    return {
+      auth: {
+        async getUser() { return { data: { user: null }, error: null } },
+        async getSession() { return { data: { session: null }, error: null } },
+        async signOut() { return { error: null } },
+      }
+    } as any
+  }
+
   const cookieStore = cookies()
 
-  return createServerClient(supabaseUrl, supabaseAnonKey, {
+  return createServerClient(supabaseUrl!, supabaseAnonKey!, {
     cookies: {
       async getAll() {
         return (await cookieStore).getAll()

@@ -17,7 +17,7 @@ const translations = {
     ticketsInOrder: "Tickets in this order",
     attachmentInfo: "We attached a separate PDF file for each attendee. Each person should bring their own PDF or show it on a phone at the entrance.",
     troubleInfo: "Having trouble opening attachments? Reply to this email and we will resend them.",
-    footer: "Acting Europe Festival · tickets@actingeurope.com",
+    footer: "Acting Europe Festival · actingeurope@gmail.com",
     tagline: "Theatre Without Borders"
   },
   bg: {
@@ -26,7 +26,7 @@ const translations = {
     ticketsInOrder: "Билети в тази поръчка",
     attachmentInfo: "Приложихме отделен PDF файл за всеки участник. Всеки човек трябва да донесе своя PDF или да го покаже на телефона на входа.",
     troubleInfo: "Имате проблеми с отварянето на прикачените файлове? Отговорете на този имейл и ще ги изпратим отново.",
-    footer: "Фестивал Acting Europe · tickets@actingeurope.com",
+    footer: "Фестивал Acting Europe · actingeurope@gmail.com",
     tagline: "Театър без граници"
   }
 };

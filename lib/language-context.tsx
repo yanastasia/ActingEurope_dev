@@ -57,6 +57,9 @@ const translations = {
     featuredPerformanceDesc: "Don't miss today's highlight at the festival",
     festivalMoments: "Festival Moments",
     viewFullGallery: "View Full Gallery",
+    // Gallery page
+    galleryDescription: "Explore moments from the Acting Europe Festival through our collection of photos capturing performances, workshops, and special events.",
+    noImagesYet: "No images uploaded yet.",
     ourPartners: "Our Partners",
 
     // Footer
@@ -611,6 +614,9 @@ const translations = {
     featuredPerformanceDesc: "Не пропускайте днешния акцент на фестивала",
     festivalMoments: "Моменти от фестивала",
     viewFullGallery: "Виж пълната галерия",
+    // Gallery page
+    galleryDescription: "Разгледайте моменти от фестивала Acting Europe чрез нашата колекция от снимки, заснемащи представления, уъркшопи и специални събития.",
+    noImagesYet: "Все още няма качени снимки.",
     ourPartners: "Нашите партньори",
 
     // Footer
@@ -1172,6 +1178,9 @@ const translations = {
     featuredPerformanceDesc: "Не го пропуштете денешниот акцент на фестивалот",
     festivalMoments: "Моменти од фестивалот",
     viewFullGallery: "Погледни ја целата галерија",
+    // Gallery page
+    galleryDescription: "Истражете моменти од фестивалот Acting Europe преку нашата колекција фотографии кои ги прикажуваат претстави, работилници и специјални настани.",
+    noImagesYet: "Сѐ уште нема качени фотографии.",
     ourPartners: "Нашите партнери",
 
     // Footer
@@ -1734,6 +1743,9 @@ const translations = {
     featuredPerformanceDesc: "Не пропустите данашњи акценат фестивала",
     festivalMoments: "Моменти са фестивала",
     viewFullGallery: "Погледај комплетну галерију",
+    // Gallery page
+    galleryDescription: "Истражите моменте са фестивала Acting Europe кроз нашу колекцију фотографија које приказују представе, радионице и посебне догађаје.",
+    noImagesYet: "Још увек нема отпремљених фотографија.",
     ourPartners: "Наши партнери",
 
     // Footer

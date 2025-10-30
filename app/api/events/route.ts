@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { getEventsByLanguage, getAllEvents, createEventWithTranslations, getTheatreByIdAndLanguage } from '@/lib/database-operations'
 import { translations } from '@/lib/translations'
 import { formatEventTime } from '@/lib/utils'
+import { createClient } from '@supabase/supabase-js'
 
 // Helper function to fix company names
 const fixCompanyName = (name: string): string => {
@@ -146,18 +147,108 @@ export async function GET(request: Request) {
     return NextResponse.json(transformedEvents);
   } catch (error) {
     console.error('Error fetching events:', error)
-    
-    // If database is unavailable, return appropriate error
-    if (error instanceof Error && 
-        (error.message.includes('Request Unit limit') || 
-         error.message.includes('database connections opened') ||
-         error.name === 'PrismaClientInitializationError')) {
-      
-      console.log('Database unavailable for events fetch')
-      return NextResponse.json({ error: 'Database temporarily unavailable' }, { status: 503 })
+    // Fallback 1: Try Supabase if configured
+    try {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      if (supabaseUrl && supabaseAnonKey) {
+        const { searchParams } = new URL(request.url);
+        const language = searchParams.get('language');
+        const translationGroup = searchParams.get('translationGroup');
+
+        const supabase = createClient(supabaseUrl!, supabaseAnonKey!)
+
+        let eventsData: any[] = []
+        if (translationGroup) {
+          const { data, error: sbError } = await supabase
+            .from('events')
+            .select('*, theatre:theatres(*), venue:venues(*)')
+            .eq('translation_group', translationGroup)
+            .order('content_language', { ascending: true })
+          if (sbError) throw sbError
+          eventsData = data || []
+        } else if (language) {
+          const { data, error: sbError } = await supabase
+            .from('events')
+            .select('*, theatre:theatres(*), venue:venues(*)')
+            .eq('content_language', language)
+            .order('event_date', { ascending: true })
+            .order('event_time', { ascending: true })
+          if (sbError) throw sbError
+          eventsData = data || []
+        } else {
+          const { data, error: sbError } = await supabase
+            .from('events')
+            .select('*, theatre:theatres(*), venue:venues(*)')
+            .order('event_date', { ascending: true })
+            .order('event_time', { ascending: true })
+          if (sbError) throw sbError
+          eventsData = data || []
+        }
+
+        // Map to transformedEvents format
+        const transformedEvents = eventsData.map((event: any) => {
+          const eventDate = new Date(event.event_date)
+          const timeString = formatEventTime(event.event_time)
+
+          // Company names
+          let theatreNames = 'Theatre Name'
+          const companyArr = Array.isArray(event.company) ? event.company : (event.company ? [event.company] : [])
+          const theatreCompanies = companyArr.filter((c: string) => c !== 'ActingEurope')
+          if (theatreCompanies.length > 0) {
+            theatreNames = fixCompanyName(theatreCompanies.join(' & '))
+          }
+
+          // Venue name with translation
+          let venueName = 'TBA'
+          if (event.venue) {
+            const langTranslations = translations[(language as keyof typeof translations) || 'en'] || translations.en
+            const translated = langTranslations && typeof langTranslations === 'object' ? (langTranslations as Record<string, string>)[event.venue.name] : undefined
+            venueName = translated || event.venue.name
+          }
+
+          const translatedCompany = companyArr.map((comp: string) => {
+            const langTranslations = translations[(language as keyof typeof translations) || 'en'] || translations.en
+            const translation = langTranslations && typeof langTranslations === 'object' ? (langTranslations as Record<string, string>)[comp] : undefined
+            return fixCompanyName(translation || comp)
+          })
+
+          return {
+            id: String(event.id),
+            title: event.title,
+            company: translatedCompany,
+            date: eventDate.toISOString().split('T')[0].split('-').reverse().join('-'),
+            time: timeString,
+            venue: venueName,
+            imageUrl: event.image_url || '/placeholder.svg?height=1080&width=1920',
+            posterUrl: event.poster_url,
+            genre: event.genre || 'Drama',
+            language: event.language || 'Bulgarian',
+            duration: event.duration || '120 min',
+            description: event.description,
+            director: event.director,
+            cast: event.cast,
+            price: event.price ? `€${event.price}` : 'Free',
+            eventType: event.event_type,
+            isFeatured: event.is_featured,
+            theatreName: theatreNames,
+            theatreCity: event.theatre?.city || 'City',
+            theatreCountry: event.theatre?.country || 'Country',
+            contentLanguage: event.content_language,
+            translationGroup: event.translation_group,
+            performanceLanguage: event.performance_language,
+            subtitleLanguage: event.subtitle_language
+          }
+        })
+
+        return NextResponse.json(transformedEvents, { status: 200 })
+      }
+    } catch (sbFallbackError) {
+      console.error('Supabase events fallback failed:', sbFallbackError)
     }
-    
-    return NextResponse.json({ error: 'Failed to fetch events' }, { status: 500 })
+
+    // Fallback 2: return empty list so UI can render gracefully
+    return NextResponse.json([], { status: 200 })
   }
 }
 

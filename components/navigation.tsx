@@ -34,6 +34,7 @@ export default function Navigation() {
     { href: "/", labelKey: "home" },
     { href: "/program", labelKey: "program" },
     { href: "/participants", labelKey: "participants" },
+    { href: "/gallery", labelKey: "gallery" },
     { href: "/news", labelKey: "news" },
     { href: "/about", labelKey: "about" },
     { href: "/contact", labelKey: "contact" },

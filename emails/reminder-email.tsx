@@ -1,3 +1,4 @@
+// @ts-ignore
 interface ReminderEmailProps {
   name: string
   eventTitle: string
@@ -68,7 +69,7 @@ export default function ReminderEmail({ name, eventTitle, eventDate, eventTime, 
           color: "#666",
         }}
       >
-        <p>If you have any questions, please contact us at tickets@actingeurope.com</p>
+        <p>If you have any questions, please contact us at actingeurope@gmail.com</p>
         <p>&copy; {new Date().getFullYear()} Acting Europe Festival. All rights reserved.</p>
       </div>
     </div>

@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button"
 import CountdownTimer from "@/components/countdown-timer"
 import QuickLinkCard from "@/components/quick-link-card"
 import PerformanceCard from "@/components/performance-card"
+import { RandomizedGallery } from "@/components/randomized-gallery"
+import { GallerySlideshow } from "@/components/gallery-slideshow"
 import { useLanguage } from "@/lib/language-context"
 // Removed static import - now using API
 
@@ -380,19 +382,7 @@ export default function Home() {
       <section className="bg-muted/30 py-12 md:py-20">
         <div className="container mx-auto px-4">
           <h2 className="mb-12 text-center text-3xl font-bold text-secondary-blue">{t("festivalMoments")}</h2>
-          <div className="grid grid-cols-5 gap-4 mx-auto max-w-fit">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="h-96 relative overflow-hidden rounded-md">
-                <Image
-                  src={`/${['artists_in_waiting.jpg', 'bozhe_moj.jpg', 'don_zhuan.jpg', 'nevedenie.jpg', 'nichija_zemja.jpg'][i-1]}`}
-                  alt={`Gallery image ${i}`}
-                  width={220}
-                  height={310}
-                  className="object-cover transition-transform hover:scale-105"
-                />
-              </div>
-            ))}
-          </div>
+          <GallerySlideshow count={12} intervalMs={3000} />
           <div className="mt-8 text-center">
             <Button variant="outline" asChild>
               <Link href="/gallery">{t("viewFullGallery")}</Link>

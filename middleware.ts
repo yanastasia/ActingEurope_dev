@@ -8,9 +8,44 @@ export async function middleware(request: NextRequest) {
     },
   })
 
+  // Graceful fallback if Supabase env vars are missing
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  // Protected routes that require authentication
+  const protectedRoutes = [
+    '/profile',
+    '/bookings',
+    '/dashboard',
+    '/admin',
+    '/scanner',
+    '/api/bookings',
+    '/api/profile',
+  ]
+
+  // Auth routes that should redirect if user is already logged in
+  const authRoutes = ['/auth/login', '/auth/signup']
+
+  const isProtectedRoute = protectedRoutes.some(route => 
+    request.nextUrl.pathname.startsWith(route)
+  )
+  const isAuthRoute = authRoutes.some(route => 
+    request.nextUrl.pathname.startsWith(route)
+  )
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    // In development without Supabase config, allow public pages
+    if (isProtectedRoute) {
+      const loginUrl = new URL('/auth/login', request.url)
+      loginUrl.searchParams.set('reason', 'missing-supabase-config')
+      return NextResponse.redirect(loginUrl)
+    }
+    return response
+  }
+
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl!,
+    supabaseAnonKey!,
     {
       cookies: {
         getAll() {
@@ -34,27 +69,7 @@ export async function middleware(request: NextRequest) {
   
   // Debug logging removed to prevent EvalError in edge runtime
 
-  // Protected routes that require authentication
-  const protectedRoutes = [
-    '/profile',
-    '/bookings',
-    '/dashboard',
-    '/admin',
-    '/scanner',
-    '/api/bookings',
-    '/api/profile',
-  ]
-
-  // Auth routes that should redirect if user is already logged in
-  const authRoutes = ['/auth/login', '/auth/signup']
-
-  const isProtectedRoute = protectedRoutes.some(route => 
-    request.nextUrl.pathname.startsWith(route)
-  )
-  
-  const isAuthRoute = authRoutes.some(route => 
-    request.nextUrl.pathname.startsWith(route)
-  )
+  // Route checks already computed above
 
   // Redirect to login if accessing protected route without authentication
   if (isProtectedRoute && !user) {

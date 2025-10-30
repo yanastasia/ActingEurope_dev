@@ -23,7 +23,7 @@ export default function ContactPage() {
     content: '',
     address: '',
     phone: '+359 87 696 7588',
-    email: 'info@actingeurope.eu',
+    email: 'actingeurope@gmail.com',
     businessHours: ''
   });
   const [isEditing, setIsEditing] = useState(false);
@@ -50,7 +50,7 @@ export default function ContactPage() {
               content: content.description || t('contactDescription'),
               address: content.address || t('addressText'),
               phone: content.phone || '+359 87 696 7588',
-              email: content.email || 'info@actingeurope.eu',
+              email: content.email || 'actingeurope@gmail.com',
               businessHours: content.businessHours || t('businessHoursText')
             });
             setContactPageId(data.id);

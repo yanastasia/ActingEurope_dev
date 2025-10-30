@@ -50,7 +50,7 @@ export default function TicketEmail(props: TicketSummary) {
           </p>
           
           <div style={{ marginTop: 20, padding: 15, backgroundColor: "#f8f9fa", borderRadius: 4, textAlign: "center" }}>
-            <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>Acting Europe Festival · tickets@actingeurope.com</p>
+            <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>Acting Europe Festival · actingeurope@gmail.com</p>
           </div>
         </div>
       </body>

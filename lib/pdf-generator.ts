@@ -196,8 +196,8 @@ export async function generatePDF(ticketData: TicketData): Promise<Buffer> {
           ? "Please present this ticket (printed or on your mobile device) at the venue entrance."
           : "Моля, представете този билет (отпечатан или на мобилното си устройство) на входа на залата.";
         const footerText2 = language === 'en'
-          ? "For assistance, contact: tickets@actingeurope.com"
-          : "За помощ се свържете с: tickets@actingeurope.com";
+          ? "For assistance, contact: actingeurope@gmail.com"
+: "За помощ се свържете с: actingeurope@gmail.com";
         
         doc
           .fontSize(10)

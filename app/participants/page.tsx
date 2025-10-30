@@ -41,23 +41,31 @@ export default function ParticipantsPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    const controller = new AbortController()
     const fetchTheatres = async () => {
       setLoading(true)
       try {
-        const response = await fetch(`/api/theatres?language=${language}`)
+        const response = await fetch(`/api/theatres?language=${language}`, { signal: controller.signal })
         if (response.ok) {
           const theatreData = await response.json()
           setTheatres(theatreData)
         } else {
-          console.error('Failed to fetch theatres')
+          // Soft-fail: use empty list without noisy console errors
+          setTheatres([])
         }
       } catch (error) {
-        console.error('Error fetching theatres:', error)
+        // Ignore aborts triggered by cleanup/unmount or StrictMode re-mount
+        if (controller.signal.aborted || (error instanceof DOMException && error.name === 'AbortError')) return
+        // Soft-fail on network errors
+        setTheatres([])
       } finally {
         setLoading(false)
       }
     }
     fetchTheatres()
+    return () => {
+      try { controller.abort() } catch {}
+    }
   }, [language])
 
   if (loading) {

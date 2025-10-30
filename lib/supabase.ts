@@ -1,19 +1,29 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+const supabaseEnabled = !!supabaseUrl && !!supabaseAnonKey
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables')
-}
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+const fallbackClient = {
   auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true
+    async signUp() { return { data: { user: null, session: null }, error: { message: 'Supabase is not configured' } } },
+    async signInWithPassword() { return { data: { user: null, session: null }, error: { message: 'Supabase is not configured' } } },
+    async signOut() { return { error: null } },
+    async getSession() { return { data: { session: null }, error: null } },
+    async getUser() { return { data: { user: null }, error: null } },
+    onAuthStateChange() { return { data: { subscription: { unsubscribe(){} } } } }
   }
-})
+} as any
+
+export const supabase = supabaseEnabled
+  ? createClient(supabaseUrl!, supabaseAnonKey!, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true
+      }
+    })
+  : fallbackClient
 
 // Helper functions for authentication
 export const auth = {

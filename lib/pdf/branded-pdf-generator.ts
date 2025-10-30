@@ -179,7 +179,7 @@ export async function generateBrandedTicketPdf(
   doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
   doc.text('Please present this ticket at the venue entrance', 105, 280, { align: 'center' });
-  doc.text('For support, contact: info@actingeurope.com', 105, 287, { align: 'center' });
+  doc.text('For support, contact: actingeurope@gmail.com', 105, 287, { align: 'center' });
 
   // Convert to buffer
   const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
