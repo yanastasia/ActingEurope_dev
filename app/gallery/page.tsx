@@ -122,7 +122,7 @@ export default function GalleryPage() {
                 className="object-cover transition-transform hover:scale-105 duration-300"
                 sizes="(min-width:1024px) 33vw, (min-width:768px) 50vw, 100vw"
                 priority={idx < 6}
-                quality={70}
+                unoptimized
               />
             </button>
           ))}
