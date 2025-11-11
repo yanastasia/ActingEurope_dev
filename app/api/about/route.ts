@@ -1,11 +1,16 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const language = searchParams.get('language') || 'en';
     
+    // If database URL is not configured, return null so client uses translation fallback
+    if (!process.env.DATABASE_URL) {
+      return NextResponse.json(null);
+    }
+    
+    const { prisma } = await import('@/lib/prisma');
     const aboutPage = await prisma.aboutPage.findFirst({
       where: {
         content_language: language
@@ -31,6 +36,10 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    if (!process.env.DATABASE_URL) {
+      return NextResponse.json({ message: 'Database not configured' }, { status: 503 });
+    }
+    const { prisma } = await import('@/lib/prisma');
     const { title, content, contentLanguage, translationGroup } = await request.json();
     
     if (!title || !content || !contentLanguage) {
@@ -55,6 +64,10 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
   try {
+    if (!process.env.DATABASE_URL) {
+      return NextResponse.json({ message: 'Database not configured' }, { status: 503 });
+    }
+    const { prisma } = await import('@/lib/prisma');
     const { id, title, content, contentLanguage, translationGroup } = await request.json();
     
     if (!id || !title || !content || !contentLanguage) {
@@ -80,6 +93,10 @@ export async function PUT(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
+    if (!process.env.DATABASE_URL) {
+      return NextResponse.json({ message: 'Database not configured' }, { status: 503 });
+    }
+    const { prisma } = await import('@/lib/prisma');
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
     

@@ -574,6 +574,12 @@ const translations = {
     businessHours: "Business Hours",
     businessHoursText: "Monday - Friday: 9:00 AM - 5:00 PM",
     followUsContact: "Follow Us",
+    countries: "Countries",
+    users: "Users",
+    bookings: "Bookings",
+    bookedSeats: "Booked Seats",
+    theatres: "Theatres",
+    moreNextYear: "And we have lots more in store for next year!",
   },
   bg: {
     // Navigation
@@ -1017,6 +1023,12 @@ const translations = {
     businessHours: "Работно време",
     businessHoursText: "Понеделник - Петък: 9:00 - 17:00",
     followUsContact: "Последвайте ни",
+    countries: "Държави",
+    users: "Потребители",
+    bookings: "Резервации",
+    bookedSeats: "Резервирани места",
+    theatres: "Театри",
+    moreNextYear: "И още много предстои през следващата година!",
 
     // Authentication
     welcomeBack: "Добре дошли отново",
@@ -1605,6 +1617,12 @@ const translations = {
     businessHours: "Работно време",
     businessHoursText: "Понеделник - Петок: 9:00 - 17:00",
     followUsContact: "Следете не",
+    countries: "Држави",
+    users: "Корисници",
+    bookings: "Резервации",
+    bookedSeats: "Резервирани седишта",
+    theatres: "Театри",
+    moreNextYear: "И многу повеќе ни претстои следната година!",
 
     // Authentication
     welcomeBack: "Добредојдовте назад",
@@ -2167,6 +2185,12 @@ const translations = {
     businessHours: "Радно време",
     businessHoursText: "Понедељак - Петак: 9:00 - 17:00",
     followUsContact: "Пратите нас",
+    countries: "Земље",
+    users: "Корисници",
+    bookings: "Резервације",
+    bookedSeats: "Резервисана седишта",
+    theatres: "Позоришта",
+    moreNextYear: "И много тога нас очекује наредне године!",
 
     // Authentication
     welcomeBack: "Добродошли назад",
