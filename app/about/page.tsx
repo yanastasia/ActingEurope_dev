@@ -42,39 +42,13 @@ const AboutPage = () => {
     setUserIsAdmin(isAdmin());
   }, []);
 
-  // Fetch about page content from database
+  // Use static translation content locally (no DB/API fetch)
   useEffect(() => {
-    const fetchAboutContent = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`/api/about?language=${language}`);
-        if (response.ok) {
-          const data = await response.json();
-          if (data) {
-            setAboutText(data.content || '');
-            setAboutTitle(data.title || t('aboutUs'));
-            setAboutPageId(data.id);
-          } else {
-            // Fallback to translation if no database content
-            setAboutText(t('aboutText'));
-            setAboutTitle(t('aboutUs'));
-          }
-        } else {
-          // Fallback to translation if API fails
-          setAboutText(t('aboutText'));
-          setAboutTitle(t('aboutUs'));
-        }
-      } catch (error) {
-        console.error('Error fetching about content:', error);
-        // Fallback to translation if fetch fails
-        setAboutText(t('aboutText'));
-        setAboutTitle(t('aboutUs'));
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAboutContent();
+    setLoading(true);
+    setAboutText(t('aboutText'));
+    setAboutTitle(t('aboutUs'));
+    setAboutPageId(null);
+    setLoading(false);
   }, [language, t]);
 
   // No stats fetching; values are hardcoded above
