@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 const HARD_STATS = {
   users: 136,
   bookings: 496,
-  bookedSeats: 2041,
+  bookedSeats: 2441,
   performances: 6,
   theatres: 6,
   workshops: 2,
