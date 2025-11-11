@@ -6,6 +6,17 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useLanguage } from '@/lib/language-context';
 import { toast } from 'sonner';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+const HARD_STATS = {
+  users: 136,
+  bookings: 496,
+  bookedSeats: 2041,
+  performances: 6,
+  theatres: 6,
+  workshops: 2,
+  countries: 3,
+}
 
 const AboutPage = () => {
   const { t, language } = useLanguage();
@@ -15,6 +26,17 @@ const AboutPage = () => {
   const [userIsAdmin, setUserIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [aboutPageId, setAboutPageId] = useState(null);
+  // Stats are hardcoded per request; no API calls
+
+  // Translation helper with safe fallback if key is missing
+  const tx = (key: string, fallback: string) => {
+    try {
+      const val = t(key);
+      return val && val !== key ? val : fallback;
+    } catch {
+      return fallback;
+    }
+  };
 
   useEffect(() => {
     setUserIsAdmin(isAdmin());
@@ -54,6 +76,8 @@ const AboutPage = () => {
 
     fetchAboutContent();
   }, [language, t]);
+
+  // No stats fetching; values are hardcoded above
 
   const handleSave = async () => {
     try {
@@ -103,7 +127,9 @@ const AboutPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold mb-6">{aboutTitle}</h1>
+      <h1 className="text-4xl font-bold tracking-tight mb-6 text-center">{aboutTitle}</h1>
+
+      {/* Cards moved below the About text, using brand colors and hardcoded values */}
       {isEditing ? (
         <div className="space-y-4">
           <div>
@@ -132,17 +158,99 @@ const AboutPage = () => {
           </div>
         </div>
       ) : (
-        <div className="prose lg:prose-xl max-w-none">
-          {aboutText.split('\n').map((paragraph, index) => (
-            <p key={index} className="text-lg mb-4">
-              {paragraph}
-            </p>
-          ))}
+        <div className="prose prose-neutral md:prose-lg max-w-3xl mx-auto leading-relaxed">
+          {aboutText
+            .split(/\n\n+/) // break on double newlines to create clearer sections
+            .map((block, index) => (
+              <p key={index} className="mb-4">
+                {block}
+              </p>
+            ))}
           {userIsAdmin && (
-            <Button onClick={() => setIsEditing(true)}>{t('editAboutPage')}</Button>
+            <div className="mt-6">
+              <Button onClick={() => setIsEditing(true)}>{t('editAboutPage')}</Button>
+            </div>
           )}
         </div>
       )}
+
+      {/* Brand-styled stats cards (below text) */}
+      <div className="mt-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {/* Order: Countries, Users, Bookings, Booked Seats, Performances, Theatres, Workshops */}
+          {/* Navy cards with golden numbers */}
+          <Card className="bg-secondary text-secondary-foreground border-secondary/30 shadow-lg">
+            <CardHeader>
+              <CardTitle lang={language} className="text-sm tracking-wide">{tx('countries', 'Countries')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-4xl font-bold text-primary">{HARD_STATS.countries}</div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-secondary text-secondary-foreground border-secondary/30 shadow-lg">
+            <CardHeader>
+              <CardTitle lang={language} className="text-sm tracking-wide">{tx('users', 'Users')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-4xl font-bold text-primary">{HARD_STATS.users}</div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-secondary text-secondary-foreground border-secondary/30 shadow-lg">
+            <CardHeader>
+              <CardTitle lang={language} className="text-sm tracking-wide">{tx('bookings', 'Bookings')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-4xl font-bold text-primary">{HARD_STATS.bookings}</div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-secondary text-secondary-foreground border-secondary/30 shadow-lg">
+            <CardHeader>
+              <CardTitle lang={language} className="text-sm tracking-wide">{tx('bookedSeats', 'Booked Seats')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-4xl font-bold text-primary">{HARD_STATS.bookedSeats}</div>
+            </CardContent>
+          </Card>
+
+          {/* Gold cards with navy text */}
+          <Card className="bg-primary text-secondary-blue border-primary/30 shadow-lg">
+            <CardHeader>
+              <CardTitle lang={language} className="text-sm tracking-wide">{tx('performances', 'Performances')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-4xl font-bold">{HARD_STATS.performances}</div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-primary text-secondary-blue border-primary/30 shadow-lg">
+            <CardHeader>
+              <CardTitle lang={language} className="text-sm tracking-wide">{tx('theatres', 'Theatres')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-4xl font-bold">{HARD_STATS.theatres}</div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-primary text-secondary-blue border-primary/30 shadow-lg">
+            <CardHeader>
+              <CardTitle lang={language} className="text-sm tracking-wide">{tx('workshops', 'Workshops')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-4xl font-bold">{HARD_STATS.workshops}</div>
+            </CardContent>
+          </Card>
+
+          {/* Message card next to Workshops */}
+          <Card className="bg-white/90 text-secondary-blue border-secondary/20 shadow-lg">
+            <CardContent className="p-6">
+              <div lang={language} className="text-lg font-semibold">{tx('moreNextYear', 'And we have lots more in store for next year!')}</div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 };
